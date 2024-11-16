@@ -1,0 +1,53 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@inertiajs/vue3": "^1.0.14",
+        "@tailwindcss/forms": "^0.5.7",
+        "@tailwindcss/typography": "^0.5.10",
+        "@vitejs/plugin-react": "^4.3.3",
+        "@vitejs/plugin-vue": "^5.0.0",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.4",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^1.0.5",
+        "postcss": "^8.4.47",
+        "tailwindcss": "^3.4.14",
+        "vite": "^5.4.10",
+        "vue": "^3.3.13"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^6.6.0",
+        "@geoman-io/leaflet-geoman-free": "^2.17.0",
+        "@vue-leaflet/vue-leaflet": "^0.10.1",
+        "aos": "^2.3.4",
+        "file-saver": "^2.0.5",
+        "flowbite": "^2.5.2",
+        "jszip": "^3.10.1",
+        "leaflet": "^1.9.4",
+        "leaflet-easybutton": "^2.4.0",
+        "leaflet-iconlayers": "^0.2.0",
+        "leaflet-toolbar": "^0.4.0-alpha.2",
+        "leaflet.fullscreen": "^3.0.2",
+        "leaflet.locatecontrol": "^0.82.0",
+        "leaflet.pm": "^2.2.0",
+        "leaflet.polylinemeasure": "^3.0.0",
+        "lucide-vue-next": "^0.456.0",
+        "pinia": "^2.2.6",
+        "tsparticles-slim": "^2.12.0",
+        "vanilla-tilt": "^1.8.1",
+        "vue-leaflet-sidepanel": "^1.1.1",
+        "vue-router": "^4.4.5",
+        "vue2-leaflet-locatecontrol": "^1.0.2",
+        "vue3-carousel": "^0.5.1",
+        "vue3-particles": "^2.12.0",
+        "vuex": "^4.1.0",
+        "xlsx": "^0.18.5",
+        "ziggy": "^2.4.0",
+        "ziggy-js": "github:tightenco/ziggy"
+    }
+}

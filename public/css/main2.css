@@ -1,0 +1,302 @@
+/* HEADER STYLE*/
+.hover-underline-animation {
+    display: inline-block;
+    position: relative;
+    color: #54e954;
+}
+
+.hover-underline-animation:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #20d220;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.hover-underline-animation:hover:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+section {
+    overflow: hidden;
+}
+
+/* HERO STYLE */
+
+.text-hero h1 {
+    font-family: "Poppins", "Roboto", sans-serif;
+    font-size: 2.75rem;
+}
+
+.text-hero h2 {
+    font-size: 2.25rem;
+}
+
+.text-hero h2,
+h3 {
+    font-family: "Roboto", sans-serif;
+}
+
+/* Sections Header
+  --------------------------------*/
+.section-header h3 {
+    font-size: 2rem;
+    color: rgb(252, 252, 252, 0.8);
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 10px;
+    margin-top: 10px;
+}
+
+.section-header h3::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 120px;
+    height: 1px;
+    background: #ddd;
+    bottom: 1px;
+    left: calc(50% - 60px);
+}
+
+.section-header h3::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 2.3rem;
+    height: 3px;
+    background: #18d26e;
+    bottom: 0;
+    left: calc(50% - 20px);
+}
+
+.section-header p {
+    text-align: center;
+    padding-bottom: 20px;
+    color: #333;
+}
+
+/* SECTION CTA */
+#cta {
+    position: relative;
+}
+
+#particles-js {
+    background-color: rgba(17, 17, 17, 0.99);
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 100%;
+}
+
+#cta::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+#cta .container {
+    position: relative;
+    padding: 20px 0 30px 0;
+}
+
+#cta .cta-img {
+    text-align: center;
+    padding: 10px;
+    transform-style: preserve-3d;
+}
+
+#cta .cta-img img {
+    transform: translateZ(100px);
+}
+
+/* SECTION FACTS */
+#facts {
+    background: #fff;
+    background-size: cover;
+    padding: 60px 0 40px 0;
+    margin-top: 40px;
+}
+
+#facts.container {
+    position: relative;
+    padding: 10px 0 20px 0;
+    color: #121212;
+}
+
+.facts-header h3 {
+    color: rgba(15, 15, 15, 0.8);
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 10px;
+    margin-top: 10px;
+}
+
+.facts-header h3::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 120px;
+    height: 1px;
+    background: #ddd;
+    bottom: 1px;
+    left: calc(50% - 60px);
+}
+
+.facts-header h3::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 2.3rem;
+    height: 3px;
+    background: #18d26e;
+    bottom: 0;
+    left: calc(50% - 20px);
+}
+
+.facts-header p {
+    text-align: center;
+    padding-bottom: 20px;
+    color: #333;
+}
+
+.scrollToTopBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+    opacity: 0;
+    background-color: #99d000;
+    border: none;
+    border-radius: 50%;
+    color: rgb(46, 45, 45);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 48px;
+    width: 48px;
+    transform: translateY(100px);
+    transition: all 0.5s ease;
+}
+
+.scrollToTopBtn:hover {
+    background-color: #31bd06;
+}
+
+.showBtn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* FOOTER STYLE */
+
+.footer-3-2 .list-footer li a {
+    color: #40467e;
+    transition: 0.3s;
+}
+
+.footer-3-2 .list-footer li {
+    line-height: 35px;
+    text-decoration: none;
+}
+
+.footer-3-2 .list-footer li:hover a {
+    color: #ff3ea6;
+    transition: 0.3s;
+}
+
+.footer-3-2 .footer-icon {
+    font-weight: 500;
+}
+
+.footer-3-2 .footer-icon .icon-fill:hover path {
+    fill: #ff3ea6;
+}
+
+.footer-3-2 .footer-icon .icon-stroke:hover path {
+    stroke: #ff3ea6;
+}
+
+.footer-3-2 .main {
+    padding: 6rem 1rem;
+}
+
+.footer-3-2 .left-col,
+.footer-3-2 .right-col {
+    width: 100%;
+}
+
+.footer-3-2 .left-col {
+    margin-bottom: 40px;
+}
+
+.footer-3-2 .caption-font {
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    letter-spacing: 1%;
+    color: #121212;
+    margin-top: 1.25rem;
+}
+
+.footer-3-2 .title-font {
+    font: 600 1.25rem/1.75rem "Poppins", sans-serif;
+    margin-bottom: 1.25rem;
+    color: #060c45;
+}
+
+.footer-3-2 .credit-font {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: #121212;
+}
+
+@media (min-width: 576px) {
+    .footer-3-2 .main {
+        background-image: url("https://api.elements.buildwithangga.com/storage/files/2/assets/Footer/Footer3/Footer-3-2.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+    }
+
+    .footer-3-2 .main {
+        padding: 6rem 2rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .footer-3-2 .main {
+        padding: 6rem 4rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .footer-3-2 .main {
+        padding: 6rem 8rem;
+    }
+
+    .footer-3-2 .left-col,
+    .footer-3-2 .right-col {
+        width: 50%;
+    }
+
+    .footer-3-2 .left-col {
+        margin-bottom: 0rem;
+    }
+}
+
+@media (min-width: 1200px) {
+}
+
+/* END FOOTER STYLE */
