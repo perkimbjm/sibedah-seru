@@ -178,7 +178,11 @@ onMounted(() => {
                         type="button"
                         class="w-full flex items-center justify-center gap-3 border border-gray-200 hover:bg-gray-50 py-3 rounded-lg transition-colors"
                     >
-                        <img src="/google.svg" alt="Google" class="w-5 h-5" />
+                        <img
+                            src="/img/google.png"
+                            alt="Google"
+                            class="w-5 h-5"
+                        />
                         Log in with Google
                     </button>
                 </form>
