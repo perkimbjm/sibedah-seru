@@ -11,15 +11,22 @@
 
     @stack('after-style')
 
+    <link rel="preconnect" href="https://fonts.bunny.net">
+
+    <!-- Scripts -->
+    @routes
+    @vite(['resources/js/app.js'])
+
 </head>
 <body class="antialiased overflow-x-hidden">
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
 
     @yield('header')
-
+    @inertia
 
     @yield('content')
+
 
     @yield('faq')
         

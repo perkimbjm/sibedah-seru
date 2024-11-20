@@ -6,19 +6,6 @@ use App\Models\Gallery;
 use Inertia\Inertia;
 
 
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
-
-// Route::get('/', function () {
-//     return view('landingpage');
-// });
-
 Route::get('/', function () {
     return Inertia::render('LandingPage');
 })->name('landingpage');
@@ -42,8 +29,12 @@ Route::get('/gallery/{gallery:slug}', function (Gallery $gallery) {
     return view('gallery-detail', ['title' => 'Galeri Detail', 'gallery' => $gallery]);
 });
 
+// Route::get('/map', function () {
+//     return view('map', ['title' => 'Peta Digital']);
+// })->name('map');
+
 Route::get('/map', function () {
-    return view('map', ['title' => 'Peta Digital']);
+    return Inertia::render('Map/index');
 })->name('map');
 
 Route::get('/webgis', function () {

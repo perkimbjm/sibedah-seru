@@ -18,29 +18,29 @@ createInertiaApp({
             import.meta.glob("./Pages/**/*.vue")
         ),
     setup({ el, App, props, plugin }) {
-        // Buat app instance terlebih dahulu
+        // Inisialisasi aplikasi utama untuk Inertia
         const app = createApp({ render: () => h(App, props) });
 
-        // Buat instance Pinia
+        // Inisialisasi Pinia untuk state management
         const pinia = createPinia();
 
+        // Fungsi untuk memuat AOS (Animate on Scroll)
         const loadAOS = async () => {
             const { default: AOS } = await import("aos");
             await import("aos/dist/aos.css");
             AOS.init();
         };
 
+        // Tambahkan event listener untuk memuat AOS setelah halaman selesai dimuat
         window.addEventListener("load", loadAOS);
 
-        // Register semua plugin
-        app.use(plugin) // Inertia plugin
-            .use(ZiggyVue) // Ziggy plugin
-            .use(pinia); // Pinia plugin
+        // Daftarkan semua plugin
+        app.use(plugin).use(ZiggyVue).use(pinia);
 
-        // Mount app
+        // Mount aplikasi utama ke elemen root
         return app.mount(el);
     },
     progress: {
-        color: "#4B5563",
+        color: "#4B5563", // Warna progress bar
     },
 });

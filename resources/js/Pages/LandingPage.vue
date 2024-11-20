@@ -1,6 +1,6 @@
 <template>
     <MainLayout>
-        <Head title="SIBEDAH SERU" />
+        <Head />
         <Hero />
         <Cta />
         <StatisticCard />

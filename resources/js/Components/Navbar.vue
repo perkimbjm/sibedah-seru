@@ -145,6 +145,14 @@ onMounted(() => {
     checkMobile();
     window.addEventListener("resize", checkMobile);
 });
+
+const page = usePage();
+</script>
+
+<script>
+export default {
+    name: "Navbar",
+};
 </script>
 
 <style scoped>
