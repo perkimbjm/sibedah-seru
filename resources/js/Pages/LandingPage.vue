@@ -7,7 +7,7 @@
         <FeaturesList />
         <GalleryCard />
         <Faq />
-
+        <FooterBar />
         <ScrollTop />
     </MainLayout>
 </template>
@@ -22,6 +22,7 @@ import FeaturesList from "@/Components/FeaturesList.vue";
 import GalleryCard from "@/Components/GalleryCard.vue";
 import Faq from "@/Components/Faq.vue";
 import StatisticCard from "@/Components/StatisticCard.vue";
+import FooterBar from "@/Components/FooterBar.vue";
 </script>
 
 <style>

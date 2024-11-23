@@ -18,6 +18,7 @@
                                 item.label
                             }}</span>
                         </div>
+
                         <div class="flex-shrink-0 pl-4 border-l">
                             <button
                                 class="px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-2"
@@ -73,13 +74,15 @@
                                             ) in listing.images"
                                             :key="idx"
                                             class="w-1.5 h-1.5 rounded-full bg-white/60"
-                                            :class="{ 'bg-white': idx === 0 }"
+                                            :class="{
+                                                'bg-white': idx === 0,
+                                            }"
                                         ></button>
                                     </div>
 
                                     <img
                                         :src="listing.images[0]"
-                                        :alt="listing.title"
+                                        :alt="listing.name"
                                         loading="lazy"
                                         class="w-full h-full object-cover"
                                     />
@@ -90,31 +93,42 @@
                                     <div
                                         class="flex justify-between items-start"
                                     >
-                                        <h3 class="font-medium text-gray-900">
-                                            {{ listing.title }}
-                                        </h3>
                                         <div class="flex items-center">
-                                            <Star
-                                                class="h-4 w-4 text-gray-900"
+                                            <UsersRoundIcon
+                                                class="h-4 w-4 text-gray-800"
+                                            />
+                                            <span
+                                                class="ml-1 font-medium text-gray-800"
+                                                >{{ listing.name }}</span
+                                            >
+                                        </div>
+                                        <div class="flex items-center">
+                                            <Clock
+                                                class="h-4 w-4 text-gray-400"
                                             />
                                             <span class="ml-1 text-sm">{{
-                                                listing.rating
+                                                listing.years
                                             }}</span>
                                         </div>
                                     </div>
-                                    <p class="text-sm text-gray-500">
-                                        {{ listing.location }}
-                                    </p>
-                                    <p class="text-sm text-gray-500">
-                                        {{ listing.dates }}
-                                    </p>
+                                    <div class="flex items-center">
+                                        <MapPinnedIcon
+                                            class="h-4 w-4 mr-2 text-pink-500"
+                                        />
+                                        <p class="text-sm text-gray-500">
+                                            Kec. {{ listing.villages }}
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <MapPin
+                                            class="h-4 w-4 mr-2 text-green-400"
+                                        />
+                                        <p class="text-sm text-gray-500">
+                                            Kec. {{ listing.location }}
+                                        </p>
+                                    </div>
                                     <p class="mt-1">
-                                        <span class="font-medium"
-                                            >Rp{{ listing.price }}</span
-                                        >
-                                        <span class="text-gray-500">
-                                            / malam</span
-                                        >
+                                        <span>{{ listing.detail }}</span>
                                     </p>
                                 </div>
                             </div>
@@ -153,30 +167,25 @@
                 </div>
             </div>
         </div>
+        <FooterBar />
     </MainLayout>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import { ChevronRight } from "lucide-vue-next";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { Head } from "@inertiajs/vue3";
 import MainLayout from "@/Layouts/MainLayout.vue";
+import FooterBar from "@/Components/FooterBar.vue";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import {
     Home,
-    Building2,
-    Bed,
-    Trees,
-    Building,
-    Tent,
-    Mountain,
-    Camera,
-    Castle,
-    Waves,
-    Heart,
-    Star,
     SlidersHorizontal,
+    ChevronRight,
+    MapPin,
+    Clock,
+    MapPinnedIcon,
+    UsersRoundIcon,
 } from "lucide-vue-next";
 
 const showList = ref(false);
@@ -192,57 +201,171 @@ const toggleView = () => {
     }, 300); // Sesuaikan dengan durasi transisi CSS
 };
 
-const navigationItems = [
-    { icon: Home, label: "Pencarian Anda" },
-    { icon: Building2, label: "Kolam renang kamen" },
-    { icon: Bed, label: "Kamar" },
-    { icon: Trees, label: "Pedesaan" },
-    { icon: Building, label: "Kota menarik" },
-    { icon: Mountain, label: "Taman Nasional" },
-    { icon: Tent, label: "Hadap pantai" },
-    { icon: Camera, label: "Pemandangan cantik" },
-    { icon: Castle, label: "Petualangan" },
-    { icon: Waves, label: "Dekat danau" },
-];
+const navigationItems = [{ icon: Home, label: "Pencarian Anda" }];
 
 const listings = ref([
     {
         id: 1,
-        title: "Guesthouse di Kecamatan Banjarmasin Barat",
-        location: "Kamar Terjangkau @Citra Raya Hotel Banjarmasin",
-        dates: "12-17 Nov",
-        price: "239.878",
-        rating: "4.8",
+        name: "Duan",
+        villages: "Desa Teluk Mesjid",
+        location: "Batu Mandi",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
         images: ["/img/rumah/rumah1.jpg"],
     },
     {
         id: 2,
-        title: "Kamar bersama di Kecamatan Banjarmasin Tengah",
-        location: "Perahu untuk bergerak",
-        dates: "16-21 Nov",
-        price: "555.219",
-        rating: "4.9",
+        name: "Sarkowi",
+        villages: "Desa Bangkal",
+        location: "Halong",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
         images: ["/img/rumah/rumah2.png"],
     },
     {
         id: 3,
-        title: "Hotel di Kecamatan Banjarmasin Tengah",
-        location: "Mega kost",
-        dates: "13-18 Nov",
-        price: "182.760",
-        rating: "4.7",
+        name: "Jannatun",
+        villages: "Desa Teluk Bayur",
+        location: "Juai",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
         images: ["/img/rumah/rumah3.png"],
     },
     {
         id: 4,
-        title: "Hotel di Kecamatan Banjarmasin Tengah",
-        location: "Mega kost",
-        dates: "13-18 Nov",
-        price: "182.760",
-        rating: "4.7",
+        name: "Syarifuddin",
+        villages: "Desa Kusambi Hulu",
+        location: "Lampihong",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
         images: ["/img/rumah/rumah4.jpg"],
     },
-    // Add more listings as needed
+    {
+        id: 5,
+        name: "Duan",
+        villages: "Desa Teluk Mesjid",
+        location: "Batu Mandi",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah1.jpg"],
+    },
+    {
+        id: 6,
+        name: "Sarkowi",
+        villages: "Desa Bangkal",
+        location: "Halong",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah2.png"],
+    },
+    {
+        id: 7,
+        name: "Jannatun",
+        villages: "Desa Teluk Bayur",
+        location: "Juai",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah3.png"],
+    },
+    {
+        id: 8,
+        name: "Syarifuddin",
+        villages: "Desa Kusambi Hulu",
+        location: "Lampihong",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah4.jpg"],
+    },
+    {
+        id: 9,
+        name: "Syarifuddin",
+        villages: "Desa Kusambi Hulu",
+        location: "Lampihong",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah4.jpg"],
+    },
+    {
+        id: 10,
+        name: "Duan",
+        villages: "Desa Teluk Mesjid",
+        location: "Batu Mandi",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah1.jpg"],
+    },
+    {
+        id: 11,
+        name: "Sarkowi",
+        villages: "Desa Bangkal",
+        location: "Halong",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah2.png"],
+    },
+    {
+        id: 12,
+        name: "Jannatun",
+        villages: "Desa Teluk Bayur",
+        location: "Juai",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah3.png"],
+    },
+    {
+        id: 13,
+        name: "Syarifuddin",
+        villages: "Desa Kusambi Hulu",
+        location: "Lampihong",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah4.jpg"],
+    },
+    {
+        id: 14,
+        name: "Syarifuddin",
+        villages: "Desa Kusambi Hulu",
+        location: "Lampihong",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah4.jpg"],
+    },
+    {
+        id: 15,
+        name: "Duan",
+        villages: "Desa Teluk Mesjid",
+        location: "Batu Mandi",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah1.jpg"],
+    },
+    {
+        id: 16,
+        name: "Sarkowi",
+        villages: "Desa Bangkal",
+        location: "Halong",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah2.png"],
+    },
+    {
+        id: 17,
+        name: "Jannatun",
+        villages: "Desa Teluk Bayur",
+        location: "Juai",
+        years: "2024",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah3.png"],
+    },
+    {
+        id: 18,
+        name: "Syarifuddin",
+        villages: "Desa Kusambi Hulu",
+        location: "Lampihong",
+        years: "2023",
+        detail: "BANTUAN RUMAH SWADAYA APBD",
+        images: ["/img/rumah/rumah4.jpg"],
+    },
 ]);
 
 // Peta

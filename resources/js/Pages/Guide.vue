@@ -8,9 +8,11 @@
                 class="w-full h-[88vh]"
             ></iframe>
         </div>
+        <FooterBar />
     </MainLayout>
 </template>
 
 <script setup>
+import FooterBar from "@/Components/FooterBar.vue";
 import MainLayout from "@/Layouts/MainLayout.vue";
 </script>

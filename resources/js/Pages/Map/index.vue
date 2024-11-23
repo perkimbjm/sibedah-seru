@@ -1,5 +1,5 @@
 <template>
-    <NavbarLayout>
+    <MainLayout>
         <Head title="Peta Digital" />
         <div
             id="map"
@@ -8,14 +8,16 @@
         >
             <SidePanel />
         </div>
-    </NavbarLayout>
+        <MapModals />
+    </MainLayout>
 </template>
 
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import SidePanel from "@/Components/SidePanel.vue";
-import NavbarLayout from "@/Layouts/NavbarLayout.vue";
+import MainLayout from "@/Layouts/MainLayout.vue";
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import MapModals from "@/Components/MapModals.vue";
 
 const mapInstance = ref(null);
 const loadedScripts = ref([]);
@@ -45,7 +47,7 @@ const TILE_LAYERS = {
     googleSatellite: {
         url: "https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
         options: {
-            maxZoom: 21,
+            maxZoom: 23,
             subdomains: ["mt0", "mt1", "mt2", "mt3"],
             detectRetina: true,
             attribution:
@@ -55,7 +57,7 @@ const TILE_LAYERS = {
     googleMaps: {
         url: "https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
         options: {
-            maxZoom: 21,
+            maxZoom: 23,
             subdomains: ["mt0", "mt1", "mt2", "mt3"],
             detectRetina: true,
             attribution: "Powered by Google , Data Peta: &copy; 2021",
@@ -81,7 +83,7 @@ const TILE_LAYERS = {
     cartoVoyager: {
         url: "https://cartodb-basemaps-1.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}{r}.png",
         options: {
-            maxZoom: 21,
+            maxZoom: 23,
             detectRetina: true,
             attribution:
                 '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -93,7 +95,7 @@ const TILE_LAYERS = {
         options: {
             attribution:
                 "Tiles &copy; RBI Indonesia Geospasial Portal, Badan Informasi Geospasial",
-            maxZoom: 18,
+            maxZoom: 21,
             subdomains: ["server", "services"],
             tileSize: 512,
             zoomOffset: -1,
@@ -126,6 +128,10 @@ const SCRIPTS = [
     {
         src: "https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js",
     },
+    {
+        src: "https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js",
+    },
+    { src: "/js/leaflet.groupedlayercontrol.js" },
     { src: "/js/iconLayers.js" },
     { src: "/js/Leaflet.PolylineMeasure.js" },
     { src: "/js/leaflet.toolbar.js" },
@@ -183,8 +189,8 @@ const initMap = async () => {
         window.cartoVoyager = layers.cartoVoyager;
         window.rbi = layers.rbi;
 
-        const mapCenter = [-2.3167, 115.3667];
-        const mapZoom = 11.5;
+        const mapCenter = [-2.33668, 115.46028];
+        const mapZoom = 18;
 
         mapInstance.value = L.map("map", {
             zoom: mapZoom,
@@ -241,6 +247,66 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
-/* Add any specific styles here */
+<style>
+.leaflet-control-layers-selector {
+    top: 0;
+    border-radius: 3px;
+}
+
+.leaflet-control-layers-selector:hover {
+    background-color: #199900;
+}
+
+[type="checkbox"]:checked,
+[type="checkbox"]:checked:hover,
+[type="checkbox"]:checked:focus,
+[type="radio"]:checked:hover,
+[type="radio"]:checked:focus {
+    border-color: transparent;
+    background-color: #199900;
+}
+
+.leaflet-control-layers-group-name {
+    font-size: small;
+    font-weight: 600;
+    margin-bottom: 0.2em;
+    margin-left: 3px;
+}
+.leaflet-control-layers-group {
+    margin-bottom: 0.5em;
+}
+
+.leaflet-control-layers label {
+    font-size: 1em;
+    top: 0;
+    transition: font-size 0.5s ease, color 0.5s ease;
+}
+
+.leaflet-control-layers label:hover {
+    font-size: 1.025em;
+    color: #199900;
+}
+
+.leaflet-control-layers-scrollbar {
+    overflow-y: scroll;
+    padding-right: 10px;
+}
+
+.leaflet-tooltip.no-background {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: none;
+    -webkit-text-stroke-width: 0.9px;
+    -webkit-text-stroke-color: whitesmoke;
+    -webkit-text-fill-color: black;
+}
+
+.no-background-tooltip {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    text-shadow: 1px 1px 0px #fff, -1px -1px 0px #fff, 1px -1px 0px #fff,
+        -1px 1px 0px #fff;
+}
 </style>

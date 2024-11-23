@@ -41,13 +41,13 @@ Route::get('/webgis', function () {
     return Inertia::render('WebGis');
 })->name('webgis');
 
-Route::get('/complaint', function () {
-    return view('complaint', ['title' => 'Pengaduan']);
-});
+// Route::get('/complaint', function () {
+//     return view('complaint', ['title' => 'Pengaduan']);
+// });
 
-Route::get('/contact', function () {
-    return view('contact', ['title' => 'Kontak']);
-});
+// Route::get('/contact', function () {
+//     return view('contact', ['title' => 'Kontak']);
+// });
 
 Route::get('/bedah', function () {
     return Inertia::render('HomeListing');
@@ -65,6 +65,10 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/login');
 })->name('logout');
+
+Route::get('/proxy/wfs', 'ProxyController@proxyGeoserverWFS')->name('proxyWFS'); //
+
+Route::get('/proxy/wms', 'ProxyController@proxyGeoserverWMS')->name('proxyWMS');
 
 
 

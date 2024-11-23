@@ -17,6 +17,7 @@ createInertiaApp({
             `./Pages/${name}.vue`,
             import.meta.glob("./Pages/**/*.vue")
         ),
+
     setup({ el, App, props, plugin }) {
         // Inisialisasi aplikasi utama untuk Inertia
         const app = createApp({ render: () => h(App, props) });
@@ -35,7 +36,7 @@ createInertiaApp({
         window.addEventListener("load", loadAOS);
 
         // Daftarkan semua plugin
-        app.use(plugin).use(ZiggyVue).use(pinia);
+        app.use(plugin).use(ZiggyVue, Ziggy).use(pinia);
 
         // Mount aplikasi utama ke elemen root
         return app.mount(el);
