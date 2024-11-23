@@ -16,14 +16,17 @@
                         <h1 class="text-4xl font-semibold font-lato py-3">
                             SIBEDAH SERU
                         </h1>
-                        <h3 class="text-2xl font-lato">SISTEM INFORMASI</h3>
-                        <h3 class="text-2xl font-lato">BEDAH SERIBU RUMAH</h3>
-                        <h3 class="text-2xl font-lato">KABUPATEN BALANGAN</h3>
+                        <h3 class="text-3xl font-lato">SISTEM INFORMASI</h3>
+                        <h3 class="text-3xl font-lato">BEDAH SERIBU RUMAH</h3>
+                        <h4 class="text-xl mt-2 font-lato">
+                            BID. PERUMAHAN RAKYAT & KAWASAN PERMUKIMAN
+                        </h4>
+                        <h4 class="text-xl font-lato">KABUPATEN BALANGAN</h4>
                         <div class="text-center lg:text-left mb-10">
                             <a
                                 href="#cta"
                                 class="box-border appearance-none bg-[#f8f550] border-2 border-[#f8f550] text-[#292928] cursor-pointer self-center text-base font-semibold leading-none text-center uppercase font-montserrat hover:bg-[#ffc802] hover:text-[#1a1919] focus:outline-nonefirst scrollto rounded-full my-3 px-4 py-3 inline-block"
-                                >JELAJAHI SEKARANG</a
+                                >JELAJAHI SEKARANG -></a
                             >
                         </div>
                     </div>

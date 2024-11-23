@@ -1,13 +1,15 @@
 <template>
-    <div>
-        <Navbar />
+    <div class="min-h-screen flex flex-col">
+        <div class="relative z-50">
+            <Navbar />
+        </div>
         <div
             v-if="loading"
             class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50"
         >
             <span>Loading...</span>
         </div>
-        <main>
+        <main class="flex-grow">
             <slot />
         </main>
     </div>
@@ -23,17 +25,19 @@ const loading = ref(false);
 
 watch(
     () => page.value,
-    () => {
+    (newPage) => {
+        // Tambahkan null check
+        if (!newPage) return;
+
         loading.value = true;
-        if (page.value.url === "/map") {
-            setTimeout(() => {
-                loading.value = false;
-            }, 700);
-        } else {
-            setTimeout(() => {
-                loading.value = false;
-            }, 500);
-        }
+        const url = newPage?.url || ""; // Gunakan optional chaining dan default value
+
+        setTimeout(() => {
+            loading.value = false;
+        }, 500);
+    },
+    {
+        deep: true, // Tambahkan deep watching karena page adalah reactive object
     }
 );
 </script>

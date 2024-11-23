@@ -62,54 +62,52 @@
     </section>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            faqs: [
-                {
-                    question:
-                        "Siapa saja yang bisa diusulkan untuk Program Bedah Rumah ?",
-                    answer: "Bantuan bedah rumah dapat diterima oleh individu atau keluarga yang memenuhi kriteria kelayakan yang telah ditetapkan.",
-                    expanded: true,
-                },
-                {
-                    question:
-                        "Apa saja kriteria kelayakan penerima bantuan bedah rumah ?",
-                    answer: "Kriteria ini termasuk memiliki rumah yang rusak atau tidak layak huni, serta tidak memiliki kemampuan untuk memperbaikinya sendiri.",
-                    expanded: false,
-                },
-                {
-                    question:
-                        "Bagaimana mekanisme pendataan dan seleksi penerima bantuan ?",
-                    answer: "Proses seleksi penerima bantuan bedah rumah dilakukan oleh tim seleksi yang independen dan transparan.",
-                    expanded: false,
-                },
-                {
-                    question:
-                        "Bagaimana cara mendaftar untuk mendapatkan bantuan bedah rumah ?",
-                    answer: "Untuk mengajukan bantuan bedah rumah, Anda dapat mengisi formulir pengajuan yang tersedia di situs web kami atau menghubungi kantor cabang terdekat.",
-                    expanded: false,
-                },
-                {
-                    question:
-                        "Bagaimana jika saya belum memiliki sertifikat tanah ?",
-                    answer: "Bantuan bedah rumah dapat diterima oleh individu atau keluarga yang memenuhi kriteria kelayakan yang telah ditetapkan.",
-                    expanded: false,
-                },
-                {
-                    question: "Siapa yang akan mengerjakan perbaikan rumah ?",
-                    answer: "Proses seleksi penerima bantuan bedah rumah dilakukan oleh tim seleksi yang independen dan transparan.",
-                    expanded: false,
-                },
-                {
-                    question:
-                        "Apakah data pada aplikasi ini dapat diakses oleh publik, dan apakah ada batasan akses tertentu?",
-                    answer: "Proses seleksi penerima bantuan bedah rumah dilakukan oleh tim seleksi yang independen dan transparan.",
-                    expanded: false,
-                },
-            ],
-        };
+<script setup>
+import { onMounted, ref } from "vue";
+import { initAccordions } from "flowbite";
+
+onMounted(() => {
+    initAccordions();
+});
+
+const faqs = ref([
+    {
+        question: "Siapa saja yang bisa diusulkan untuk Program Bedah Rumah ?",
+        answer: "Bantuan bedah rumah dapat diterima oleh individu atau keluarga yang memenuhi kriteria kelayakan yang telah ditetapkan.",
+        expanded: true,
     },
-};
+    {
+        question: "Apa saja kriteria kelayakan penerima bantuan bedah rumah ?",
+        answer: "Kriteria ini termasuk memiliki rumah yang rusak atau tidak layak huni, serta tidak memiliki kemampuan untuk memperbaikinya sendiri.",
+        expanded: false,
+    },
+    {
+        question:
+            "Bagaimana mekanisme pendataan dan seleksi penerima bantuan ?",
+        answer: "Proses seleksi penerima bantuan bedah rumah dilakukan oleh tim seleksi yang independen dan transparan.",
+        expanded: false,
+    },
+    {
+        question:
+            "Bagaimana cara mendaftar untuk mendapatkan bantuan bedah rumah ?",
+        answer: "Untuk mengajukan bantuan bedah rumah, Anda dapat mengisi formulir pengajuan yang tersedia di situs web kami atau menghubungi kantor cabang terdekat.",
+        expanded: false,
+    },
+    {
+        question: "Bagaimana jika saya belum memiliki sertifikat tanah ?",
+        answer: "Bantuan bedah rumah dapat diterima oleh individu atau keluarga yang memenuhi kriteria kelayakan yang telah ditetapkan.",
+        expanded: false,
+    },
+    {
+        question: "Siapa yang akan mengerjakan perbaikan rumah ?",
+        answer: "Proses seleksi penerima bantuan bedah rumah dilakukan oleh tim seleksi yang independen dan transparan.",
+        expanded: false,
+    },
+    {
+        question:
+            "Apakah data pada aplikasi ini dapat diakses oleh publik, dan apakah ada batasan akses tertentu?",
+        answer: "Proses seleksi penerima bantuan bedah rumah dilakukan oleh tim seleksi yang independen dan transparan.",
+        expanded: false,
+    },
+]);
 </script>

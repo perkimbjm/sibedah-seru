@@ -16,11 +16,13 @@ L.easyButton({
         },
     ],
 }).addTo(map);
+console.log("Easy button berhasil dimuat");
 
 L.Control.geocoder({
     position: "topleft",
     collapsed: true,
 }).addTo(map);
+console.log("Geocoder control berhasil dimuat");
 
 /* GPS enabled geolocation control set to follow the user's location */
 const locateControl = L.control
@@ -54,9 +56,11 @@ const locateControl = L.control
         },
     })
     .addTo(map);
+console.log("Locate control berhasil dimuat");
 
 /*Scale Map*/
 L.control.scale({ imperial: false }).addTo(map);
+console.log("Scale control berhasil dimuat");
 
 /*Basemap*/
 const baseMapIcons = {
@@ -99,6 +103,7 @@ let iconLayersControl = new L.Control.IconLayers(iconLayers, {
 });
 
 iconLayersControl.addTo(map);
+console.log("Icon layers control berhasil dimuat");
 
 // define drawtoolbar options
 let options = {
@@ -146,6 +151,7 @@ map.pm.addControls({
     position: "topleft",
     drawCircle: false,
 });
+console.log("PM toolbar berhasil dimuat");
 
 let pmToolbar = document.querySelector(".leaflet-pm-toolbar");
 if (pmToolbar) {
@@ -153,6 +159,7 @@ if (pmToolbar) {
 }
 
 let ctlMeasure = L.control.polylineMeasure({ position: "topleft" }).addTo(map);
+console.log("Measure control berhasil dimuat");
 
 function showModal(title, content) {
     document.getElementById("feature-title").innerText = title;
@@ -222,7 +229,7 @@ function loadKecamatanData() {
                         let tooltip = L.tooltip({
                             permanent: true,
                             direction: "center",
-                            className: "no-background-tooltip",
+                            className: "no-background",
                         })
                             .setContent(feature.properties.KECAMATAN)
                             .setLatLng(layer.getBounds().getCenter());
@@ -285,7 +292,7 @@ function loadDesaData() {
                         let tooltip = L.tooltip({
                             permanent: true,
                             direction: "center",
-                            className: "no-background-tooltip",
+                            className: "no-background",
                         })
                             .setContent(feature.properties.DESA)
                             .setLatLng(layer.getBounds().getCenter());
@@ -389,13 +396,6 @@ function loadPolaruangData() {
     }
 }
 
-console.log("Kecamatan:", kecamatan);
-console.log("Tooltip Kecamatan:", tooltipKecamatan);
-console.log("Desa:", desa);
-console.log("Tooltip Desa:", tooltipDesa);
-console.log("Kumuh:", kumuh);
-console.log("Polaruang:", polaruang);
-
 // Event handler untuk memuat data
 map.on("overlayadd", function (e) {
     if (e.name === "Kecamatan " || e.name === "Nama Kecamatan") {
@@ -454,3 +454,21 @@ let onClicked = function (e) {
 };
 
 map.on("contextmenu", onClicked);
+
+const sidepanelLeft = L.control
+    .sidepanel("mySidepanelLeft", {
+        tabsPosition: "left",
+        startTab: "tab-1",
+    })
+    .addTo(map);
+console.log("Sidepanel kiri berhasil dimuat");
+
+const sidepanelRight = L.control
+    .sidepanel("mySidepanelRight", {
+        panelPosition: "right",
+        tabsPosition: "top",
+        darkMode: true,
+        startTab: "tab-2",
+    })
+    .addTo(map);
+console.log("Sidepanel kanan berhasil dimuat");

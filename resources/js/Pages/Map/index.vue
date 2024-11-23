@@ -1,14 +1,16 @@
 <template>
     <MainLayout>
         <Head title="Peta Digital" />
-        <div
-            id="map"
-            role="map"
-            class="h-[87vh] w-screen mx-auto overflow-hidden"
-        >
-            <SidePanel />
+        <div class="relative">
+            <div
+                id="map"
+                role="map"
+                class="h-[87vh] w-full mx-auto overflow-hidden relative z-5"
+            >
+                <SidePanel />
+            </div>
+            <MapModals />
         </div>
-        <MapModals />
     </MainLayout>
 </template>
 
@@ -18,6 +20,7 @@ import SidePanel from "@/Components/SidePanel.vue";
 import MainLayout from "@/Layouts/MainLayout.vue";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import MapModals from "@/Components/MapModals.vue";
+import { loadMapStyles } from "@/styles/map-styles";
 
 const mapInstance = ref(null);
 const loadedScripts = ref([]);
@@ -128,9 +131,7 @@ const SCRIPTS = [
     {
         src: "https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js",
     },
-    {
-        src: "https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js",
-    },
+    { src: "/js/Control.Geocoder.js" },
     { src: "/js/leaflet.groupedlayercontrol.js" },
     { src: "/js/iconLayers.js" },
     { src: "/js/Leaflet.PolylineMeasure.js" },
@@ -144,6 +145,7 @@ const loadScript = (src, critical = false) => {
         const script = document.createElement("script");
         script.src = src;
         script.defer = !critical;
+        script.async = !critical;
         script.onload = () => resolve(script);
         script.onerror = () => reject(new Error(`Failed to load ${src}`));
         document.head.appendChild(script);
@@ -171,6 +173,8 @@ const loadAllScripts = async () => {
 
 const initMap = async () => {
     if (typeof L === "undefined") return;
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     try {
         // Inisialisasi semua tile layers
@@ -205,22 +209,6 @@ const initMap = async () => {
         const coreJsContent = await response.text();
         eval(coreJsContent);
 
-        const sidepanelLeft = L.control
-            .sidepanel("mySidepanelLeft", {
-                tabsPosition: "left",
-                startTab: "tab-1",
-            })
-            .addTo(map);
-
-        const sidepanelRight = L.control
-            .sidepanel("mySidepanelRight", {
-                panelPosition: "right",
-                tabsPosition: "top",
-                darkMode: true,
-                startTab: "tab-2",
-            })
-            .addTo(map);
-
         window.dispatchEvent(new Event("resize"));
     } catch (error) {
         console.error("Error initializing map:", error);
@@ -228,7 +216,9 @@ const initMap = async () => {
 };
 
 onMounted(async () => {
+    console.log("Component mounted");
     try {
+        await loadMapStyles();
         await loadAllScripts();
         await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -244,10 +234,16 @@ onBeforeUnmount(() => {
         script?.parentNode?.removeChild(script)
     );
     loadedScripts.value = [];
+    loadMapStyles.value = null;
+    loadAllScripts.value = null;
 });
 </script>
 
 <style>
+:deep(.leaflet-control-layers) {
+    z-index: 999;
+}
+
 .leaflet-control-layers-selector {
     top: 0;
     border-radius: 3px;
@@ -293,19 +289,10 @@ onBeforeUnmount(() => {
 }
 
 .leaflet-tooltip.no-background {
-    background: transparent;
-    border: none;
-    box-shadow: none;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
     color: none;
-    -webkit-text-stroke-width: 0.9px;
-    -webkit-text-stroke-color: whitesmoke;
-    -webkit-text-fill-color: black;
-}
-
-.no-background-tooltip {
-    background: transparent;
-    border: none;
-    box-shadow: none;
     text-shadow: 1px 1px 0px #fff, -1px -1px 0px #fff, 1px -1px 0px #fff,
         -1px 1px 0px #fff;
 }
