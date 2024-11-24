@@ -129,9 +129,21 @@ const isMenuOpen = ref(false);
 const isDesktop = ref(false);
 
 const menuItems = ref([
-    { name: "Beranda", href: "/", route: "landingpage" },
-    { name: "Peta Digital", href: "/map", route: "map" },
-    { name: "Download", href: "/download", route: "download" },
+    {
+        name: "Beranda",
+        href: usePage().props.app.url + "/",
+        route: "landingpage",
+    },
+    {
+        name: "Peta Digital",
+        href: usePage().props.app.url + "/map",
+        route: "map",
+    },
+    {
+        name: "Download",
+        href: usePage().props.app.url + "/download",
+        route: "download",
+    },
     {
         name: "Smart RTLH",
         href: "https://forms.gle/uEnQ5fygU9p1YUk59",
@@ -139,8 +151,16 @@ const menuItems = ref([
         target: "_blank",
         rel: "noopener noreferrer",
     },
-    { name: "Bedah Rumah", href: "/bedah", route: "bedah" },
-    { name: "Panduan", href: "/guide", route: "guide" },
+    {
+        name: "Bedah Rumah",
+        href: usePage().props.app.url + "/bedah",
+        route: "bedah",
+    },
+    {
+        name: "Panduan",
+        href: usePage().props.app.url + "/guide",
+        route: "guide",
+    },
 ]);
 
 const toggleMenu = () => {
