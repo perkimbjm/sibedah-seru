@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Models\Gallery;
 use Inertia\Inertia;
+use App\Http\Controllers\ProxyController;
 
 
 Route::get('/', function () {
@@ -66,9 +67,8 @@ Route::post('/logout', function () {
     return redirect('/login');
 })->name('logout');
 
-Route::get('/proxy/wfs', 'ProxyController@proxyGeoserverWFS')->name('proxyWFS'); //
-
-Route::get('/proxy/wms', 'ProxyController@proxyGeoserverWMS')->name('proxyWMS');
+Route::get('/proxy/wfs', [ProxyController::class, 'proxyGeoserverWFS'])->name('proxyWFS');
+Route::get('/proxy/wms', [ProxyController::class, 'proxyGeoserverWMS'])->name('proxyWMS');
 
 
 

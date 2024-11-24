@@ -379,20 +379,45 @@ function loadKumuhData() {
 }
 
 let isPolaruangLoaded = false;
+let isLayerVisible = false;
+
+// Tambahkan opsi caching pada WMS layer
 let polaruang = L.tileLayer.wms("/proxy/wms?", {
     layers: "simtaruBalangan:polaruang_rtrw",
     format: "image/png",
     transparent: true,
     version: "1.1.0",
+    tileSize: 256,
+    updateWhenIdle: true,
+    updateWhenZooming: false,
+    keepBuffer: 2,
+    // Tambahkan parameter untuk membantu caching
+    time: new Date().getTime(), // Timestamp untuk force cache
+    cacheControl: "max-age=3600", // Cache selama 1 jam
+    noCache: false,
+});
+
+// Tambahkan event listener untuk tile loading
+polaruang.on("loading", function () {
+    console.log("Memuat tiles...");
+});
+
+polaruang.on("load", function () {
+    console.log("Tiles selesai dimuat");
 });
 
 function loadPolaruangData() {
     if (!isPolaruangLoaded) {
+        // Initial load
         map.addLayer(polaruang);
         isPolaruangLoaded = true;
-        console.log("Data polaruang berhasil dimuat");
-    } else {
-        console.log("Polaruang sudah dimuat sebelumnya.");
+        isLayerVisible = true;
+        console.log("Data polaruang berhasil dimuat pertama kali");
+    } else if (!isLayerVisible) {
+        // Reaktivasi layer
+        map.addLayer(polaruang);
+        isLayerVisible = true;
+        console.log("Polaruang diaktifkan kembali tanpa mengunduh ulang");
     }
 }
 
@@ -409,6 +434,56 @@ map.on("overlayadd", function (e) {
     }
 });
 
+map.on("overlayremove", function (e) {
+    // Handle Kecamatan layer
+    if (e.name === "Kecamatan ") {
+        if (map.hasLayer(kecamatan)) {
+            map.removeLayer(kecamatan);
+            console.log("Layer kecamatan dinonaktifkan");
+        }
+    }
+
+    // Handle Nama Kecamatan layer
+    if (e.name === "Nama Kecamatan") {
+        if (map.hasLayer(tooltipKecamatan)) {
+            map.removeLayer(tooltipKecamatan);
+            console.log("Layer nama kecamatan dinonaktifkan");
+        }
+    }
+
+    // Handle Desa layer
+    if (e.name === "Kel / Desa") {
+        if (map.hasLayer(desa)) {
+            map.removeLayer(desa);
+            console.log("Layer desa dinonaktifkan");
+        }
+    }
+
+    // Handle Nama Desa layer
+    if (e.name === "Nama Desa") {
+        if (map.hasLayer(tooltipDesa)) {
+            map.removeLayer(tooltipDesa);
+            console.log("Layer nama desa dinonaktifkan");
+        }
+    }
+
+    // Handle Kumuh layer
+    if (e.name === "Deliniasi Kumuh") {
+        if (map.hasLayer(kumuh)) {
+            map.removeLayer(kumuh);
+            console.log("Layer kumuh dinonaktifkan");
+        }
+    }
+
+    // Handle RTRW layer
+    if (e.name === "RTRW ") {
+        map.removeLayer(polaruang);
+        isLayerVisible = false;
+        console.log("Polaruang dinonaktifkan");
+    }
+});
+
+// Event handler untuk memuat data
 let groupedOverlays = {
     TEMATIK: {
         "Kecamatan ": kecamatan || {},
@@ -454,21 +529,3 @@ let onClicked = function (e) {
 };
 
 map.on("contextmenu", onClicked);
-
-const sidepanelLeft = L.control
-    .sidepanel("mySidepanelLeft", {
-        tabsPosition: "left",
-        startTab: "tab-1",
-    })
-    .addTo(map);
-console.log("Sidepanel kiri berhasil dimuat");
-
-const sidepanelRight = L.control
-    .sidepanel("mySidepanelRight", {
-        panelPosition: "right",
-        tabsPosition: "top",
-        darkMode: true,
-        startTab: "tab-2",
-    })
-    .addTo(map);
-console.log("Sidepanel kanan berhasil dimuat");

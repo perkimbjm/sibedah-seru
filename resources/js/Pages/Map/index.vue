@@ -209,6 +209,24 @@ const initMap = async () => {
         const coreJsContent = await response.text();
         eval(coreJsContent);
 
+        const sidepanelLeft = L.control
+            .sidepanel("mySidepanelLeft", {
+                tabsPosition: "left",
+                startTab: "tab-1",
+            })
+            .addTo(map);
+        console.log("Sidepanel kiri berhasil dimuat");
+
+        const sidepanelRight = L.control
+            .sidepanel("mySidepanelRight", {
+                panelPosition: "right",
+                tabsPosition: "top",
+                darkMode: true,
+                startTab: "tab-2",
+            })
+            .addTo(map);
+        console.log("Sidepanel kanan berhasil dimuat");
+
         window.dispatchEvent(new Event("resize"));
     } catch (error) {
         console.error("Error initializing map:", error);
@@ -229,13 +247,55 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-    mapInstance.value?.remove();
-    loadedScripts.value.forEach((script) =>
-        script?.parentNode?.removeChild(script)
-    );
+    if (mapInstance.value) {
+        // Hapus semua kontrol dan layer
+        mapInstance.value.eachLayer((layer) => {
+            mapInstance.value.removeLayer(layer);
+        });
+
+        // Hapus semua kontrol
+        for (const [, control] of Object.entries(
+            mapInstance.value._controlCorners
+        )) {
+            control.innerHTML = "";
+        }
+
+        // Hapus instance map
+        mapInstance.value.remove();
+        mapInstance.value = null;
+    }
+
+    // Hapus semua script yang telah dimuat
+    loadedScripts.value.forEach((script) => {
+        if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
+    });
+
+    // Reset semua referensi
     loadedScripts.value = [];
+
+    // Hapus referensi map dari window object
+    window.map = undefined;
+    window.cartoLight = undefined;
+    window.googleSatellite = undefined;
+    window.googleMaps = undefined;
+    window.cartoDark = undefined;
+    window.otopomap = undefined;
+    window.osm = undefined;
+    window.cartoVoyager = undefined;
+    window.rbi = undefined;
+
+    loadedScripts.value = [];
+    // Reset fungsi dan nilai
     loadMapStyles.value = null;
     loadAllScripts.value = null;
+
+    // Bersihkan elemen DOM map
+    const mapElement = document.getElementById("map");
+    if (mapElement) {
+        mapElement.innerHTML = "";
+    }
 });
 </script>
 
