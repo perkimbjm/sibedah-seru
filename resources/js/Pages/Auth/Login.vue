@@ -29,7 +29,6 @@ const emailInput = ref(null);
 const showPassword = ref(false);
 const captchaInput = ref("");
 const captchaError = ref("");
-const showMessageBox = ref(false);
 
 // Fungsi handleBack yang baru
 const handleBack = () => {
@@ -41,6 +40,26 @@ const handleBack = () => {
     } else {
         router.visit("/");
     }
+};
+
+// Fungsi untuk mengirim data form
+const submit = () => {
+    if (!validateCaptcha()) {
+        return;
+    }
+    form.transform((data) => ({
+        ...data,
+        remember: form.remember ? "on" : "",
+    })).post(route("login"), {
+        onSuccess: (response) => {
+            // Update auth store setelah login berhasil
+            authStore.handleLoginSuccess(response?.props?.auth?.user);
+            form.reset("password");
+        },
+        onError: () => {
+            form.reset("password");
+        },
+    });
 };
 
 // Captcha state
@@ -56,44 +75,22 @@ const generateCaptcha = () => {
         num2: Math.floor(Math.random() * 50) + 1,
     };
     captchaInput.value = ""; // Reset input when generating new captcha
-    captchaError.value = "";
-    showMessageBox.value = false; // Clear any previous errors
+    captchaError.value = ""; // Clear any previous errors
 };
 
 // Validate captcha
 const validateCaptcha = () => {
     const sum = captcha.value.num1 + captcha.value.num2;
-    console.log("Captcha sum:", sum);
-    console.log("Captcha input:", captchaInput.value);
     if (parseInt(captchaInput.value) !== sum) {
-        captchaError.value = "Hasil Perhitungan salah. Please try again.";
-        generateCaptcha(); // Generate new captcha on incorrect attempt
-        showMessageBox.value = true;
+        captchaError.value = "Captcha Salah Penjumlahan. Maaf Coba Lagi.";
+        generateCaptcha();
         return false;
     }
-    captchaError.value = ""; // Reset error if captcha is correct
-    showMessageBox.value = false;
     return true;
 };
 
-// Fungsi untuk mengirim data form
-const submit = () => {
-    if (!validateCaptcha()) {
-        return; // Jika captcha tidak valid, hentikan eksekusi
-    }
-    form.transform((data) => ({
-        ...data,
-        remember: form.remember ? "on" : "",
-    })).post(route("login"), {
-        onSuccess: (response) => {
-            // Update auth store setelah login berhasil
-            authStore.handleLoginSuccess(response?.props?.auth?.user);
-            form.reset("password");
-        },
-        onError: () => {
-            form.reset("password");
-        },
-    });
+const handleGoogleLogin = () => {
+    window.location.href = route("auth.google");
 };
 
 // Check auth status when component mounts
@@ -119,6 +116,7 @@ onMounted(() => {
         <div
             class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-2xl shadow-xl flex overflow-hidden"
         >
+            <!-- Left Side - Login Form -->
             <div class="w-full lg:w-1/2 px-8 py-12 sm:px-12">
                 <div class="flex items-center gap-2 mb-12">
                     <button
@@ -130,6 +128,7 @@ onMounted(() => {
                     <div class="w-10 h-10 flex items-center justify-center">
                         <AuthenticationCardLogo />
                     </div>
+
                     <span class="text-xl font-semibold">SIBEDAH SERU</span>
                 </div>
 
@@ -158,8 +157,11 @@ onMounted(() => {
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
+                    <!-- Password Section -->
                     <div>
-                        <InputLabel for="password" value="Password" />
+                        <InputLabel for="password" value="Password"
+                            >Password</InputLabel
+                        >
                         <div class="relative">
                             <TextInput
                                 id="password"
@@ -194,7 +196,7 @@ onMounted(() => {
                             </p>
                         </div>
                         <input
-                            type="text"
+                            type="number"
                             v-model="captchaInput"
                             required
                             class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
@@ -206,15 +208,9 @@ onMounted(() => {
                         >
                             {{ captchaError }}
                         </p>
-                        <!-- Message Box for Captcha Error -->
-                        <div
-                            v-if="showMessageBox"
-                            class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded"
-                        >
-                            {{ captchaError }}
-                        </div>
                     </div>
 
+                    <!-- Remember me and Forgot Password-->
                     <div class="flex items-center justify-between mt-4">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <Checkbox
@@ -282,7 +278,9 @@ onMounted(() => {
                     >
                 </p>
             </div>
+            <!-- End Left Side -->
 
+            <!-- Right Side - Illustration -->
             <div
                 class="hidden sm:block w-1/2 bg-gray-300 dark:bg-gray-600 p-12 relative"
             >
@@ -305,6 +303,7 @@ onMounted(() => {
                     </p>
                 </div>
             </div>
+            <!--End Right Side-->
         </div>
     </div>
 </template>
