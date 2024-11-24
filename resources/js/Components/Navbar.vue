@@ -14,12 +14,12 @@
                     />
                     <div class="flex flex-col justify-center">
                         <p
-                            class="font-semibold italic whitespace-nowrap dark:text-white"
+                            class="italic whitespace-nowrap dark:text-white font-poppins font-light text-sm"
                         >
                             SIBEDAH SERU
                         </p>
                         <p
-                            class="font-semibold italic whitespace-nowrap dark:text-white"
+                            class="italic whitespace-nowrap dark:text-white font-poppins font-light text-sm"
                         >
                             PERKIM
                         </p>

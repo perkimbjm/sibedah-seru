@@ -1,10 +1,11 @@
 <?php
 
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use App\Models\Gallery;
 use Inertia\Inertia;
+use App\Models\Gallery;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
 use App\Http\Controllers\ProxyController;
+use App\Http\Controllers\Auth\GoogleController;
 
 
 Route::get('/', function () {
@@ -14,6 +15,17 @@ Route::get('/', function () {
 Route::get('/download', function () {
     return Inertia::render('DownloadData');
 })->name('download');
+
+Route::get('/terms', function () {
+    return Inertia::render('TermsOfService');
+})->name('terms');
+
+Route::get('/policy', function () {
+    return Inertia::render('PrivacyPolicy');
+})->name('policy');
+
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 
 Route::get('/home', function () {
@@ -30,9 +42,6 @@ Route::get('/gallery/{gallery:slug}', function (Gallery $gallery) {
     return view('gallery-detail', ['title' => 'Galeri Detail', 'gallery' => $gallery]);
 });
 
-// Route::get('/map', function () {
-//     return view('map', ['title' => 'Peta Digital']);
-// })->name('map');
 
 Route::get('/map', function () {
     return Inertia::render('Map/index');

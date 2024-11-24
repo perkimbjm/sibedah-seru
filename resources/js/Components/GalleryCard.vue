@@ -20,20 +20,21 @@
         </div>
 
         <Carousel
-            :items-to-show="itemsToShow"
+            :settings="settings"
+            :breakpoints="breakpoints"
             :wrap-around="true"
             :transition="1000"
             :autoplay="2000"
             class="gallery-carousel"
         >
             <Slide v-for="property in properties" :key="property.id">
-                <div class="px-2">
+                <div class="carousel__item px-2">
                     <div class="relative group cursor-pointer">
                         <img
                             :src="property.image"
                             :alt="property.title"
                             loading="lazy"
-                            class="w-full h-[300px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                            class="w-full h-[300px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-200"
                         />
                         <div
                             class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent rounded-b-lg"
@@ -62,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import { Link } from "@inertiajs/vue3";
 import { ChevronDownIcon, MapPinIcon } from "lucide-vue-next";
@@ -101,36 +102,31 @@ const properties = [
     },
 ];
 
-const itemsToShow = ref(3); // Default untuk desktop
-
-const responsiveItemsToShow = computed(() => {
-    if (window.innerWidth <= 426) return 1; // Mobile: 1 item
-    if (window.innerWidth <= 768) return 2; // Tablet: 2 items
-    return 3; // Desktop: 3 items
-});
-
-const updateItemsToShow = () => {
-    itemsToShow.value = responsiveItemsToShow.value;
+const settings = {
+    itemsToShow: 1,
+    snapAlign: "center",
 };
 
-onMounted(() => {
-    updateItemsToShow();
-    window.addEventListener("resize", updateItemsToShow);
-});
-
-onBeforeUnmount(() => {
-    window.removeEventListener("resize", updateItemsToShow);
-});
+const breakpoints = {
+    768: {
+        itemsToShow: 2,
+        snapAlign: "center",
+    },
+    1024: {
+        itemsToShow: 3,
+        snapAlign: "center",
+    },
+};
 </script>
 
 <style scoped>
 .gallery-carousel :deep(.carousel__prev),
 .gallery-carousel :deep(.carousel__next) {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.5);
     border: 1px solid #e5e7eb;
     border-radius: 9999px;
-    width: 40px;
-    height: 40px;
+    width: 25px;
+    height: 25px;
     color: #374151;
 }
 
@@ -143,15 +139,13 @@ onBeforeUnmount(() => {
     margin-top: 1rem;
 }
 
-.gallery-carousel :deep(.carousel__pagination-button) {
-    background-color: #e5e7eb;
-    width: 8px;
-    height: 8px;
-    border-radius: 9999px;
-    margin: 0 4px;
+.gallery-carousel :deep(.carousel__pagination-button--active) {
+    background-color: #dedede;
+    border-radius: 50%;
+    margin: 0 6px;
 }
 
-.gallery-carousel :deep(.carousel__pagination-button--active) {
-    background-color: #374151;
+.gallery-carousel :deep(.carousel__slide) {
+    padding: 1px;
 }
 </style>

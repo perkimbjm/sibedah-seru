@@ -36,7 +36,7 @@
                     id="img-hero"
                 >
                     <img
-                        src="/img/hero.webp"
+                        src="/img/hero_c.webp"
                         class="img-fluid animated hero-img"
                         alt="bedah-seribu-rumah"
                         data-aos="zoom-out"

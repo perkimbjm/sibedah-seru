@@ -11,3 +11,17 @@ defineProps({
         </p>
     </div>
 </template>
+
+<style scoped>
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+.animate-fade-in {
+    animation: fade-in 0.3s ease-in-out;
+}
+</style>

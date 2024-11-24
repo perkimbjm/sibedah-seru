@@ -9,7 +9,7 @@
         <h4 class="text-center mb-2 italic text-base">
             Pertanyaan yang Paling Sering Ditanyakan
         </h4>
-        <div class="x-4 sm:px-8 md:px-24 lg:px-24 xl:px-32 mx-auto my-8">
+        <div class="px-6 sm:px-8 md:px-16 lg:px-24 xl:px-32 mx-auto my-8">
             <div
                 id="accordion-color"
                 data-accordion="collapse"
