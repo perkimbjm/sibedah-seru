@@ -3,12 +3,9 @@ export const loadMapStyles = () => {
     const styles = [
         {
             href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-            crossorigin: "anonymous", // Mengubah crossorigin menjadi "anonymous"
-        },
-        {
-            href: "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
             crossorigin: "anonymous",
         },
+        "/css/fontawesome.css",
         {
             href: "https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css",
             crossorigin: "anonymous",
