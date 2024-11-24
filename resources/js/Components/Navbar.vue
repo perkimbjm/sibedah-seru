@@ -119,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import NavLink from "./NavLink.vue";
 import AuthButton from "./AuthButton.vue";
@@ -128,20 +128,22 @@ const page = usePage();
 const isMenuOpen = ref(false);
 const isDesktop = ref(false);
 
-const menuItems = ref([
+const baseUrl = computed(() => page.props.app?.url || "");
+
+const menuItems = computed(() => [
     {
         name: "Beranda",
-        href: usePage().props.app.url + "/",
+        href: `${baseUrl.value}/`,
         route: "landingpage",
     },
     {
         name: "Peta Digital",
-        href: usePage().props.app.url + "/map",
+        href: `${baseUrl.value}/map`,
         route: "map",
     },
     {
         name: "Download",
-        href: usePage().props.app.url + "/download",
+        href: `${baseUrl.value}/download`,
         route: "download",
     },
     {
@@ -153,12 +155,12 @@ const menuItems = ref([
     },
     {
         name: "Bedah Rumah",
-        href: usePage().props.app.url + "/bedah",
+        href: `${baseUrl.value}/bedah`,
         route: "bedah",
     },
     {
         name: "Panduan",
-        href: usePage().props.app.url + "/guide",
+        href: `${baseUrl.value}/guide`,
         route: "guide",
     },
 ]);
