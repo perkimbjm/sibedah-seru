@@ -133,6 +133,7 @@ const SCRIPTS = [
     },
     { src: "/js/Control.Geocoder.js" },
     { src: "/js/leaflet.groupedlayercontrol.js" },
+    { src: "/js/typeahead.bundle.min.js" },
     { src: "/js/iconLayers.js" },
     { src: "/js/Leaflet.PolylineMeasure.js" },
     { src: "/js/leaflet.toolbar.js" },
@@ -174,6 +175,22 @@ const loadAllScripts = async () => {
 const initMap = async () => {
     if (typeof L === "undefined") return;
 
+    // Tunggu sampai element map tersedia
+    const waitForMap = () => {
+        return new Promise((resolve) => {
+            const checkMap = () => {
+                const mapElement = document.getElementById("map");
+                if (mapElement) {
+                    resolve();
+                } else {
+                    setTimeout(checkMap, 100);
+                }
+            };
+            checkMap();
+        });
+    };
+
+    await waitForMap();
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     try {
@@ -233,13 +250,32 @@ const initMap = async () => {
     }
 };
 
+let cachedToken = null;
+
+const getToken = async () => {
+    if (!cachedToken) {
+        try {
+            const response = await fetch("/api/token");
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+            cachedToken = data.token;
+        } catch (error) {
+            console.error("Error fetching token:", error);
+            return null;
+        }
+    }
+    return cachedToken;
+};
+
 onMounted(async () => {
     console.log("Component mounted");
     try {
+        const token = await getToken();
         await loadMapStyles();
         await loadAllScripts();
         await new Promise((resolve) => setTimeout(resolve, 100));
-
         await initMap();
     } catch (error) {
         console.error("Error during initialization:", error);
@@ -348,7 +384,7 @@ onBeforeUnmount(() => {
     padding-right: 10px;
 }
 
-.leaflet-tooltip.no-background {
+.no-background {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;

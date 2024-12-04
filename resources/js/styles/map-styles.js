@@ -1,11 +1,11 @@
 // styles/map-styles.js
 export const loadMapStyles = () => {
     const styles = [
+        "/css/fontawesome.css",
         {
             href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
             crossorigin: "anonymous",
         },
-        "/css/fontawesome.css",
         {
             href: "https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css",
             crossorigin: "anonymous",

@@ -56,17 +56,17 @@ import { MapPinHouse, HousePlus, House } from "lucide-vue-next";
 
 const statistics = ref([
     {
-        value: "73",
+        value: "150",
         label: "Kelurahan / Desa",
         icon: MapPinHouse,
     },
     {
-        value: "100",
+        value: "1134",
         label: "Rumah yang Diperbaiki",
         icon: HousePlus,
     },
     {
-        value: "1000",
+        value: "1870",
         label: "RTLH Tersisa",
         icon: House,
     },

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Vite;
 use App\Actions\Jetstream\DeleteUser;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Http\Request;
 
 class JetstreamServiceProvider extends ServiceProvider
 {

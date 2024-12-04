@@ -118,18 +118,16 @@ onMounted(() => {
         >
             <!-- Left Side - Login Form -->
             <div class="w-full lg:w-1/2 px-8 py-12 sm:px-12">
-                <div class="flex items-center gap-2 mb-12">
+                <div class="flex items-center gap-2 mb-3">
                     <button
                         class="w-10 h-10 flex items-center justify-center"
                         @click="handleBack"
                     >
                         <ChevronLeftIcon class="w-8 h-8" />
                     </button>
-                    <div class="w-10 h-10 flex items-center justify-center">
+                    <div class="w-60 flex items-center justify-center">
                         <AuthenticationCardLogo />
                     </div>
-
-                    <span class="text-xl font-semibold">SIBEDAH SERU</span>
                 </div>
 
                 <h1 class="text-3xl font-bold mb-2">Welcome Back !</h1>

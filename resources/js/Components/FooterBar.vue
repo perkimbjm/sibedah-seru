@@ -11,12 +11,12 @@
                             loading="lazy"
                             class="mb-4 h-14 mr-2"
                         />
-                        <!-- <img
-                            src="/img/si-aldo4.png"
+                        <img
+                            src="/img/sibedahseru-tiny.png"
                             alt="logo sibedah-seru"
                             loading="lazy"
-                            class="mb-4 h-10 mr-2"
-                        /> -->
+                            class="mb-4 h-14 mr-2"
+                        />
                     </div>
                     <p
                         class="text-gray-800 text-md text-left md:text-center font-semibold space-y-2"
