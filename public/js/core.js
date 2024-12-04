@@ -2,6 +2,8 @@ setTimeout(function () {
     map.invalidateSize();
 }, 1000);
 
+window.DesaSearch = [];
+
 /*Zoom Extends*/
 L.easyButton({
     states: [
@@ -190,7 +192,7 @@ let kecamatan = L.geoJson(null, {
                     Paringin: "#87CEEB",
                     "Paringin Selatan": "#FFFF00",
                     "Tebing Tinggi": "#CCFFCC",
-                }[feature.properties.KECAMATAN] || "#FFFFFF",
+                }[feature.properties.name] || "#FFFFFF",
             fillOpacity: 0.6,
             opacity: 0.5,
             width: 0.001,
@@ -221,7 +223,7 @@ let isKecamatanLoaded = false;
 // Fungsi untuk memuat data kecamatan
 function loadKecamatanData() {
     if (!isKecamatanLoaded) {
-        fetch("data/KECAMATAN_AR.geojson")
+        fetch("/api/kecamatan/geojson")
             .then((response) => response.json())
             .then((data) => {
                 L.geoJson(data, {
@@ -231,7 +233,7 @@ function loadKecamatanData() {
                             direction: "center",
                             className: "no-background",
                         })
-                            .setContent(feature.properties.KECAMATAN)
+                            .setContent(feature.properties.name)
                             .setLatLng(layer.getBounds().getCenter());
 
                         tooltipKecamatan.addLayer(tooltip);
@@ -261,6 +263,12 @@ let desa = L.geoJson(null, {
         };
     },
     onEachFeature: function (feature, layer) {
+        DesaSearch.push({
+            name: layer.feature.properties.name,
+            source: "desa",
+            id: L.stamp(layer),
+            bounds: layer.getBounds(),
+        });
         layer.on({
             mouseover: function (e) {
                 let layer = e.target;
@@ -284,7 +292,7 @@ let isDesaLoaded = false;
 // Fungsi untuk memuat data desa
 function loadDesaData() {
     if (!isDesaLoaded) {
-        fetch("data/DESA_AR.geojson")
+        fetch("api/desa/geojson")
             .then((response) => response.json())
             .then((data) => {
                 L.geoJson(data, {
@@ -294,7 +302,7 @@ function loadDesaData() {
                             direction: "center",
                             className: "no-background",
                         })
-                            .setContent(feature.properties.DESA)
+                            .setContent(feature.properties.name)
                             .setLatLng(layer.getBounds().getCenter());
 
                         tooltipDesa.addLayer(tooltip);
@@ -421,6 +429,108 @@ function loadPolaruangData() {
     }
 }
 
+// Buat fungsi untuk memuat data rumah
+let house = L.geoJson(null, {
+    pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, {
+            icon: L.icon({
+                iconUrl: "/img/home-blue.png", // Pastikan gambar marker tersedia
+                iconSize: [16, 16],
+                iconAnchor: [8, 16],
+                popupAnchor: [0, -16],
+            }),
+        });
+    },
+    onEachFeature: function (feature, layer) {
+        if (feature.properties) {
+            let content =
+                "<table class='table-auto w-full'>" +
+                "<tr><th class='text-left'>ID</th><td>" +
+                feature.properties.id +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Nama</th><td>" +
+                feature.properties.name +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Alamat</th><td>" +
+                feature.properties.address +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Kecamatan</th><td>" +
+                feature.properties.district +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Tahun</th><td>" +
+                feature.properties.year +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Tipe</th><td>" +
+                feature.properties.type +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Sumber</th><td>" +
+                feature.properties.source +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Catatan</th><td>" +
+                feature.properties.note +
+                "</td></tr>" +
+                "</table>";
+            layer.bindPopup(content);
+        }
+    },
+});
+
+let isHouseLoaded = false;
+
+// Fungsi untuk memuat data rumah
+function loadHouseData() {
+    if (!isHouseLoaded) {
+        getToken() // Ambil token dari cache atau fetch
+            .then((token) => {
+                if (!token) {
+                    throw new Error("Token is missing");
+                }
+
+                // Lakukan fetch data rumah dengan token
+                return fetch("/api/houses", {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Gunakan token dari cache
+                    },
+                });
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!Array.isArray(data.data)) {
+                    throw new Error("Data yang diterima bukan array");
+                }
+
+                // Konversi data ke format GeoJSON
+                let geoJsonData = {
+                    type: "FeatureCollection",
+                    features: data.data.map((item) => ({
+                        type: "Feature",
+                        geometry: {
+                            type: "Point",
+                            coordinates: [item.lng, item.lat],
+                        },
+                        properties: {
+                            id: item.id,
+                            name: item.name,
+                            address: item.address,
+                            district: item.district.name,
+                            year: item.year,
+                            type: item.type,
+                            source: item.source,
+                            note: item.note,
+                        },
+                    })),
+                };
+
+                house.addData(geoJsonData);
+                isHouseLoaded = true;
+                console.log("Data rumah berhasil dimuat");
+            })
+            .catch((error) => {
+                console.error("Error loading house data:", error);
+            });
+    }
+}
+
 // Event handler untuk memuat data
 map.on("overlayadd", function (e) {
     if (e.name === "Kecamatan " || e.name === "Nama Kecamatan") {
@@ -431,6 +541,8 @@ map.on("overlayadd", function (e) {
         loadKumuhData();
     } else if (e.name === "RTRW ") {
         loadPolaruangData();
+    } else if (e.name === "Bedah Rumah") {
+        loadHouseData();
     }
 });
 
@@ -481,6 +593,14 @@ map.on("overlayremove", function (e) {
         isLayerVisible = false;
         console.log("Polaruang dinonaktifkan");
     }
+
+    // Handle Rumah layer
+    if (e.name === "Bedah Rumah") {
+        if (map.hasLayer(house)) {
+            map.removeLayer(house);
+            console.log("Layer rumah dinonaktifkan");
+        }
+    }
 });
 
 // Event handler untuk memuat data
@@ -492,6 +612,7 @@ let groupedOverlays = {
         "Nama Desa": tooltipDesa || {},
         "Deliniasi Kumuh": kumuh || {},
         "RTRW ": polaruang || {},
+        "Bedah Rumah": house || {},
     },
 };
 

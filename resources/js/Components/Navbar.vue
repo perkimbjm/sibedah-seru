@@ -8,18 +8,16 @@
                     :href="route('landingpage')"
                     class="flex items-center space-x-3 rtl:space-x-reverse"
                 >
-                    <img
-                        src="/img/logobalangan-nav.webp"
-                        alt="logo sibedah-seru"
-                    />
+                    <img src="/img/logobalangan-nav.webp" alt="logo balangan" />
+                    <img src="/img/logo-sibedah.png" alt="logo sibedah-seru" />
                     <div class="flex flex-col justify-center">
                         <p
-                            class="italic whitespace-nowrap dark:text-white font-poppins font-light text-sm"
+                            class="whitespace-nowrap dark:text-white font-roboto font-bold"
                         >
-                            SIBEDAH SERU
+                            SiBEDAH-SERU
                         </p>
                         <p
-                            class="italic whitespace-nowrap dark:text-white font-poppins font-light text-sm"
+                            class="whitespace-nowrap dark:text-white font-roboto font-bold text-sm"
                         >
                             PERKIM
                         </p>
@@ -145,13 +143,6 @@ const menuItems = computed(() => [
         name: "Download",
         href: `${baseUrl.value}/download`,
         route: "download",
-    },
-    {
-        name: "Smart RTLH",
-        href: "https://forms.gle/uEnQ5fygU9p1YUk59",
-        isExternal: true,
-        target: "_blank",
-        rel: "noopener noreferrer",
     },
     {
         name: "Bedah Rumah",

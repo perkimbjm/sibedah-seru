@@ -26,7 +26,7 @@
                             <a
                                 href="#cta"
                                 class="box-border appearance-none bg-[#f8f550] border-2 border-[#f8f550] text-[#292928] cursor-pointer self-center text-base font-semibold leading-none text-center uppercase font-montserrat hover:bg-[#ffc802] hover:text-[#1a1919] focus:outline-nonefirst scrollto rounded-full my-3 px-4 py-3 inline-block"
-                                >JELAJAHI SEKARANG -></a
+                                >JELAJAHI SEKARANG →</a
                             >
                         </div>
                     </div>

@@ -17,7 +17,7 @@
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div
                     v-for="(feature, index) in features"
                     :key="index"
@@ -52,45 +52,35 @@ export default {
                 {
                     imgSrc: "/img/landingpage/spasial.png",
                     imgAlt: "spasial",
-                    title: "FITUR 1",
-                    description: "Lorem ipsum dolor sit amet consectetur",
+                    title: "Informasi Spasial",
+                    description:
+                        "informasi disajikan dalam bentuk data spasial sehingga lebih menarik",
                     delay: 200,
                 },
                 {
                     imgSrc: "/img/landingpage/data-inventory.png",
-                    imgAlt: "inventory",
-                    title: "FITUR 2",
-                    description: "Lorem ipsum dolor sit amet consectetur",
+                    imgAlt: "Inventori Data",
+                    title: "Inventori Data",
+                    description:
+                        "Bank data dalam menyimpan informasi tentang RTLH dan bedah rumah",
                     delay: 200,
                 },
                 {
                     imgSrc: "/img/landingpage/dashboard.png",
                     imgAlt: "visualize-data",
-                    title: "FITUR 3",
-                    description: "Lorem ipsum dolor sit amet consectetur",
+                    title: "Visualisasi Data",
+                    description:
+                        "Data divisualisasikan lebih komunikatif dengan multimedia",
                     delay: 200,
                 },
                 {
                     imgSrc: "/img/landingpage/document.png",
                     imgAlt: "download-data",
-                    title: "FITUR 4",
-                    description: "Lorem ipsum dolor sit amet consectetur",
+                    title: "Unduh Dokumen",
+                    description:
+                        "Dokumen dan regulasi tentang bedah rumah dan lainnya siap diunduh",
                     delay: 300,
-                    link: "#", // Optional link
-                },
-                {
-                    imgSrc: "/img/landingpage/route.png",
-                    imgAlt: "route",
-                    title: "FITUR 5",
-                    description: "Lorem ipsum dolor sit amet consectetur",
-                    delay: 200,
-                },
-                {
-                    imgSrc: "/img/landingpage/dynamic.png",
-                    imgAlt: "dynamic",
-                    title: "FITUR 6",
-                    description: "Lorem ipsum dolor sit amet consectetur",
-                    delay: 200,
+                    link: "/download",
                 },
             ],
         };

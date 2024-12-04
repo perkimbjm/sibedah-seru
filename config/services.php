@@ -40,4 +40,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'house' => env('HOUSE'),
+
+    'base_api_house_dev' => env('BASE_API_HOUSE_DEV'),
+    'base_api_house' => env('BASE_API_HOUSE'),
+
 ];

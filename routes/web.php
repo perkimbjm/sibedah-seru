@@ -32,9 +32,6 @@ Route::get('/home', function () {
     return view('home', ['title' => 'Beranda']);
 })->name('home');
 
-Route::get('/gallery', function () {
-    return view('gallery', ['title' => 'Galeri Kegiatan Bedah Rumah', 'galleries' => Gallery::all()]);
-});
 
 Route::get('/gallery/{gallery:slug}', function (Gallery $gallery) {
     
@@ -51,13 +48,6 @@ Route::get('/webgis', function () {
     return Inertia::render('WebGis');
 })->name('webgis');
 
-// Route::get('/complaint', function () {
-//     return view('complaint', ['title' => 'Pengaduan']);
-// });
-
-// Route::get('/contact', function () {
-//     return view('contact', ['title' => 'Kontak']);
-// });
 
 Route::get('/bedah', function () {
     return Inertia::render('HomeListing');

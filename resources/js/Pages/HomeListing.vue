@@ -116,7 +116,7 @@
                                             class="h-4 w-4 mr-2 text-pink-500"
                                         />
                                         <p class="text-sm text-gray-500">
-                                            Kec. {{ listing.villages }}
+                                            {{ listing.villages }}
                                         </p>
                                     </div>
                                     <div class="flex items-center">
