@@ -17,7 +17,6 @@ use App\Http\Controllers\Api\DistrictController;
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/rutilahu', [RutilahuController::class, 'index']);
 
 Route::get('/token', function () {
     return response()->json(['token' => config('services.house')]);
@@ -39,7 +38,6 @@ Route::middleware('auth:sanctum')->group(function() {
 
 // Public House routes
 Route::prefix('houses')->group(function() {
-    Route::get('/geojson', [HouseController::class, 'geojson']);
     Route::get('/years', [HouseController::class, 'getYears']);
     Route::get('/types', [HouseController::class, 'getTypes']);
     Route::get('/find-by-location', [HouseController::class, 'findByLocation']);
@@ -68,12 +66,6 @@ Route::prefix('rtlh')->group(function() {
     Route::post('/', [RtlhController::class, 'store']);
     Route::put('/{slug}', [RtlhController::class, 'update']);
     Route::delete('/{slug}', [RtlhController::class, 'destroy']);
-    Route::get('/map', [RtlhController::class, 'map']);
-    Route::get('/geojson', [RtlhController::class, 'geojson']);
     Route::get('/status', [RtlhController::class, 'getStatus']);
     Route::get('/find-by-location', [RtlhController::class, 'findByLocation']);
-});
-
-Route::get('/routes', function() {
-    return Route::getRoutes();
 });
