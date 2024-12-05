@@ -531,6 +531,103 @@ function loadHouseData() {
     }
 }
 
+// Buat fungsi untuk memuat data rtlh
+let rtlh = L.geoJson(null, {
+    pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, {
+            icon: L.icon({
+                iconUrl: "/img/home-blue.png", // Pastikan gambar marker tersedia
+                iconSize: [16, 16],
+                iconAnchor: [8, 16],
+                popupAnchor: [0, -16],
+            }),
+        });
+    },
+    onEachFeature: function (feature, layer) {
+        if (feature.properties) {
+            let content =
+                "<table class='table-auto w-full'>" +
+                "<tr><th class='text-left'>ID</th><td>" +
+                feature.properties.id +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Nama</th><td>" +
+                feature.properties.name +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Alamat</th><td>" +
+                feature.properties.address +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Jumlah Penghuni</th><td>" +
+                feature.properties.people +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Pondasi</th><td>" +
+                feature.properties.pondasi +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Atap</th><td>" +
+                feature.properties.atap +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Dinding</th><td>" +
+                feature.properties.dinding +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Lantai</th><td>" +
+                feature.properties.lantai +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Status</th><td>" +
+                feature.properties.status +
+                "</td></tr>" +
+                "<tr><th class='text-left'>Catatan</th><td>" +
+                feature.properties.note +
+                "</td></tr>" +
+                "</table>";
+            layer.bindPopup(content);
+        }
+    },
+});
+
+let isRtlhLoaded = false;
+
+// Fungsi untuk memuat data rumah
+function loadRtlhData() {
+    // Lakukan fetch data rumah dengan token
+    return fetch("/api/rtlh")
+        .then((response) => response.json())
+        .then((data) => {
+            if (!Array.isArray(data.data)) {
+                throw new Error("Data yang diterima bukan array");
+            }
+
+            // Konversi data ke format GeoJSON
+            let geoJsonData = {
+                type: "FeatureCollection",
+                features: data.data.map((item) => ({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [item.lng, item.lat],
+                    },
+                    properties: {
+                        id: item.id,
+                        name: item.name,
+                        address: item.address,
+                        people: item.people,
+                        pondasi: item.pondasi,
+                        atap: item.atap,
+                        dinding: item.dinding,
+                        lantai: item.lantai,
+                        status: item.status,
+                        note: item.note,
+                    },
+                })),
+            };
+
+            rtlh.addData(geoJsonData);
+            isRtlhLoaded = true;
+            console.log("Data rtlh berhasil dimuat");
+        })
+        .catch((error) => {
+            console.error("Error loading rtlh data:", error);
+        });
+}
+
 // Event handler untuk memuat data
 map.on("overlayadd", function (e) {
     if (e.name === "Kecamatan " || e.name === "Nama Kecamatan") {
@@ -543,6 +640,8 @@ map.on("overlayadd", function (e) {
         loadPolaruangData();
     } else if (e.name === "Bedah Rumah") {
         loadHouseData();
+    } else if (e.name === "RTLH ") {
+        loadRtlhData();
     }
 });
 
@@ -601,6 +700,14 @@ map.on("overlayremove", function (e) {
             console.log("Layer rumah dinonaktifkan");
         }
     }
+
+    // Handle RTLH layer
+    if (e.name === "RTLH ") {
+        if (map.hasLayer(rtlh)) {
+            map.removeLayer(rtlh);
+            console.log("Layer rtlh dinonaktifkan");
+        }
+    }
 });
 
 // Event handler untuk memuat data
@@ -613,6 +720,7 @@ let groupedOverlays = {
         "Deliniasi Kumuh": kumuh || {},
         "RTRW ": polaruang || {},
         "Bedah Rumah": house || {},
+        "RTLH ": rtlh || {},
     },
 };
 
