@@ -12,58 +12,36 @@
             </div>
 
             <!-- Search Bar and Actions -->
-            <div
-                class="flex flex-wrap justify-between items-center mb-4 space-y-2 md:space-y-0"
-            >
+            <div class="flex flex-wrap justify-between items-center mb-4 space-y-2 md:space-y-0">
                 <div class="relative w-full md:w-1/3">
-                    <input
-                        v-model="searchQuery"
-                        type="text"
-                        placeholder="Search..."
-                        class="w-full p-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-300 mb-2 md:mb-0"
-                    />
+                    <input v-model="searchQuery" type="text" placeholder="Search..."
+                        class="w-full p-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-300 mb-2 md:mb-0" />
                 </div>
                 <div class="flex flex-wrap items-center space-x-2">
-                    <PrimaryButton
-                        @click="exportToExcel"
-                        class="w-full md:w-auto mb-3 bg-emerald-500 hover:bg-emerald-600"
-                    >
+                    <PrimaryButton @click="exportToExcel"
+                        class="w-full md:w-auto mb-3 bg-emerald-500 hover:bg-emerald-600">
                         Ekspor ke Excel
                     </PrimaryButton>
-                    <SecondaryButton
-                        @click="downloadSelected"
-                        :disabled="selectedRows.length === 0"
-                        class="w-full md:w-auto mb-3 disabled:opacity-75 disabled:cursor-not-allowed"
-                    >
+                    <SecondaryButton @click="downloadSelected" :disabled="selectedRows.length === 0"
+                        class="w-full md:w-auto mb-3 disabled:opacity-75 disabled:cursor-not-allowed">
                         Download Selected ({{ selectedRows.length }})
                     </SecondaryButton>
                 </div>
             </div>
 
             <!-- Column Selector -->
-            <div
-                class="flex flex-wrap space-x-4 mb-4 items-start md:items-center"
-            >
-                <label
-                    v-for="(column, key) in columnVisibility"
-                    :key="key"
-                    class="flex items-start md:items-center space-x-2"
-                >
-                    <input
-                        type="checkbox"
-                        v-model="columnVisibility[key]"
-                        class="form-checkbox h-5 w-5 text-blue-600"
-                    />
+            <div class="flex flex-wrap space-x-4 mb-4 items-start md:items-center">
+                <label v-for="(column, key) in columnVisibility" :key="key"
+                    class="flex items-start md:items-center space-x-2">
+                    <input type="checkbox" v-model="columnVisibility[key]"
+                        class="form-checkbox h-5 w-5 text-blue-600" />
                     <span>{{ key }}</span>
                 </label>
             </div>
         </div>
 
         <!-- Empty State -->
-        <div
-            v-if="filteredData.length === 0"
-            class="text-center py-8 bg-white rounded-lg shadow"
-        >
+        <div v-if="filteredData.length === 0" class="text-center py-8 bg-white rounded-lg shadow">
             <div class="text-gray-500">
                 {{
                     searchQuery
@@ -75,25 +53,15 @@
 
         <!-- Table -->
         <div v-else class="overflow-x-auto bg-white rounded-lg shadow">
-            <table
-                class="min-w-full table-auto text-xs sm:text-sm md:text-base"
-            >
+            <table class="min-w-full table-auto text-xs sm:text-sm md:text-base">
                 <thead class="bg-gray-200">
                     <tr>
                         <th class="p-4 text-left">
-                            <input
-                                type="checkbox"
-                                @change="toggleAllSelection"
-                                v-model="allSelected"
-                                class="form-checkbox h-5 w-5"
-                            />
+                            <input type="checkbox" @change="toggleAllSelection" v-model="allSelected"
+                                class="form-checkbox h-5 w-5" />
                         </th>
-                        <th
-                            v-for="(key, index) in visibleColumns"
-                            :key="index"
-                            @click="sortColumn(key)"
-                            class="p-4 text-left cursor-pointer hover:bg-gray-300"
-                        >
+                        <th v-for="(key, index) in visibleColumns" :key="index" @click="sortColumn(key)"
+                            class="p-4 text-left cursor-pointer hover:bg-gray-300">
                             <div class="flex items-center space-x-1">
                                 <span>{{ key }}</span>
                                 <span class="text-gray-500">
@@ -107,26 +75,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="(row, index) in paginatedData"
-                        :key="index"
-                        class="hover:bg-gray-100"
-                    >
+                    <tr v-for="(row, index) in paginatedData" :key="index" class="hover:bg-gray-100">
                         <td class="p-4">
-                            <input
-                                type="checkbox"
-                                v-model="selectedRows"
-                                :value="row"
-                                class="form-checkbox h-5 w-5"
-                            />
+                            <input type="checkbox" v-model="selectedRows" :value="row" class="form-checkbox h-5 w-5" />
                         </td>
                         <td v-if="columnVisibility['Jenis']" class="p-4">
                             {{ row.jenis }}
                         </td>
-                        <td
-                            v-if="columnVisibility['Nomor dan Tahun']"
-                            class="p-4"
-                        >
+                        <td v-if="columnVisibility['Nomor dan Tahun']" class="p-4">
                             {{ row.nomorTahun }}
                         </td>
                         <td v-if="columnVisibility['Judul']" class="p-4">
@@ -136,11 +92,8 @@
                             {{ row.deskripsi }}
                         </td>
                         <td v-if="columnVisibility['Tombol Unduh']" class="p-4">
-                            <a
-                                :href="row.url"
-                                target="_blank"
-                                class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
-                            >
+                            <a :href="row.url" target="_blank"
+                                class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">
                                 Unduh
                             </a>
                         </td>
@@ -150,10 +103,8 @@
         </div>
 
         <!-- Pagination -->
-        <div
-            v-if="filteredData.length > 0"
-            class="mt-4 flex flex-wrap justify-between items-center text-xs sm:text-sm md:text-base"
-        >
+        <div v-if="filteredData.length > 0"
+            class="mt-4 flex flex-wrap justify-between items-center text-xs sm:text-sm md:text-base">
             <div class="text-gray-600">
                 Halaman {{ currentPage }} dari {{ totalPages }} ({{
                     (currentPage - 1) * rowsPerPage + 1
@@ -162,18 +113,12 @@
                 }})
             </div>
             <div class="flex items-center space-x-2">
-                <button
-                    @click="prevPage"
-                    :disabled="currentPage === 1"
-                    class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
-                >
+                <button @click="prevPage" :disabled="currentPage === 1"
+                    class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50">
                     Prev
                 </button>
-                <button
-                    @click="nextPage"
-                    :disabled="currentPage === totalPages"
-                    class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
-                >
+                <button @click="nextPage" :disabled="currentPage === totalPages"
+                    class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50">
                     Next
                 </button>
             </div>
@@ -211,8 +156,8 @@ const tableData = ref([
     {
         jenis: "Peraturan Bupati",
         nomorTahun: "2/2024",
-        judul: "Dokumen A",
-        deskripsi: "Deskripsi dokumen A",
+        judul: "Perubahan atas Peraturan Bupati Balangan Nomor 46 Tahun 2022 tentang Pedoman Pelaksanaan Pemberian Bantuan Rumah Swadaya",
+        deskripsi: "Disisipkannya pada Perda Bupati no.46 tahun 2022 yaitu ayat yang menjelaskan tentang Syarat-syarat Penerima BRS, Besaran nilai BRS serta rincian penggunaan bantuan",
         url: "/doc/perbup2-2024.pdf",
     },
     {

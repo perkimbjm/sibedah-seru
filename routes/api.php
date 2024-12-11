@@ -37,7 +37,8 @@ Route::middleware('auth:sanctum')->group(function() {
 
 
 // Public House routes
-Route::prefix('houses')->group(function() {
+Route::prefix('bedah')->group(function() {
+    Route::get('/general', [HouseController::class, 'general'])->name('api.bedah.general');
     Route::get('/years', [HouseController::class, 'getYears']);
     Route::get('/types', [HouseController::class, 'getTypes']);
     Route::get('/find-by-location', [HouseController::class, 'findByLocation']);
@@ -61,7 +62,7 @@ Route::prefix('desa')->group(function() {
 
 // RTLH routes
 Route::prefix('rtlh')->group(function() {
-    Route::get('/', [RtlhController::class, 'index']);
+    Route::get('/', [RtlhController::class, 'index'])->name('api.rtlh');
     Route::get('/{slug}', [RtlhController::class, 'show']);
     Route::post('/', [RtlhController::class, 'store']);
     Route::put('/{slug}', [RtlhController::class, 'update']);

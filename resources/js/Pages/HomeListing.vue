@@ -1,28 +1,22 @@
 <template>
     <MainLayout>
+
         <Head title="Bedah Rumah" />
         <div class="min-h-screen bg-white">
             <!-- Navigation Bar -->
             <nav class="sticky top-0 z-50 bg-white border-b">
                 <div class="px-4 py-4">
-                    <div
-                        class="flex items-center space-x-6 overflow-x-auto scrollbar-hide"
-                    >
-                        <div
-                            v-for="(item, index) in navigationItems"
-                            :key="index"
-                            class="flex flex-col items-center min-w-[56px] text-gray-600 hover:text-gray-900 cursor-pointer"
-                        >
+                    <div class="flex items-center space-x-6 overflow-x-auto scrollbar-hide">
+                        <div v-for="(item, index) in navigationItems" :key="index"
+                            class="flex flex-col items-center min-w-[56px] text-gray-600 hover:text-gray-900 cursor-pointer">
                             <component :is="item.icon" class="h-6 w-6 mb-1" />
                             <span class="text-xs whitespace-nowrap">{{
                                 item.label
-                            }}</span>
+                                }}</span>
                         </div>
 
                         <div class="flex-shrink-0 pl-4 border-l">
-                            <button
-                                class="px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-2"
-                            >
+                            <button class="px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-2">
                                 <SlidersHorizontal class="h-4 w-4" />
                                 Filter
                             </button>
@@ -34,95 +28,59 @@
             <!-- Main Content -->
             <div class="flex relative">
                 <!-- Listings Section -->
-                <div
-                    :class="[
-                        'transition-all duration-300 ease-in-out overflow-y-auto',
-                        showList ? 'hidden' : 'flex-1',
-                        'p-4',
-                    ]"
-                >
+                <div :class="[
+                    'transition-all duration-300 ease-in-out overflow-y-auto',
+                    showList ? 'hidden' : 'flex-1',
+                    'p-4',
+                ]">
                     <div class="p-4">
-                        <div
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"
-                        >
-                            <div
-                                v-for="listing in listings"
-                                :key="listing.id"
-                                class="relative"
-                            >
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                            <div v-for="listing in listings" :key="listing.id" class="relative">
                                 <!-- Image Carousel -->
-                                <div
-                                    class="relative aspect-[4/3] rounded-xl overflow-hidden group"
-                                >
+                                <div class="relative aspect-[4/3] rounded-xl overflow-hidden group">
                                     <div class="absolute top-3 right-3 z-10">
-                                        <button
-                                            class="p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-                                        >
-                                            <Heart
-                                                class="h-5 w-5 text-gray-600"
-                                            />
+                                        <button class="p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                                            <Heart class="h-5 w-5 text-gray-600" />
                                         </button>
                                     </div>
 
                                     <!-- Image Navigation Dots -->
                                     <div
-                                        class="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1 z-10"
-                                    >
-                                        <button
-                                            v-for="(
+                                        class="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1 z-10">
+                                        <button v-for="(
                                                 image, idx
-                                            ) in listing.images"
-                                            :key="idx"
-                                            class="w-1.5 h-1.5 rounded-full bg-white/60"
-                                            :class="{
+                                            ) in listing.images" :key="idx"
+                                            class="w-1.5 h-1.5 rounded-full bg-white/60" :class="{
                                                 'bg-white': idx === 0,
-                                            }"
-                                        ></button>
+                                            }"></button>
                                     </div>
 
-                                    <img
-                                        :src="listing.images[0]"
-                                        :alt="listing.name"
-                                        loading="lazy"
-                                        class="w-full h-full object-cover"
-                                    />
+                                    <img :src="listing.images[0]" :alt="listing.name" loading="lazy"
+                                        class="w-full h-full object-cover" />
                                 </div>
 
                                 <!-- Listing Details -->
                                 <div class="mt-3">
-                                    <div
-                                        class="flex justify-between items-start"
-                                    >
+                                    <div class="flex justify-between items-start">
                                         <div class="flex items-center">
-                                            <UsersRoundIcon
-                                                class="h-4 w-4 text-gray-800"
-                                            />
-                                            <span
-                                                class="ml-1 font-medium text-gray-800"
-                                                >{{ listing.name }}</span
-                                            >
+                                            <UsersRoundIcon class="h-4 w-4 text-gray-800" />
+                                            <span class="ml-1 font-medium text-gray-800">{{ listing.name }}</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <Clock
-                                                class="h-4 w-4 text-gray-400"
-                                            />
+                                            <Clock class="h-4 w-4 text-gray-400" />
                                             <span class="ml-1 text-sm">{{
                                                 listing.years
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                     </div>
                                     <div class="flex items-center">
-                                        <MapPinnedIcon
-                                            class="h-4 w-4 mr-2 text-pink-500"
-                                        />
+                                        <MapPinnedIcon class="h-4 w-4 mr-2 text-pink-500" />
                                         <p class="text-sm text-gray-500">
                                             {{ listing.villages }}
                                         </p>
                                     </div>
                                     <div class="flex items-center">
-                                        <MapPin
-                                            class="h-4 w-4 mr-2 text-green-400"
-                                        />
+                                        <MapPin class="h-4 w-4 mr-2 text-green-400" />
                                         <p class="text-sm text-gray-500">
                                             Kec. {{ listing.location }}
                                         </p>
@@ -137,42 +95,35 @@
                 </div>
 
                 <!-- Map Section -->
-                <div
-                    :class="[
-                        'transition-all duration-300 ease-in-out',
-                        showList ? 'w-full' : 'lg:w-[50%]', // Ubah dari 40% ke 50%
-                        'h-[calc(100vh-76px)]',
-                        'sticky top-[76px]', // Sesuaikan dengan tinggi navbar
-                        { 'fixed inset-0 z-50': showList }, // Gunakan fixed ketika fullscreen
-                    ]"
-                >
+                <div :class="[
+                    'transition-all duration-300 ease-in-out',
+                    showList ? 'w-full' : 'lg:w-[50%]', // Ubah dari 40% ke 50%
+                    'h-[calc(100vh-76px)]',
+                    'sticky top-[76px]', // Sesuaikan dengan tinggi navbar
+                    { 'fixed inset-0 z-50': showList }, // Gunakan fixed ketika fullscreen
+                ]">
                     <div class="h-full w-full bg-gray-100 relative">
                         <div id="map" class="w-full h-full"></div>
 
                         <!-- Toggle Button -->
-                        <button
-                            @click="toggleView"
-                            class="absolute top-4 left-4 bg-white text-black font-medium py-2 px-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 ease-in-out flex items-center space-x-2 z-[9999] border border-gray-200"
-                        >
-                            <ChevronRight
-                                v-if="showList"
-                                class="h-4 w-4"
-                                :class="{ 'rotate-180 font-bold': showList }"
-                            />
+                        <button @click="toggleView"
+                            class="absolute top-4 left-4 bg-white text-black font-medium py-2 px-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 ease-in-out flex items-center space-x-2 z-[9999] border border-gray-200">
+                            <ChevronRight v-if="showList" class="h-4 w-4"
+                                :class="{ 'rotate-180 font-bold': showList }" />
                             <span>{{
                                 showList ? "Tampilkan daftar" : "&lt;"
-                            }}</span>
+                                }}</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <FooterBar />
+        <FooterBar :links="links" />
     </MainLayout>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, defineProps } from "vue";
 import { Head } from "@inertiajs/vue3";
 import MainLayout from "@/Layouts/MainLayout.vue";
 import FooterBar from "@/Components/FooterBar.vue";
@@ -187,6 +138,13 @@ import {
     MapPinnedIcon,
     UsersRoundIcon,
 } from "lucide-vue-next";
+
+defineProps({
+    links: {
+        type: Array,
+        required: true,
+    }
+});
 
 const showList = ref(false);
 let map;
@@ -377,12 +335,66 @@ onMounted(() => {
         maxZoom: 19,
         attribution: "© OpenStreetMap",
     }).addTo(map);
+    // Tambahkan marker berdasarkan lat dan lng dari API
+    fetch('/api/bedah/general')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                // Buat layer group untuk markers
+                const markersLayer = L.layerGroup().addTo(map);
 
-    // Tambahkan marker contoh
-    L.marker([-2.337971, 115.458156])
-        .addTo(map)
-        .bindPopup("Lokasi Contoh")
-        .openPopup();
+                // Event handler untuk update markers saat peta bergerak
+                map.on('moveend', () => {
+                    markersLayer.clearLayers();
+                    const bounds = map.getBounds();
+
+                    data.data.forEach(house => {
+                        if (house.lat && house.lng) {
+                            const lat = parseFloat(house.lat);
+                            const lng = parseFloat(house.lng);
+                            const latlng = L.latLng(lat, lng);
+
+                            if (!isNaN(lat) && !isNaN(lng) && bounds.contains(latlng)) {
+                                // Buat marker berupa lingkaran biru transparan
+                                const marker = L.circleMarker(latlng, {
+                                    radius: 8,
+                                    fillColor: '#3388ff',
+                                    fillOpacity: 0.6,
+                                    color: '#3388ff',
+                                    weight: 2,
+                                    opacity: 0.8
+                                });
+
+                                // Tambah lingkaran radius 5 meter
+                                const circle = L.circle(latlng, {
+                                    radius: 6,
+                                    fillColor: '#3388ff',
+                                    fillOpacity: 0.2,
+                                    color: '#3388ff',
+                                    weight: 1,
+                                    opacity: 0.4
+                                });
+
+                                marker.bindPopup(`
+                                    <b>${house.name}</b><br>
+                                    ${house.address}<br>
+                                    ${house.village?.name || ''}, ${house.district?.name || ''}
+                                `);
+
+                                markersLayer.addLayer(marker);
+                                markersLayer.addLayer(circle);
+                            }
+                        }
+                    });
+                });
+
+                // Trigger initial update
+                map.fire('moveend');
+            } else {
+                console.error('Error: Data tidak valid dari API');
+            }
+        })
+        .catch(error => console.error('Error:', error));
 
     // Atur posisi tombol zoom in dan zoom out ke kanan atas
     map.zoomControl.setPosition("topright");
@@ -417,6 +429,7 @@ onMounted(() => {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }

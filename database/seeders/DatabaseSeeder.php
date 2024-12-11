@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
+use Database\Seeders\UsersTableSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -15,19 +17,10 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('admin123'),
-            'email_verified_at' => now(),
-            'role' => 'admin',
-            'remember_token' => Str::random(10),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
         $this->call([
-            GalleriesTableSeeder::class,
+            UsersTableSeeder::class,
+            PermissionsTableSeeder::class,
+            RoleAndPermissionsSeeder::class
         ]);
     }
 }

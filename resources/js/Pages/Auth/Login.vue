@@ -53,8 +53,8 @@ const submit = () => {
     })).post(route("login"), {
         onSuccess: (response) => {
             // Update auth store setelah login berhasil
-            authStore.handleLoginSuccess(response?.props?.auth?.user);
-            form.reset("password");
+            // authStore.handleLoginSuccess(response?.props?.auth?.user);
+            window.location.assign(route("dashboard"));
         },
         onError: () => {
             form.reset("password");
@@ -109,20 +109,14 @@ onMounted(() => {
 </script>
 
 <template>
+
     <Head title="Log in" />
-    <div
-        class="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-100 to-emerald-100"
-    >
-        <div
-            class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-2xl shadow-xl flex overflow-hidden"
-        >
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-100 to-emerald-100">
+        <div class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-2xl shadow-xl flex overflow-hidden">
             <!-- Left Side - Login Form -->
             <div class="w-full lg:w-1/2 px-8 py-12 sm:px-12">
                 <div class="flex items-center gap-2 mb-3">
-                    <button
-                        class="w-10 h-10 flex items-center justify-center"
-                        @click="handleBack"
-                    >
+                    <button class="w-10 h-10 flex items-center justify-center" @click="handleBack">
                         <ChevronLeftIcon class="w-8 h-8" />
                     </button>
                     <div class="w-60 flex items-center justify-center">
@@ -133,77 +127,44 @@ onMounted(() => {
                 <h1 class="text-3xl font-bold mb-2">Welcome Back !</h1>
                 <p class="text-gray-600 mb-8">Silahkan Login Kembali</p>
 
-                <div
-                    v-if="status"
-                    class="mb-4 font-medium text-sm text-green-600"
-                >
+                <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
                     {{ status }}
                 </div>
 
                 <form @submit.prevent="submit" class="space-y-6">
                     <div>
                         <InputLabel for="email" value="Email" />
-                        <TextInput
-                            id="email"
-                            ref="emailInput"
-                            v-model="form.email"
-                            type="email"
-                            required
-                            autocomplete="email"
-                            placeholder="Masukkan Email kamu"
-                        />
+                        <TextInput id="email" ref="emailInput" v-model="form.email" type="email" required
+                            autocomplete="email" placeholder="Masukkan Email kamu" />
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
                     <!-- Password Section -->
                     <div>
-                        <InputLabel for="password" value="Password"
-                            >Password</InputLabel
-                        >
+                        <InputLabel for="password" value="Password">Password</InputLabel>
                         <div class="relative">
-                            <TextInput
-                                id="password"
-                                v-model="form.password"
-                                :type="showPassword ? 'text' : 'password'"
-                                required
-                                autocomplete="current-password"
-                                placeholder="Masukkan kata sandi"
-                            />
-                            <button
-                                type="button"
-                                @click="showPassword = !showPassword"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                            >
+                            <TextInput id="password" v-model="form.password" :type="showPassword ? 'text' : 'password'"
+                                required autocomplete="current-password" placeholder="Masukkan kata sandi" />
+                            <button type="button" @click="showPassword = !showPassword"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
                                 <EyeIcon v-if="!showPassword" class="w-5 h-5" />
                                 <EyeOffIcon v-else class="w-5 h-5" />
                             </button>
                         </div>
-                        <InputError
-                            class="mt-2"
-                            :message="form.errors.password"
-                        />
+                        <InputError class="mt-2" :message="form.errors.password" />
                     </div>
 
                     <!-- Captcha Section -->
                     <div>
                         <div class="p-4 mb-2">
-                            <p
-                                class="text-blue-800 text-3xl font-semibold text-center"
-                            >
+                            <p class="text-blue-800 text-3xl font-semibold text-center">
                                 {{ captcha.num1 }} + {{ captcha.num2 }} =
                             </p>
                         </div>
-                        <input
-                            type="number"
-                            v-model="captchaInput"
-                            required
+                        <input type="number" v-model="captchaInput" required
                             class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
-                            placeholder="Masukkan Captcha Hasil Penjumlahan"
-                        />
-                        <p
-                            v-if="captchaError"
-                            class="mt-1 text-sm text-red-500"
-                        >
+                            placeholder="Masukkan Captcha Hasil Penjumlahan" />
+                        <p v-if="captchaError" class="mt-1 text-sm text-red-500">
                             {{ captchaError }}
                         </p>
                     </div>
@@ -211,29 +172,18 @@ onMounted(() => {
                     <!-- Remember me and Forgot Password-->
                     <div class="flex items-center justify-between mt-4">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <Checkbox
-                                v-model:checked="form.remember"
-                                name="remember"
-                            />
-                            <span class="ms-2 text-sm text-gray-600"
-                                >Remember me</span
-                            >
+                            <Checkbox v-model:checked="form.remember" name="remember" />
+                            <span class="ms-2 text-sm text-gray-600">Remember me</span>
                         </label>
 
-                        <Link
-                            v-if="canResetPassword"
-                            :href="route('password.request')"
-                            class="text-sm text-emerald-600 hover:text-emerald-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-                        >
-                            Lupa Password ?
+                        <Link v-if="canResetPassword" :href="route('password.request')"
+                            class="text-sm text-emerald-600 hover:text-emerald-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                        Lupa Password ?
                         </Link>
                     </div>
 
-                    <button
-                        :class="{ 'opacity-50': form.processing }"
-                        :disabled="form.processing"
-                        class="w-full px-4 py-3 text-white bg-emerald-500 hover:bg-emerald-600 font-semibold rounded-lg transition-colors duration-300"
-                    >
+                    <button :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
+                        class="w-full px-4 py-3 text-white bg-emerald-500 hover:bg-emerald-600 font-semibold rounded-lg transition-colors duration-300">
                         {{ form.processing ? "Logging in..." : "Log in" }}
                     </button>
 
@@ -242,23 +192,14 @@ onMounted(() => {
                             <div class="w-full border-t border-gray-200"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500"
-                                >or continue</span
-                            >
+                            <span class="px-2 bg-white text-gray-500">or continue</span>
                         </div>
                     </div>
 
-                    <button
-                        type="button"
-                        @click="handleGoogleLogin"
+                    <button type="button" @click="handleGoogleLogin"
                         class="w-full flex items-center justify-center gap-3 border border-gray-200 hover:bg-gray-50 py-3 rounded-lg transition-colors"
-                        :disabled="form.processing"
-                    >
-                        <img
-                            src="/img/google.png"
-                            alt="Google"
-                            class="w-5 h-5"
-                        />
+                        :disabled="form.processing">
+                        <img src="/img/google.png" alt="Google" class="w-5 h-5" />
                         {{
                             form.processing
                                 ? "Processing..."
@@ -269,30 +210,17 @@ onMounted(() => {
 
                 <p class="mt-8 text-center text-sm text-gray-600">
                     Belum memiliki Akun?
-                    <Link
-                        :href="route('register')"
-                        class="text-emerald-600 hover:text-emerald-700 font-medium"
-                        >Daftar Sekarang</Link
-                    >
+                    <Link :href="route('register')" class="text-emerald-600 hover:text-emerald-700 font-medium">Daftar
+                    Sekarang</Link>
                 </p>
             </div>
             <!-- End Left Side -->
 
             <!-- Right Side - Illustration -->
-            <div
-                class="hidden sm:block w-1/2 bg-gray-300 dark:bg-gray-600 p-12 relative"
-            >
-                <div
-                    class="h-full flex flex-col items-center justify-center text-center"
-                >
-                    <img
-                        src="/img/tugu.svg"
-                        alt="Login Illustration"
-                        class="mb-3"
-                    />
-                    <h2
-                        class="text-3xl font-bold text-gray-900 dark:text-white mb-4"
-                    >
+            <div class="hidden sm:block w-1/2 bg-gray-300 dark:bg-gray-600 p-12 relative">
+                <div class="h-full flex flex-col items-center justify-center text-center">
+                    <img src="/img/tugu.svg" alt="Login Illustration" class="mb-3" />
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                         SIBEDAH SERU
                     </h2>
                     <p class="text-gray-600">
