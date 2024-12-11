@@ -479,56 +479,47 @@ let isHouseLoaded = false;
 
 // Fungsi untuk memuat data rumah
 function loadHouseData() {
-    if (!isHouseLoaded) {
-        getToken() // Ambil token dari cache atau fetch
-            .then((token) => {
-                if (!token) {
-                    throw new Error("Token is missing");
-                }
+    return fetch("/api/bedah/general")
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (!Array.isArray(data.data)) {
+                throw new Error("Data yang diterima bukan array");
+            }
 
-                // Lakukan fetch data rumah dengan token
-                return fetch("/api/houses", {
-                    headers: {
-                        Authorization: `Bearer ${token}`, // Gunakan token dari cache
+            // Konversi data ke format GeoJSON
+            let geoJsonData = {
+                type: "FeatureCollection",
+                features: data.data.map((item) => ({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [item.lng, item.lat],
                     },
-                });
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (!Array.isArray(data.data)) {
-                    throw new Error("Data yang diterima bukan array");
-                }
+                    properties: {
+                        id: item.id,
+                        name: item.name,
+                        address: item.address,
+                        district: item.district.name,
+                        year: item.year,
+                        type: item.type,
+                        source: item.source,
+                        note: item.note,
+                    },
+                })),
+            };
 
-                // Konversi data ke format GeoJSON
-                let geoJsonData = {
-                    type: "FeatureCollection",
-                    features: data.data.map((item) => ({
-                        type: "Feature",
-                        geometry: {
-                            type: "Point",
-                            coordinates: [item.lng, item.lat],
-                        },
-                        properties: {
-                            id: item.id,
-                            name: item.name,
-                            address: item.address,
-                            district: item.district.name,
-                            year: item.year,
-                            type: item.type,
-                            source: item.source,
-                            note: item.note,
-                        },
-                    })),
-                };
-
-                house.addData(geoJsonData);
-                isHouseLoaded = true;
-                console.log("Data rumah berhasil dimuat");
-            })
-            .catch((error) => {
-                console.error("Error loading house data:", error);
-            });
-    }
+            house.addData(geoJsonData);
+            isHouseLoaded = true;
+            console.log("Data rumah berhasil dimuat");
+        })
+        .catch((error) => {
+            console.error("Error loading house data:", error);
+        });
 }
 
 // Buat fungsi untuk memuat data rtlh

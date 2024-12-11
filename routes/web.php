@@ -1,19 +1,54 @@
 <?php
 
 use Inertia\Inertia;
-use App\Models\Gallery;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\LinkController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RtlhController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\GuideController;
+use App\Http\Controllers\HouseController;
 use App\Http\Controllers\ProxyController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\RtlhMapController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\HouseMapController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\HousePhotoController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\RenovatedHousePhotoController;
 
 
-Route::get('/', function () {
-    return Inertia::render('LandingPage');
+
+Route::get('/', function() {
+    $statisticController = app(StatisticController::class);
+    $faqController = app(FaqController::class);
+    $linkController = app(LinkController::class);
+    
+    $statistics = $statisticController->getData();
+    $faqs = $faqController->getData();
+    $links = $linkController->getData();
+     
+    return Inertia::render('LandingPage', [
+        'statistics' => $statistics,
+        'faqs' => $faqs,
+        'links' => $links
+    ]);
 })->name('landingpage');
 
 Route::get('/download', function () {
-    return Inertia::render('DownloadData');
+    $downloadController = app(DownloadController::class);
+    $downloads = $downloadController->getData();
+    $linkController = app(LinkController::class);
+    $links = $linkController->getData();
+    return Inertia::render('DownloadData', ['downloads' => $downloads, 'links' => $links] );
 })->name('download');
 
 Route::get('/terms', function () {
@@ -50,7 +85,9 @@ Route::get('/webgis', function () {
 
 
 Route::get('/bedah', function () {
-    return Inertia::render('HomeListing');
+    $linkController = app(LinkController::class);
+    $links = $linkController->getData();
+    return Inertia::render('HomeListing', ['links' => $links]);
 })->name('bedah');
 
 Route::get('/test', function () {
@@ -70,13 +107,52 @@ Route::get('/proxy/wfs', [ProxyController::class, 'proxyGeoserverWFS'])->name('p
 Route::get('/proxy/wms', [ProxyController::class, 'proxyGeoserverWMS'])->name('proxyWMS');
 
 
-
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    // Dashboard route
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Admin routes dengan prefix 'app'
+    Route::prefix('app')->name('app.')->group(function () {
+        // Routes yang memerlukan permission `role_access`
+        Route::middleware(['can:user_management_access'])->group(function () {
+            // User Management
+            Route::resources([
+                'roles' => RoleController::class,
+                'users' => UserController::class,
+                'permissions' => PermissionController::class,
+                // 'audit-logs' => AuditLogController::class, ['except' => ['create', 'store', 'edit', 'update', 'destroy']],
+            ]);
+        });
+
+        // Content Management
+        Route::middleware(['can:data_access'])->group(function () {
+            Route::get('houses/getKecamatan', [HouseController::class, 'getKecamatan'])->name('houses.getKecamatan');
+            Route::get('houses/check-nik', [HouseController::class, 'checkNIK'])->name('houses.checkNIK');
+            Route::get('rtlh/getKecamatan', [RtlhController::class, 'getKecamatan'])->name('rtlh.getKecamatan');
+            Route::resources([
+                'houses' => HouseController::class,
+                'rtlh' => RtlhController::class,
+                'renovated-house-photos' => RenovatedHousePhotoController::class,
+                'house-photos' => HousePhotoController::class,
+                'documents' => DocumentController::class,
+                'reviews' => ReviewController::class,
+            ]);
+            Route::get('bedah/peta', [HouseMapController::class, 'index'])->name('bedah.peta');
+            Route::get('rutilahu/peta', [RtlhMapController::class, 'index'])->name('rutilahu.peta');
+        });
+
+        // Content Management
+        Route::middleware(['can:content_management_access'])->group(function () {
+            Route::resources([
+                'faqs' => FaqController::class,
+                'downloads' => DownloadController::class,
+                'links' => LinkController::class,
+                'contacts' => ContactController::class,
+            ]);
+        });
+    });
 });

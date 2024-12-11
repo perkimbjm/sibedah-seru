@@ -1,107 +1,59 @@
 <template>
     <header class="h-full w-full bg-white">
         <nav class="bg-white border-gray-200 dark:bg-gray-900">
-            <div
-                class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
-            >
-                <Link
-                    :href="route('landingpage')"
-                    class="flex items-center space-x-3 rtl:space-x-reverse"
-                >
-                    <img src="/img/logobalangan-nav.webp" alt="logo balangan" />
-                    <img src="/img/logo-sibedah.png" alt="logo sibedah-seru" />
-                    <div class="flex flex-col justify-center">
-                        <p
-                            class="whitespace-nowrap dark:text-white font-roboto font-bold"
-                        >
-                            SiBEDAH-SERU
-                        </p>
-                        <p
-                            class="whitespace-nowrap dark:text-white font-roboto font-bold text-sm"
-                        >
-                            PERKIM
-                        </p>
-                    </div>
+            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                <Link :href="route('landingpage')" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <img src="/img/logobalangan-nav.webp" alt="logo balangan" />
+                <img src="/img/logo-sibedah.png" class="w-12" alt="logo sibedah-seru" />
+                <div class="flex flex-col justify-center">
+                    <p class="whitespace-nowrap dark:text-white font-roboto font-bold">
+                        SiBEDAH-SERU
+                    </p>
+                    <p class="whitespace-nowrap dark:text-white font-roboto font-bold text-sm">
+                        PERKIM
+                    </p>
+                </div>
                 </Link>
 
-                <div
-                    class="flex items-center md:order-2 space-x-3 rtl:space-x-reverse"
-                >
+                <div class="flex items-center md:order-2 space-x-3 rtl:space-x-reverse">
                     <div class="hidden md:block">
                         <AuthButton mobile />
                     </div>
 
-                    <button
-                        @click="toggleMenu"
-                        type="button"
+                    <button @click="toggleMenu" type="button"
                         class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                        aria-controls="navbar-cta"
-                        :aria-expanded="isMenuOpen"
-                    >
+                        aria-controls="navbar-cta" :aria-expanded="isMenuOpen">
                         <span class="sr-only">Open main menu</span>
-                        <svg
-                            :class="{ block: !isMenuOpen, hidden: isMenuOpen }"
-                            class="h-8 w-8"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                            data-slot="icon"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                            />
+                        <svg :class="{ block: !isMenuOpen, hidden: isMenuOpen }" class="h-8 w-8" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
+                            data-slot="icon">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                         </svg>
 
-                        <svg
-                            :class="{ hidden: !isMenuOpen, block: isMenuOpen }"
-                            class="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                            data-slot="icon"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 18 18 6M6 6l12 12"
-                            />
+                        <svg :class="{ hidden: !isMenuOpen, block: isMenuOpen }" class="h-6 w-6" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
+                            data-slot="icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
                 <!-- Menu List in mobile or desktop -->
-                <div
-                    id="navbar-cta"
-                    class="w-full md:flex md:w-auto md:order-1"
-                    :class="{
-                        hidden: !isMenuOpen && !isDesktop,
-                        block: isMenuOpen || isDesktop,
-                    }"
-                >
+                <div id="navbar-cta" class="w-full md:flex md:w-auto md:order-1" :class="{
+                    hidden: !isMenuOpen && !isDesktop,
+                    block: isMenuOpen || isDesktop,
+                }">
                     <ul
-                        class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700"
-                    >
+                        class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                         <template v-for="item in menuItems" :key="item.name">
-                            <NavLink
-                                :href="
-                                    item.isExternal
-                                        ? item.href
-                                        : route(item.route)
-                                "
-                                :active="
-                                    item.isExternal
-                                        ? false
-                                        : route().current(item.route)
-                                "
-                                :target="item.target"
-                                :rel="item.rel"
-                            >
+                            <NavLink :href="item.isExternal
+                                ? item.href
+                                : route(item.route)
+                                " :active="item.isExternal
+                                    ? false
+                                    : route().current(item.route)
+                                    " :target="item.target" :rel="item.rel">
                                 {{ item.name }}
                             </NavLink>
                         </template>
@@ -130,7 +82,7 @@ const baseUrl = computed(() => page.props.app?.url || "");
 
 const menuItems = computed(() => [
     {
-        name: "Beranda",
+        name: "Home",
         href: `${baseUrl.value}/`,
         route: "landingpage",
     },

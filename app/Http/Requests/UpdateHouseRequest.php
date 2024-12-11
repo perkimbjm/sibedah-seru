@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateHouseRequest extends FormRequest
@@ -9,9 +10,9 @@ class UpdateHouseRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function authorize()
     {
-        return false;
+        return Gate::allows('house_edit');
     }
 
     /**
@@ -22,7 +23,19 @@ class UpdateHouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string'],
+            'nik' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'district' => ['nullable', 'string'],
+            'lat' => ['required', 'string'],
+            'lng' => ['required', 'string'],
+            'year' => ['required', 'integer'],
+            'lng' => ['required', 'string'],
+            'type' => ['required', 'string'],
+            'rtlh_id' => ['nullable', 'integer', 'exists:rtlh,id'],
+            'district_id' => ['required', 'integer', 'exists:districts,id'],
+            'village_id' => ['required', 'integer', 'exists:villages,id'],
+            'note' => ['nullable', 'text'],
         ];
     }
 }

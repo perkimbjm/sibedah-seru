@@ -1,51 +1,33 @@
 <template>
     <section class="max-w-7xl mx-auto px-4 py-16">
-        <div
-            class="flex flex-col md:flex-row justify-between items-start mb-16 gap-8"
-        >
+        <div class="flex flex-col md:flex-row justify-between items-start mb-16 gap-8">
             <h2 class="text-5xl font-semibold">Best Practices</h2>
             <div class="max-w-lg">
                 <p class="text-gray-700 text-lg mb-4">
                     Dokumentasi foto-foto terbaik pada kegiatan bedah seru
                     (bedah seribu rumah) di Kabupaten Balangan.
                 </p>
-                <Link
-                    href="/bedah"
-                    class="inline-flex items-center px-4 py-2 rounded-full border bg-lime-300 hover:bg-lime-500 hover:text-white transition-colors"
-                >
-                    Lihat Semua
-                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                <Link href="/bedah"
+                    class="inline-flex items-center px-4 py-2 rounded-full border bg-lime-300 hover:bg-lime-500 hover:text-white transition-colors">
+                Lihat Semua
+                <ChevronDownIcon class="w-4 h-4 ml-2" />
                 </Link>
             </div>
         </div>
 
-        <Carousel
-            :settings="settings"
-            :breakpoints="breakpoints"
-            :wrap-around="true"
-            :transition="1000"
-            :autoplay="2000"
-            class="gallery-carousel"
-        >
+        <Carousel :settings="settings" :breakpoints="breakpoints" :wrap-around="true" :transition="1000"
+            :autoplay="2000" class="gallery-carousel">
             <Slide v-for="property in properties" :key="property.id">
                 <div class="carousel__item px-2">
                     <div class="relative group cursor-pointer">
-                        <img
-                            :src="property.image"
-                            :alt="property.title"
-                            loading="lazy"
-                            class="w-full h-[300px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-200"
-                        />
+                        <img :src="property.image" :alt="property.title" loading="lazy"
+                            class="w-full h-[300px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-200" />
                         <div
-                            class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent rounded-b-lg"
-                        >
+                            class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent rounded-b-lg">
                             <h3 class="text-white font-medium">
                                 {{ property.title }}
                             </h3>
-                            <p
-                                v-if="property.location"
-                                class="text-white/80 text-sm flex items-center mt-1"
-                            >
+                            <p v-if="property.location" class="text-white/80 text-sm flex items-center mt-1">
                                 <MapPinIcon class="w-4 h-4 mr-1" />
                                 {{ property.location }}
                             </p>
@@ -63,7 +45,6 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import { Link } from "@inertiajs/vue3";
 import { ChevronDownIcon, MapPinIcon } from "lucide-vue-next";

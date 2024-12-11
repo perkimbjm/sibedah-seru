@@ -15,10 +15,14 @@
         "laravel/sanctum": "*",
         "laravel/socialite": "*",
         "laravel/tinker": "^2.9",
-        "tightenco/ziggy": "^2.0"
+        "owen-it/laravel-auditing": "^13.6",
+        "spatie/laravel-permission": "^6.10",
+        "tightenco/ziggy": "^2.0",
+        "yajra/laravel-datatables": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "laravel-shift/blueprint": "^2.10",
         "laravel/pail": "^1.1",
         "laravel/pint": "^1.13",
         "mockery/mockery": "^1.6",

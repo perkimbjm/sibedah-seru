@@ -90,4 +90,5 @@ class VillageController extends Controller
             'data' => $village
         ]);
     }
+
 }

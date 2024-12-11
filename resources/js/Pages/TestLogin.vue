@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { EyeIcon, EyeOffIcon, WalletIcon } from "lucide-vue-next";
+import { EyeIcon, EyeOffIcon, ChevronLeftIcon } from "lucide-vue-next";
 
 const email = ref("");
 const password = ref("");
@@ -61,11 +61,21 @@ onMounted(() => {
         class="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-100 to-emerald-100"
     >
         <div
-            class="w-full max-w-6xl bg-white rounded-2xl shadow-xl flex overflow-hidden"
+            class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-2xl shadow-xl flex overflow-hidden"
         >
             <!-- Left Side - Login Form -->
             <div class="w-full lg:w-1/2 px-8 py-12 sm:px-12">
                 <div class="flex items-center gap-2 mb-12">
+                    <button
+                        class="w-10 h-10 flex items-center justify-center"
+                        @click="
+                            window.history.length > 1
+                                ? $router.go(-1)
+                                : $router.push('/')
+                        "
+                    >
+                        <ChevronLeftIcon class="w-8 h-8" />
+                    </button>
                     <div class="w-10 h-10 flex items-center justify-center">
                         <img src="/img/logobalangan.webp" alt="Balangan" />
                     </div>
@@ -118,7 +128,7 @@ onMounted(() => {
                     <div>
                         <div class="p-4 mb-2">
                             <p
-                                class="text-blue-800 text-4xl font-semibold text-center"
+                                class="text-blue-800 text-3xl font-semibold text-center"
                             >
                                 {{ captcha.num1 }} + {{ captcha.num2 }} =
                             </p>
@@ -198,19 +208,23 @@ onMounted(() => {
             </div>
 
             <!-- Right Side - Illustration -->
-            <div class="hidden lg:block w-1/2 bg-gray-300 p-12 relative">
+            <div
+                class="hidden sm:block w-1/2 bg-gray-300 dark:bg-gray-600 p-12 relative"
+            >
                 <div
                     class="h-full flex flex-col items-center justify-center text-center"
                 >
                     <img
-                        src="/img/login.png"
+                        src="/img/tugu.svg"
                         alt="Login Illustration"
-                        class="mb-8 w-64"
+                        class="mb-3"
                     />
-                    <h2 class="text-3xl font-bold text-white mb-4">
+                    <h2
+                        class="text-3xl font-bold text-gray-900 dark:text-white mb-4"
+                    >
                         SIBEDAH SERU
                     </h2>
-                    <p class="text-gray-400">
+                    <p class="text-gray-600">
                         Sistem Informasi<br />
                         Bedah Seribu Rumah
                     </p>

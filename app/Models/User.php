@@ -2,66 +2,73 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Role;
+use App\Models\Review;
+use Spatie\Permission\Traits\HasRoles;
+// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Contracts\Auth\Access\Authorizable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Authorizable
 {
-    use HasApiTokens;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory;
-    use HasProfilePhoto;
-    use Notifiable;
+    use HasFactory, HasRoles;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
+        'google_id',
         'name',
         'email',
-        'password',
-        'google_id',
         'avatar',
-        'email_verified_at'
-
+        'password',
+        'role_id',
+        'remember_token',
+        'email_verified_at',
+        'phone',
+        'profile_photo_path'
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        'phone'
     ];
 
     /**
-     * The accessors to append to the model's array form.
+     * The attributes that should be cast to native types.
      *
-     * @var array<int, string>
+     * @var array
      */
-    protected $appends = [
-        'profile_photo_url',
+    protected $casts = [
+        'id' => 'integer',
+        'role_id' => 'integer',
+        'email_verified_at' => 'timestamp',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function isSuperAdmin()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->roles()->where('id', 1)->exists();
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 }

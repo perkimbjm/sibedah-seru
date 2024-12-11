@@ -71,4 +71,36 @@ class House extends Model
     {
         return DB::select("SELECT ST_AsGeoJSON(geom) as geojson FROM houses WHERE id = ?", [$this->id])[0]->geojson;
     }
+
+    public $appends = [
+        'coordinate', 'map_popup_content',
+    ];
+
+
+    public function getNameLinkAttribute()
+    {
+        $title = __('global.show_detail_title');
+        $link = '<a href="' . route('app.houses.show', $this) . '"';
+        $link .= ' title="' . $title . '">';
+        $link .= $this->id;
+        $link .= '</a>';
+
+        return $link;
+    }
+
+    public function getCoordinateAttribute()
+    {
+        if ($this->lat && $this->lng) {
+            return $this->lat . ', ' . $this->lng;
+        }
+    }
+
+    public function getMapPopupContentAttribute()
+    {
+        $mapPopupContent = '';
+        $mapPopupContent .= '<div class="my-2"><strong>' . __('rumah') . ':</strong><br>' . $this->name_link . '</div>';
+        $mapPopupContent .= '<div class="my-2"><strong>' . __('koordinat') . ':</strong><br>' . $this->coordinate . '</div>';
+
+        return $mapPopupContent;
+    }
 }
