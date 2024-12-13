@@ -21,8 +21,8 @@ class RtlhController extends Controller
     {
         abort_if(Gate::denies('rtlh_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $rtlhs = Rtlh::with([
-            'district:id,name',
-            'village:id,name'
+            'districts:id,name',
+            'villages:id,name'
         ])->select(
             'id', 'name', 'nik', 'kk', 'address', 'people', 'area', 'pondasi', 
             'kolom_blk', 'rngk_atap', 'atap', 'dinding', 'lantai', 'air', 
@@ -80,6 +80,7 @@ class RtlhController extends Controller
         $request->session()->flash('rtlh.id', $rtlh->id);
         return redirect()->route('app.rtlh.index')->with('success', 'Data berhasil ditambahkan.');
     }
+    
 
     // // Menampilkan detail satu data RTLH
     public function show($id)
@@ -89,48 +90,58 @@ class RtlhController extends Controller
         return response()->json($rtlh);
     }
 
+    public function edit(Rtlh $rtlh)
+    {
+        abort_if(Gate::denies('rtlh_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $districts = District::select('id','name')->pluck('name', 'id')->prepend("Pilih Kecamatan", '');
+
+        $villages = Village::select('id','name', 'district_id')->pluck('name','id')->prepend("Pilih Kelurahan / Desa", '');
+
+        $kelayakanOptions = ['Layak', 'Menuju Layak', 'Agak Layak', 'Kurang Layak', 'Tidak Layak'];
+        $bigOptions = ['LAYAK', 'MENUJU LAYAK', 'AGAK LAYAK', 'KURANG LAYAK', 'TIDAK LAYAK'];
+        $airOptions = [
+            'Leher Angsa',
+            'Air Kemasan',
+            'Pamsimas',
+            'Mata Air',
+            'PDAM',
+            'Air Hujan',
+            'Sungai',
+            'Sumur',
+            'Lainnya',
+        ];
+
+        $jarakTinjaOptions = ['≥ 10 Meter', '≤ 10 Meter'];
+
+        $wcOptions = ['Tidak Ada', 'Bersama', 'Milik Sendiri'];
+
+        $jenisWcOptions = ['Tidak Ada', 'Plengsengan', 'Leher Angsa', 'Cemplung/Cubluk'];
+
+        $tpaTinjaOptions = ['Tangki Septik', 'Lubang Tanah', 'IPAL', 'Kolam/Sawah/Sungai/Danau/Laut', 'Pantai/Tanah Lapang/Kebun'];
+
+        $rtlh->load('districts', 'villages');
+
+        return view('rtlh.edit', compact('districts', 'villages', 'rtlh', 'kelayakanOptions', 'bigOptions','jenisWcOptions', 'airOptions', 'jarakTinjaOptions', 'wcOptions', 'tpaTinjaOptions'));
+    }
+
     
 
     // Mengupdate data RTLH
-    public function update(UpdateRtlhRequest $request, $id)
+    public function update(UpdateRtlhRequest $request, $id, Rtlh $rtlh)
     {
         $rtlh = Rtlh::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'nik' => 'nullable|string|max:255',
-            'kk' => 'nullable|string|max:255',
-            'address' => 'required|string',
-            'people' => 'nullable|integer',
-            'lat'=> 'nullable|string',
-            'lng'=> 'nullable|string',
-            'area'=> 'nullable|float',
-            'pondasi'=> 'nullable|string', 
-            'kolom_blk'=> 'nullable|string',
-            'rngk_atap' => 'nullable|string',
-            'atap'=> 'nullable|string',
-            'dinding'=> 'nullable|string',
-            'lantai'=> 'nullable|string',
-            'air'=> 'nullable|string',
-            'jarak_tinja'=> 'nullable|string',
-            'wc'=> 'nullable|string',
-            'jenis_wc' => 'nullable|string',
-            'tpa_tinja' => 'nullable|string',
-            'status'=> 'nullable|string',
-            'is_renov'=> 'nullable|boolean',
-            'district_id' => 'nullable|integer',
-            'village_id' => 'nullable|integer',
-            'note'=> 'nullable|string',
-        ]);
-
-        $rtlh->update($validated);
+        $rtlh->update($request->all());
 
         if ($request->has('house')) {
             $rtlh->house()->updateOrCreate([], $request->input('house'));
         }
 
-        return response()->json($rtlh);
+        return redirect()->route('app.rtlh.index');
+
     }
+
 
     // Menghapus data RTLH
     public function destroy($id)
@@ -143,7 +154,7 @@ class RtlhController extends Controller
 
         $rtlh->delete();
 
-        return response()->json(['message' => 'Data berhasil dihapus.']);
+        return redirect()->route('app.rtlh.index');
     }
 
     public function getKecamatan(Request $request)

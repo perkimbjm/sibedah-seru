@@ -1,30 +1,39 @@
 setTimeout(function () {
-    map.invalidateSize();
+    if (map) {
+        map.invalidateSize();
+    }
 }, 1000);
 
 window.DesaSearch = [];
 
-/*Zoom Extends*/
-L.easyButton({
-    states: [
-        {
-            stateName: "zoom-to-default",
-            icon: "fa-home fa-lg",
-            title: "zoom to Balangan",
-            onClick: function (btn, map) {
-                map.setView(mapCenter, mapZoom);
-                btn.state("zoom-to-default");
-            },
-        },
-    ],
-}).addTo(map);
-console.log("Easy button berhasil dimuat");
+const mapCenter = [-2.33668, 115.46028];
+const mapZoom = 18;
 
-L.Control.geocoder({
-    position: "topleft",
-    collapsed: true,
-}).addTo(map);
-console.log("Geocoder control berhasil dimuat");
+/*Zoom Extends*/
+if (L && L.easyButton) {
+    L.easyButton({
+        states: [
+            {
+                stateName: "zoom-to-default",
+                icon: "fa-home fa-lg",
+                title: "zoom to Balangan",
+                onClick: function (btn, map) {
+                    map.setView(mapCenter, mapZoom);
+                    btn.state("zoom-to-default");
+                },
+            },
+        ],
+    }).addTo(map);
+    console.log("Easy button berhasil dimuat");
+}
+
+if (L && L.Control && L.Control.geocoder) {
+    L.Control.geocoder({
+        position: "topleft",
+        collapsed: true,
+    }).addTo(map);
+    console.log("Geocoder control berhasil dimuat");
+}
 
 /* GPS enabled geolocation control set to follow the user's location */
 const locateControl = L.control
@@ -61,8 +70,10 @@ const locateControl = L.control
 console.log("Locate control berhasil dimuat");
 
 /*Scale Map*/
-L.control.scale({ imperial: false }).addTo(map);
-console.log("Scale control berhasil dimuat");
+if (L && L.control && L.control.scale) {
+    L.control.scale({ imperial: false }).addTo(map);
+    console.log("Scale control berhasil dimuat");
+}
 
 /*Basemap*/
 const baseMapIcons = {
@@ -120,18 +131,20 @@ let options = {
     removalMode: true,
 };
 
-L.easyButton({
-    states: [
-        {
-            stateName: "draw",
-            icon: "fa fa-wrench fa-lg",
-            title: "draw this map",
-            onClick: function (btn, map) {
-                togglePMToolbar();
+if (L && L.easyButton) {
+    L.easyButton({
+        states: [
+            {
+                stateName: "draw",
+                icon: "fa fa-wrench fa-lg",
+                title: "draw this map",
+                onClick: function (btn, map) {
+                    togglePMToolbar();
+                },
             },
-        },
-    ],
-}).addTo(map);
+        ],
+    }).addTo(map);
+}
 
 // Fungsi untuk menampilkan atau menyembunyikan tombol-tombol leaflet.pm
 function togglePMToolbar() {
@@ -406,95 +419,219 @@ let polaruang = L.tileLayer.wms("/proxy/wms?", {
 });
 
 // Tambahkan event listener untuk tile loading
-polaruang.on("loading", function () {
-    console.log("Memuat tiles...");
-});
+if (polaruang) {
+    polaruang.on("loading", function () {
+        console.log("Memuat tiles...");
+    });
 
-polaruang.on("load", function () {
-    console.log("Tiles selesai dimuat");
-});
+    polaruang.on("load", function () {
+        console.log("Tiles selesai dimuat");
+    });
+}
 
 function loadPolaruangData() {
     if (!isPolaruangLoaded) {
         // Initial load
-        map.addLayer(polaruang);
+        if (map && polaruang) {
+            map.addLayer(polaruang);
+        }
         isPolaruangLoaded = true;
         isLayerVisible = true;
         console.log("Data polaruang berhasil dimuat pertama kali");
     } else if (!isLayerVisible) {
         // Reaktivasi layer
-        map.addLayer(polaruang);
+        if (map && polaruang) {
+            map.addLayer(polaruang);
+        }
         isLayerVisible = true;
         console.log("Polaruang diaktifkan kembali tanpa mengunduh ulang");
     }
 }
 
-// Buat fungsi untuk memuat data rumah
-let house = L.geoJson(null, {
+const createClusterGroup = () => {
+    return L.markerClusterGroup({
+        chunkedLoading: true,
+        chunkInterval: 200,
+        chunkDelay: 50,
+        maxClusterRadius: (zoom) => {
+            return zoom <= 13 ? 80 : zoom <= 15 ? 40 : 20;
+        },
+        spiderfyOnMaxZoom: false,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        removeOutsideVisibleBounds: true,
+        animate: true,
+        animateAddingMarkers: false,
+        disableClusteringAtZoom: 16,
+        maxZoom: 16,
+    });
+};
+
+const isValidLatLng = (lat, lng) => {
+    return (
+        lat &&
+        lng &&
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat >= -90 &&
+        lat <= 90 &&
+        lng >= -180 &&
+        lng <= 180
+    );
+};
+
+const house = L.geoJson(null, {
     pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, {
+        if (!isValidLatLng(latlng.lat, latlng.lng)) {
+            console.warn("Invalid coordinates detected:", latlng);
+            return null;
+        }
+
+        const marker = L.marker(latlng, {
             icon: L.icon({
-                iconUrl: "/img/home-blue.png", // Pastikan gambar marker tersedia
+                iconUrl: "/img/home-blue.png",
                 iconSize: [16, 16],
                 iconAnchor: [8, 16],
                 popupAnchor: [0, -16],
             }),
         });
+
+        marker.options.clickable = true;
+        marker.options.riseOnHover = true;
+        marker.options.bubblingMouseEvents = false;
+
+        return marker;
     },
     onEachFeature: function (feature, layer) {
         if (feature.properties) {
-            let content =
-                "<table class='table-auto w-full'>" +
-                "<tr><th class='text-left'>ID</th><td>" +
-                feature.properties.id +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Nama</th><td>" +
-                feature.properties.name +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Alamat</th><td>" +
-                feature.properties.address +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Kecamatan</th><td>" +
-                feature.properties.district +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Tahun</th><td>" +
-                feature.properties.year +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Tipe</th><td>" +
-                feature.properties.type +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Sumber</th><td>" +
-                feature.properties.source +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Catatan</th><td>" +
-                feature.properties.note +
-                "</td></tr>" +
-                "</table>";
-            layer.bindPopup(content);
+            const content = `<table class='table-auto w-full'>
+                <tr><th class='text-left'>ID</th><td>${
+                    feature.properties.id || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Nama</th><td>${
+                    feature.properties.name || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Alamat</th><td>${
+                    feature.properties.address || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Kecamatan</th><td>${
+                    feature.properties.district || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Tahun</th><td>${
+                    feature.properties.year || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Tipe</th><td>${
+                    feature.properties.type || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Sumber</th><td>${
+                    feature.properties.source || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Catatan</th><td>${
+                    feature.properties.note || "-"
+                }</td></tr>
+            </table>`;
+            layer.bindPopup(content, {
+                closeButton: true,
+                autoPan: false,
+                maxWidth: 300,
+            });
         }
+    },
+    filter: function (feature) {
+        const coords = feature.geometry.coordinates;
+        return isValidLatLng(coords[1], coords[0]);
     },
 });
 
-let isHouseLoaded = false;
+const rtlh = L.geoJson(null, {
+    pointToLayer: function (feature, latlng) {
+        if (!isValidLatLng(latlng.lat, latlng.lng)) {
+            console.warn("Invalid coordinates detected:", latlng);
+            return null;
+        }
 
-// Fungsi untuk memuat data rumah
-function loadHouseData() {
-    return fetch("/api/bedah/general")
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("HTTP error " + response.status);
-            }
-            return response.json();
-        })
-        .then((data) => {
+        const marker = L.marker(latlng, {
+            icon: L.icon({
+                iconUrl: "/img/home-red.png",
+                iconSize: [16, 16],
+                iconAnchor: [8, 16],
+                popupAnchor: [0, -16],
+            }),
+        });
+
+        marker.options.clickable = true;
+        marker.options.riseOnHover = true;
+        marker.options.bubblingMouseEvents = false;
+
+        return marker;
+    },
+    onEachFeature: function (feature, layer) {
+        if (feature.properties) {
+            const content = `<table class='table-auto w-full'>
+                <tr><th class='text-left'>ID</th><td>${
+                    feature.properties.id || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Nama</th><td>${
+                    feature.properties.name || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Alamat</th><td>${
+                    feature.properties.address || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Jumlah Penghuni</th><td>${
+                    feature.properties.people || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Pondasi</th><td>${
+                    feature.properties.pondasi || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Atap</th><td>${
+                    feature.properties.atap || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Dinding</th><td>${
+                    feature.properties.dinding || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Lantai</th><td>${
+                    feature.properties.lantai || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Status</th><td>${
+                    feature.properties.status || "-"
+                }</td></tr>
+                <tr><th class='text-left'>Catatan</th><td>${
+                    feature.properties.note || "-"
+                }</td></tr>
+            </table>`;
+            layer.bindPopup(content, {
+                closeButton: true,
+                autoPan: false,
+                maxWidth: 300,
+            });
+        }
+    },
+    filter: function (feature) {
+        const coords = feature.geometry.coordinates;
+        return isValidLatLng(coords[1], coords[0]);
+    },
+});
+
+const houseCluster = createClusterGroup();
+const rtlhCluster = createClusterGroup();
+
+let isHouseLoaded = false;
+let isRtlhLoaded = false;
+let activePopup = null;
+
+async function loadHouseData() {
+    if (!isHouseLoaded) {
+        try {
+            const response = await fetch("/api/bedah/general");
+            const data = await response.json();
+
             if (!Array.isArray(data.data)) {
                 throw new Error("Data yang diterima bukan array");
             }
 
-            // Konversi data ke format GeoJSON
-            let geoJsonData = {
-                type: "FeatureCollection",
-                features: data.data.map((item) => ({
+            const validFeatures = data.data
+                .filter((item) => isValidLatLng(item.lat, item.lng))
+                .map((item) => ({
                     type: "Feature",
                     geometry: {
                         type: "Point",
@@ -510,86 +647,47 @@ function loadHouseData() {
                         source: item.source,
                         note: item.note,
                     },
-                })),
-            };
+                }));
 
-            house.addData(geoJsonData);
-            isHouseLoaded = true;
-            console.log("Data rumah berhasil dimuat");
-        })
-        .catch((error) => {
+            if (validFeatures.length > 0) {
+                const geoJsonData = {
+                    type: "FeatureCollection",
+                    features: validFeatures,
+                };
+
+                house.clearLayers();
+                house.addData(geoJsonData);
+
+                houseCluster.clearLayers();
+                houseCluster.addLayer(house);
+
+                if (!map.hasLayer(houseCluster)) {
+                    map.addLayer(houseCluster);
+                    console.log("Layer houseCluster ditambahkan");
+                }
+
+                isHouseLoaded = true;
+                console.log("Data house berhasil dimuat");
+            }
+        } catch (error) {
             console.error("Error loading house data:", error);
-        });
+        }
+    }
 }
 
-// Buat fungsi untuk memuat data rtlh
-let rtlh = L.geoJson(null, {
-    pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, {
-            icon: L.icon({
-                iconUrl: "/img/home-blue.png", // Pastikan gambar marker tersedia
-                iconSize: [16, 16],
-                iconAnchor: [8, 16],
-                popupAnchor: [0, -16],
-            }),
-        });
-    },
-    onEachFeature: function (feature, layer) {
-        if (feature.properties) {
-            let content =
-                "<table class='table-auto w-full'>" +
-                "<tr><th class='text-left'>ID</th><td>" +
-                feature.properties.id +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Nama</th><td>" +
-                feature.properties.name +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Alamat</th><td>" +
-                feature.properties.address +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Jumlah Penghuni</th><td>" +
-                feature.properties.people +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Pondasi</th><td>" +
-                feature.properties.pondasi +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Atap</th><td>" +
-                feature.properties.atap +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Dinding</th><td>" +
-                feature.properties.dinding +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Lantai</th><td>" +
-                feature.properties.lantai +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Status</th><td>" +
-                feature.properties.status +
-                "</td></tr>" +
-                "<tr><th class='text-left'>Catatan</th><td>" +
-                feature.properties.note +
-                "</td></tr>" +
-                "</table>";
-            layer.bindPopup(content);
-        }
-    },
-});
+async function loadRtlhData() {
+    if (!isRtlhLoaded) {
+        try {
+            const response = await fetch("/api/rtlh");
+            const data = await response.json();
 
-let isRtlhLoaded = false;
-
-// Fungsi untuk memuat data rumah
-function loadRtlhData() {
-    // Lakukan fetch data rumah dengan token
-    return fetch("/api/rtlh")
-        .then((response) => response.json())
-        .then((data) => {
             if (!Array.isArray(data.data)) {
                 throw new Error("Data yang diterima bukan array");
             }
 
-            // Konversi data ke format GeoJSON
-            let geoJsonData = {
-                type: "FeatureCollection",
-                features: data.data.map((item) => ({
+            const validFeatures = data.data
+                .filter((item) => isValidLatLng(item.lat, item.lng))
+                .map((item) => ({
                     type: "Feature",
                     geometry: {
                         type: "Point",
@@ -607,17 +705,41 @@ function loadRtlhData() {
                         status: item.status,
                         note: item.note,
                     },
-                })),
-            };
+                }));
 
-            rtlh.addData(geoJsonData);
-            isRtlhLoaded = true;
-            console.log("Data rtlh berhasil dimuat");
-        })
-        .catch((error) => {
-            console.error("Error loading rtlh data:", error);
-        });
+            if (validFeatures.length > 0) {
+                const geoJsonData = {
+                    type: "FeatureCollection",
+                    features: validFeatures,
+                };
+
+                rtlh.clearLayers();
+                rtlh.addData(geoJsonData);
+
+                rtlhCluster.clearLayers();
+                rtlhCluster.addLayer(rtlh);
+
+                if (!map.hasLayer(rtlhCluster)) {
+                    map.addLayer(rtlhCluster);
+                    console.log("Layer rtlhCluster ditambahkan");
+                }
+
+                isRtlhLoaded = true;
+                console.log("Data RTLH berhasil dimuat");
+            }
+        } catch (error) {
+            console.error("Error loading RTLH data:", error);
+        }
+    }
 }
+
+// Event listeners
+map.on("zoomstart", function () {
+    if (activePopup) {
+        map.closePopup(activePopup);
+        activePopup = null;
+    }
+});
 
 // Event handler untuk memuat data
 map.on("overlayadd", function (e) {
@@ -630,9 +752,13 @@ map.on("overlayadd", function (e) {
     } else if (e.name === "RTRW ") {
         loadPolaruangData();
     } else if (e.name === "Bedah Rumah") {
-        loadHouseData();
+        map.whenReady(function () {
+            loadHouseData();
+        });
     } else if (e.name === "RTLH ") {
-        loadRtlhData();
+        map.whenReady(function () {
+            loadHouseData();
+        });
     }
 });
 
@@ -685,19 +811,11 @@ map.on("overlayremove", function (e) {
     }
 
     // Handle Rumah layer
-    if (e.name === "Bedah Rumah") {
-        if (map.hasLayer(house)) {
-            map.removeLayer(house);
-            console.log("Layer rumah dinonaktifkan");
-        }
+    if (e.name === "Bedah Rumah" && map.hasLayer(houseCluster)) {
+        map.removeLayer(houseCluster);
     }
-
-    // Handle RTLH layer
-    if (e.name === "RTLH ") {
-        if (map.hasLayer(rtlh)) {
-            map.removeLayer(rtlh);
-            console.log("Layer rtlh dinonaktifkan");
-        }
+    if (e.name === "RTLH " && map.hasLayer(rtlhCluster)) {
+        map.removeLayer(rtlhCluster);
     }
 });
 
@@ -710,8 +828,8 @@ let groupedOverlays = {
         "Nama Desa": tooltipDesa || {},
         "Deliniasi Kumuh": kumuh || {},
         "RTRW ": polaruang || {},
-        "Bedah Rumah": house || {},
-        "RTLH ": rtlh || {},
+        "Bedah Rumah": houseCluster || {},
+        "RTLH ": rtlhCluster || {},
     },
 };
 

@@ -29,6 +29,11 @@ class House extends Model
         'note'
     ];
 
+    // public function getRouteKeyName()
+    // {
+    //     return 'slug';
+    // }
+
     // Relasi dengan rtlh
     public function rtlh()
     {

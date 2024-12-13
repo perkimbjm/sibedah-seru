@@ -97,7 +97,16 @@ class HouseController extends Controller
      */
     public function edit(House $house)
     {
-        //
+        abort_if(Gate::denies('house_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $district = District::select('id','name')->pluck('name', 'id')->prepend("Pilih Kecamatan", '');
+
+        $villages = Village::select('id','name', 'district_id')->pluck('name','id')->prepend("Pilih Kelurahan / Desa", '');
+
+
+        $house->load('district', 'village');
+
+        return view('house.edit', compact('house','district', 'villages'));
     }
 
     /**
@@ -105,7 +114,10 @@ class HouseController extends Controller
      */
     public function update(UpdateHouseRequest $request, House $house)
     {
-        //
+
+        $house->update($request->all());
+
+        return redirect()->route('app.houses.index');
     }
 
     /**
