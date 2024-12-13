@@ -78,7 +78,7 @@
                                 {{ $rtlh->address?? '' }}
                             </td>
                             <td>
-                                {{ $rtlh->district->name ?? '' }}
+                                {{ $rtlh->districts->name ?? '' }}
                             </td>
                             <td>
                                 {{ $rtlh->people ?? '' }}

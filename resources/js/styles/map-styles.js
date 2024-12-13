@@ -22,6 +22,7 @@ export const loadMapStyles = () => {
         "/css/locateControl.css",
         "/css/Control.Geocoder.css",
         "/css/iconLayers.css",
+        "/css/markerCluster.css",
         "/css/leaflet.pm.css",
         "/css/Leaflet.PolylineMeasure.css",
         "/css/leaflet.toolbar.css",

@@ -3,7 +3,8 @@
     'label',
     'options',
     'errors' => null,
-    'uppercase' => false
+    'uppercase' => false,
+    'selected' => null
 ])
 
 <div class="form-group">
@@ -11,7 +12,7 @@
     <select class="form-control {{ $errors && $errors->has($name) ? 'is-invalid' : '' }}" name="{{ $name }}" id="{{ $name }}" required>
         <option value="">-- Pilih --</option>
         @foreach($options as $option)
-            <option value="{{ $uppercase ? strtoupper($option) : $option }}" {{ old($name) == $option ? 'selected' : '' }}>
+            <option value="{{ $uppercase ? strtoupper($option) : $option }}" {{ $selected == $option ? 'selected' : '' }}>
                 {{ $option }}
             </option>
         @endforeach

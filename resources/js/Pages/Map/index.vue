@@ -1,12 +1,9 @@
 <template>
     <MainLayout>
+
         <Head title="Peta Digital" />
         <div class="relative">
-            <div
-                id="map"
-                role="map"
-                class="h-[87vh] w-full mx-auto overflow-hidden relative z-5"
-            >
+            <div id="map" role="map" class="h-[87vh] w-full mx-auto overflow-hidden relative z-5">
                 <SidePanel />
             </div>
             <MapModals />
@@ -133,6 +130,7 @@ const SCRIPTS = [
     },
     { src: "/js/Control.Geocoder.js" },
     { src: "/js/leaflet.groupedlayercontrol.js" },
+    { src: "/js/leaflet.markercluster141.js" },
     { src: "/js/typeahead.bundle.min.js" },
     { src: "/js/iconLayers.js" },
     { src: "/js/Leaflet.PolylineMeasure.js" },
@@ -224,7 +222,9 @@ const initMap = async () => {
 
         const response = await fetch("/js/core.js");
         const coreJsContent = await response.text();
-        eval(coreJsContent);
+        const script = document.createElement("script");
+        script.textContent = coreJsContent;
+        document.head.appendChild(script);
 
         const sidepanelLeft = L.control
             .sidepanel("mySidepanelLeft", {
@@ -232,7 +232,6 @@ const initMap = async () => {
                 startTab: "tab-1",
             })
             .addTo(map);
-        console.log("Sidepanel kiri berhasil dimuat");
 
         const sidepanelRight = L.control
             .sidepanel("mySidepanelRight", {
@@ -242,7 +241,7 @@ const initMap = async () => {
                 startTab: "tab-2",
             })
             .addTo(map);
-        console.log("Sidepanel kanan berhasil dimuat");
+
 
         window.dispatchEvent(new Event("resize"));
     } catch (error) {
@@ -364,6 +363,7 @@ onBeforeUnmount(() => {
     margin-bottom: 0.2em;
     margin-left: 3px;
 }
+
 .leaflet-control-layers-group {
     margin-bottom: 0.5em;
 }
