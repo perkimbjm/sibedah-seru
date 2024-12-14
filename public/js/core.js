@@ -757,7 +757,7 @@ map.on("overlayadd", function (e) {
         });
     } else if (e.name === "RTLH ") {
         map.whenReady(function () {
-            loadHouseData();
+            loadRtlhData();
         });
     }
 });
