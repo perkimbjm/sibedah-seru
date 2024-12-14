@@ -128,11 +128,12 @@ class RtlhController extends Controller
     
 
     // Mengupdate data RTLH
-    public function update(UpdateRtlhRequest $request, $id, Rtlh $rtlh)
+    public function update(UpdateRtlhRequest $request, $id)
     {
         $rtlh = Rtlh::findOrFail($id);
 
         $rtlh->update($request->all());
+        $data['is_renov'] = isset($data['is_renov']) && $data['is_renov'] === '1';
 
         if ($request->has('house')) {
             $rtlh->house()->updateOrCreate([], $request->input('house'));

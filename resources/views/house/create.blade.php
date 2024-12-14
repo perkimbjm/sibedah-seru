@@ -136,7 +136,7 @@
                 <button class="btn btn-danger" type="submit">
                     Simpan
                 </button>
-                <a href="{{ url()->previous() }}" class="btn btn-link">Batal</a>
+                <a href="{{ url()->previous() }}" class="btn btn-info">Batal</a>
             </div>
         </form>
     </div>

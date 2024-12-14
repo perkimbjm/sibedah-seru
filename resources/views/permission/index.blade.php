@@ -52,12 +52,6 @@
                                 {{ $permission->name ?? '' }}
                             </td>
                             <td>
-                                @can('permission_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('app.permissions.show', $permission->id) }}">
-                                        Lihat
-                                    </a>
-                                @endcan
-
                                 @can('permission_edit')
                                     <a class="btn btn-xs btn-info" href="{{ route('app.permissions.edit', $permission->id) }}">
                                         Edit

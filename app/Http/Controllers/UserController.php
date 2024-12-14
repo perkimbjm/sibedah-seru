@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\View\View;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\UserStoreRequest;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UserUpdateRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -48,23 +51,72 @@ class UserController extends Controller
         return redirect()->route('app.users.index');
     }
 
-    public function show(Request $request, User $user): Response
+    public function show($id)
     {
+        $user = User::findOrFail($id);
         return view('user.show', compact('user'));
     }
 
-    public function edit(Request $request, User $user): Response
+
+    public function edit(Request $request, $id)
     {
-        return view('user.edit', compact('user'));
+        // Mengambil data user berdasarkan ID
+        $user = User::findOrFail($id);
+
+        // Mengambil semua role untuk digunakan dalam dropdown
+        $roles = Role::pluck('name', 'id');
+
+        return view('user.edit', compact('user', 'roles'));
     }
 
-    public function update(UserControllerUpdateRequest $request, User $user): Response
+    public function update(UserUpdateRequest $request, User $user): Response
     {
-        $user->update($request->validated());
+        
+        $user->update(Arr::except($request->validated(), ['password']));
+
+        
+        // Hanya update password jika diisi
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        // Update role user
+        $user->role_id = $request->role_id;
+
+
+        // Jika ada file foto baru yang diupload
+        if ($request->hasFile('profile_photo_path')) {
+            // Hapus foto lama jika ada
+            if ($user->profile_photo_path) {
+                Storage::delete('public/' . $user->profile_photo_path);
+            }
+
+            // Simpan foto baru dan update path-nya di database
+            $path = $request->file('profile_photo_path')->store('users', 'public');
+            $user->profile_photo_path = $path;
+        }
+
+
+        // Cek input dari radio button 'email_verified_at'
+        $emailVerifiedOption = $request->input('email_verified_at');
+
+        switch($emailVerifiedOption) {
+            case 'now':
+                $user->email_verified_at = now();
+                break;
+            case 'unverify':
+                $user->email_verified_at = null;
+                break;
+            case 'keep':
+                // Tidak perlu mengubah nilai email_verified_at
+                break;
+        }
+        
+        $user->save();
 
         $request->session()->flash('user.id', $user->id);
 
-        return redirect()->route('users.index');
+        return redirect()->route('app.users.index')->with('success', 'Data pengguna berhasil diperbarui');
     }
 
     public function destroy(Request $request, User $user): Response

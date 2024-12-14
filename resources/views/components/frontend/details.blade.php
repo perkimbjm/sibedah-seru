@@ -21,7 +21,7 @@
   <div class="container mx-auto">
     <ul class="breadcrumb py-2">
       <li>
-        <a href="/">{{ trans('frontend.home') }}</a>
+        <a href="/">Home</a>
       </li>
       <li>
         <a href="#" aria-label="current-page">Detail</a>

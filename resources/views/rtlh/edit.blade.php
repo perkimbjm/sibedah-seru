@@ -2,6 +2,51 @@
 
 @section('styles')
     <x-leaflet></x-leaflet>
+
+    <style>
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .toggle-switch::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    input:checked + .toggle-switch::before {
+        background-color: #2196F3;
+    }
+
+    .toggle-switch::after {
+        content: '';
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 26px;
+        height: 26px;
+        background-color: white;
+        border-radius: 50%;
+        transition: .4s;
+    }
+
+    input:checked + .toggle-switch::after {
+        transform: translateX(26px);
+    }
+    </style>
 @endsection
 
 @php
@@ -19,6 +64,31 @@
         <form method="POST" action="{{ route("app.rtlh.update", [$rtlh->id]) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+
+            <div class="form-group mb-4">
+                <label for="is_renov" class="text-gray-700 mb-2 flex justify-between items-center p-2">
+                    Rumah Sudah Diperbaiki
+                </label>
+                <div class="flex items-center">
+                    <input type="hidden" name="is_renov" value="0">
+                    <input type="checkbox" name="is_renov" id="is_renov" value="1" 
+                           class="appearance-none peer" 
+                           {{ old('is_renov', $rtlh->is_renov) ? 'checked' : '' }} onclick="toggleLabel()">
+                    <label for="is_renov" class="toggle-switch relative inline-block w-10 h-6 bg-gray-300 rounded-full cursor-pointer">
+                        <span class="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out 
+                                     peer-checked:bg-green-400 
+                                     after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 
+                                     {{ old('is_renov', $rtlh->is_renov) ? 'peer-checked:after:translate-x-6' : '' }}">
+                        </span>
+                    </label>
+                    <span id="toggleLabel" class="ml-3 text-sm font-medium text-gray-900">
+                        {{ old('is_renov', $rtlh->is_renov) ? 'Ya' : 'Tidak' }}
+                    </span>
+                </div>
+                @if($errors->has('is_renov'))
+                    <span class="text-red-500 text-sm">{{ $errors->first('is_renov') }}</span>
+                @endif
+            </div>
 
             <!-- Identitas Diri dan Lokasi Rumah -->
             <div class="card mb-3">
@@ -179,7 +249,7 @@
                 <button class="btn btn-danger" type="submit">
                     Simpan
                 </button>
-                <a href="{{ url()->previous() }}" class="btn btn-link">Batal</a>
+                <a href="{{ url()->previous() }}" class="btn btn-info">Batal</a>
             </div>
         </form>
     </div>
@@ -188,6 +258,12 @@
 
 @section('scripts')
 <script>
+    function toggleLabel() {
+        const checkbox = document.getElementById('is_renov');
+        const label = document.getElementById('toggleLabel');
+        label.textContent = checkbox.checked ? 'Ya' : 'Tidak';
+    }
+
     $("#village_id").change(function(){
     let selectedValue = $(this).val();
     $.ajax({

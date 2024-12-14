@@ -123,9 +123,17 @@ class HouseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(House $house)
+    public function destroy($id)
     {
-        //
+        abort_if(Gate::denies('house_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $house = House::findOrFail($id);
+
+        // Hapus relasi house jika ada
+        $house->house()->delete();
+
+        $house->delete();
+
+        return redirect()->route('app.house.index');
     }
 
     public function renov($rtlh_id)

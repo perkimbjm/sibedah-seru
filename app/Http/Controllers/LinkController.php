@@ -49,18 +49,22 @@ class LinkController extends Controller
         return view('link.show', compact('link'));
     }
 
-    public function edit(Request $request, Link $link): Response
+    public function edit(Request $request, $id)
     {
+        abort_if(Gate::denies('link_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $link = Link::findOrFail($id);
         return view('link.edit', compact('link'));
     }
 
-    public function update(LinkControllerUpdateRequest $request, Link $link): Response
+    public function update(LinkUpdateRequest $request, link $link): Response
     {
-        $link->update($request->validated());
+        abort_if(Gate::denies('link_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+   
+        $link->update($request->validated());        
 
         $request->session()->flash('link.id', $link->id);
 
-        return redirect()->route('links.index');
+        return redirect()->route('app.links.index')->with('success', 'link berhasil diperbarui!');
     }
 
     public function destroy(Request $request, Link $link): Response

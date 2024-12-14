@@ -147,20 +147,20 @@
           var name = $(this).data("name");
           event.preventDefault();
         Swal.fire({
-        title: '{{ trans('global.confirmSave') }}',
+        title: 'Apakah Yakin Ingin Menyimpan ?',
         showDenyButton: true,
         showCancelButton: true,
-        cancelButtonText: '{{ trans('global.cancel') }}',
-        confirmButtonText: '{{ trans('global.save') }}',
-        denyButtonText: '{{ trans('global.dont_save') }}',
+        cancelButtonText: 'Batal',
+        confirmButtonText: 'Simpan',
+        denyButtonText: 'Jangan Simpan',
       }).then((result) => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
           form.submit();
-          Swal.fire('{{ trans('global.saved') }} !', '', 'success')
+          Swal.fire('Berhasil tersimpan !', '', 'success')
         } else if (result.isDenied) {
           window.history.back();
-          Swal.fire('{{ trans('global.saved_not') }}', '', 'info')
+          Swal.fire('Gagal menyimpan', '', 'info')
 
         }
       });

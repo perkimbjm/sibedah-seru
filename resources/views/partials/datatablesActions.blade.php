@@ -1,5 +1,5 @@
 @can($viewGate)
-    <a class="btn btn-xs btn-primary mt-2" href="{{ route('app.' . $crudRoutePart . '.show', $row->id) }}" data-toggle="tooltip" title="{{ trans('global.view') }}">
+    <a class="btn btn-xs btn-primary mt-2" href="{{ route('app.' . $crudRoutePart . '.show', $row->id) }}" data-toggle="tooltip" title="Lihat">
         <i class="fas fa-eye"></i> Lihat
     </a>
 @endcan
@@ -24,20 +24,20 @@
           var name = $(this).data("name");
           event.preventDefault();
           Swal.fire({
-              title: '{{ trans('global.areYouSure') }}',
+              title: 'Apakah Kamu Yakin ?',
               icon: "warning",
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
               cancelButtonColor: '#d33',
-              confirmButtonText: '{{ trans('global.yesDelete') }}',
-              cancelButtonText: '{{ trans('global.cancel') }}'
+              confirmButtonText: 'Apakah Kamu Yakin ?',
+              cancelButtonText: 'Batal'
           }).then((willDelete) => {
             if (willDelete.isConfirmed) {
               form.submit();
 
               Swal.fire(
-                '{{ trans('global.deleted') }}',
-                '{{ trans('global.deleteSuccess') }}',
+                'Hapus',
+                'Penghapusan Data Berhasil',
                 'success'
                 )
             }

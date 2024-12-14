@@ -40,23 +40,28 @@ class DownloadController extends Controller
         return redirect()->route('app.downloads.index');
     }
 
-    public function show(Request $request, Download $download): Response
+    public function show($id)
     {
+        $download = Download::findOrFail($id);
         return view('download.show', compact('download'));
     }
 
-    public function edit(Request $request, Download $download): Response
+    public function edit(Request $request, $id)
     {
+        abort_if(Gate::denies('download_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $download = Download::findOrFail($id);
         return view('download.edit', compact('download'));
     }
 
-    public function update(DownloadUpdateRequest $request, Download $download): Response
+    public function update(DownloadUpdateRequest $request, download $download): Response
     {
-        $download->update($request->validated());
+        abort_if(Gate::denies('download_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+   
+        $download->update($request->validated());        
 
         $request->session()->flash('download.id', $download->id);
 
-        return redirect()->route('app.downloads.index');
+        return redirect()->route('app.downloads.index')->with('success', 'download berhasil diperbarui!');
     }
 
     public function destroy(Request $request, Download $download): Response

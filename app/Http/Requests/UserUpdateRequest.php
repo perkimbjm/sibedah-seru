@@ -23,13 +23,13 @@ class UserUpdateRequest extends FormRequest
         return [
             'google_id' => ['nullable', 'string'],
             'name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => ['required', 'email'],
             'avatar' => ['nullable', 'string'],
-            'password' => ['required', 'string'],
+            'password' => ['nullable', 'string'],
             'role_id' => ['required', 'integer', 'exists:roles,id'],
-            'email_verified_at' => ['nullable'],
             'phone' => ['nullable', 'string'],
-            'profile_photo_path' => ['nullable'],
+            'profile_photo_path' => ['nullable','image', 'mimes:jpeg,jpg,png,webp']
+
         ];
     }
 }
