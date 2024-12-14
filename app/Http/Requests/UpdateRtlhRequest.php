@@ -25,8 +25,8 @@ class UpdateRtlhRequest extends FormRequest
     {
         return [
             'name'=> ['required','string'],
-            'nik'=> ['nullable','string','max:16','unique:rtlh,nik'],
-            'kk'=> ['nullable','string', 'unique:rtlh,kk'],
+            'nik'=> ['nullable','string','max:16'],
+            'kk'=> ['nullable','string'],
             'address'=> ['required','string'],
             'people'=> ['nullable','integer'],
             'lat'=> ['nullable','string'],

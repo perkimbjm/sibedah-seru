@@ -60,12 +60,6 @@
                                 @endforeach
                             </td>
                             <td>
-                                @can('role_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('app.roles.show', $role->id) }}">
-                                        Lihat
-                                    </a>
-                                @endcan
-
                                 @can('role_edit')
                                     <a class="btn btn-xs btn-info" href="{{ route('app.roles.edit', $role->id) }}">
                                         Edit

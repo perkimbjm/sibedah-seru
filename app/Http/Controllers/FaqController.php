@@ -39,24 +39,28 @@ class FaqController extends Controller
         return redirect()->route('app.faqs.index');
     }
 
-    public function show(Request $request, Faq $faq): Response
+    public function show($id)
     {
+        $faq = Faq::findOrFail($id);
         return view('faq.show', compact('faq'));
     }
 
-    public function edit(Request $request, Faq $faq): Response
+    public function edit(Request $request, $id)
     {
         abort_if(Gate::denies('faq_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $faq = Faq::findOrFail($id);
         return view('faq.edit', compact('faq'));
     }
 
     public function update(FaqUpdateRequest $request, Faq $faq): Response
     {
-        $faq->update($request->validated());
+        abort_if(Gate::denies('faq_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+   
+        $faq->update($request->validated());        
 
         $request->session()->flash('faq.id', $faq->id);
 
-        return redirect()->route('app.faqs.index');
+        return redirect()->route('app.faqs.index')->with('success', 'FAQ berhasil diperbarui!');
     }
 
     public function destroy(Request $request, Faq $faq): Response

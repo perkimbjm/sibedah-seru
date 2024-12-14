@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Permission;
 use App\Http\Requests\PermissionStoreRequest;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\PermissionControllerStoreRequest;
-use App\Http\Requests\PermissionControllerUpdateRequest;
+use App\Http\Requests\PermissionUpdateRequest;
 
 class PermissionController extends Controller
 {  
@@ -39,29 +39,27 @@ class PermissionController extends Controller
         return redirect()->route('app.permissions.index');
     }
 
-    public function show(Request $request, Permission $permission): Response
+    public function edit(Permission $permission)
     {
-        return view('permission.show', compact('permission'));
-    }
+        abort_if(Gate::denies('permission_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-    public function edit(Request $request, Permission $permission): Response
-    {
         return view('permission.edit', compact('permission'));
     }
 
-    public function update(PermissionControllerUpdateRequest $request, Permission $permission): Response
+    public function update(PermissionUpdateRequest $request, Permission $permission)
     {
+        abort_if(Gate::denies('permission_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        // Update permission dengan data yang divalidasi
         $permission->update($request->validated());
 
-        $request->session()->flash('permission.id', $permission->id);
-
-        return redirect()->route('permissions.index');
+        return redirect()->route('app.permissions.index')->with('success', 'Hak Akses berhasil diupdate');
     }
 
     public function destroy(Request $request, Permission $permission): Response
     {
         $permission->delete();
 
-        return redirect()->route('permissions.index');
+        return redirect()->route('app.permissions.index');
     }
 }

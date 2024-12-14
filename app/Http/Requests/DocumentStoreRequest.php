@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DownloadUpdateRequest extends FormRequest
+class DocumentStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,10 +20,9 @@ class DownloadUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string'],
-            'year' => ['required', 'string'],
+            'renovated_house_id' => ['required', 'integer', 'exists:houses,id'],
+            'document_url' => ['required', 'string'],
             'description' => ['nullable', 'string'],
-            'file_url' => ['required', 'string'],
         ];
     }
 }

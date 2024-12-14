@@ -11,7 +11,7 @@ use App\Http\Requests\RoleStoreRequest;
 use Spatie\Permission\Models\Permission;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\RoleControllerStoreRequest;
-use App\Http\Requests\RoleControllerUpdateRequest;
+use App\Http\Requests\RoleUpdateRequest;
 
 class RoleController extends Controller
 {
@@ -42,29 +42,36 @@ class RoleController extends Controller
         return redirect()->route('app.roles.index');
     }
 
-    public function show(Request $request, Role $role): Response
+
+    public function edit(Role $role)
     {
-        return view('role.show', compact('role'));
+        abort_if(Gate::denies('role_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        
+        $permissions = Permission::pluck('name', 'id');  // Ambil list permission
+
+        return view('role.edit', compact('role', 'permissions'));
     }
 
-    public function edit(Request $request, Role $role): Response
+    public function update(RoleUpdateRequest $request, Role $role)
     {
-        return view('role.edit', compact('role'));
+        abort_if(Gate::denies('role_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        
+        // Update role dengan data baru
+        $data = $request->validated();
+        $data['guard_name'] = 'web';  // Pastikan guard_name tetap 'web'
+        $role->update($data);
+        
+        // Update permission yang terkait dengan role
+        $role->permissions()->sync($request->input('permissions', []));
+        
+        return redirect()->route('app.roles.index')->with('success', 'Peran berhasil diupdate');
     }
 
-    public function update(RoleControllerUpdateRequest $request, Role $role): Response
-    {
-        $role->update($request->validated());
-
-        $request->session()->flash('role.id', $role->id);
-
-        return redirect()->route('roles.index');
-    }
 
     public function destroy(Request $request, Role $role): Response
     {
         $role->delete();
 
-        return redirect()->route('roles.index');
+        return redirect()->route('app.roles.index');
     }
 }

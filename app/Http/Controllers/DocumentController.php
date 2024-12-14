@@ -55,6 +55,6 @@ class DocumentController extends Controller
     {
         $document->delete();
 
-        return redirect()->route('documents.index');
+        return redirect()->route('app.documents.index');
     }
 }

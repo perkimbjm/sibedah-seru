@@ -57,10 +57,10 @@
                                 {{ $faq->order ?? '' }}
                             </td>
                             <td>
-                                {{ substr($faq->question ?? '', 0, 150) }}
+                                {{ strlen($faq->question) > 150 ? substr($faq->question, 0, 150) . '...' : $faq->question }}
                             </td>
                             <td>
-                                {{ substr($faq->answer ?? '', 0, 150) }}
+                                {{ strlen($faq->answer) > 150 ? substr($faq->answer, 0, 150) . '...' : $faq->answer }}
                             </td>
                             
                             <td>
