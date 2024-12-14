@@ -17,8 +17,8 @@ class RtlhController extends Controller
     {
         $query = Rtlh::selectRaw("id, name, address, people, area, pondasi, kolom_blk, rngk_atap, atap, dinding, lantai, air, jarak_tinja, wc, jenis_wc, tpa_tinja, status, is_renov, note, district_id, village_id, ST_X(geom::geometry) AS lng, ST_Y(geom::geometry) AS lat")
         ->with([
-            'district:id,name',
-            'village:id,name'
+            'districts:id,name',
+            'villages:id,name'
         ]);
 
 
