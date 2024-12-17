@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreHouseRequest;
 use App\Http\Requests\UpdateHouseRequest;
+use App\Http\Requests\MassDestroyHouseRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 class HouseController extends Controller
@@ -84,17 +85,18 @@ class HouseController extends Controller
     }
 
 
-    /**
-     * Display the specified resource.
-     */
     public function show(House $house)
     {
-        //
+        abort_if(Gate::denies('house_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $house = House::with([
+            'district:id,name',
+            'village:id,name',
+            'rtlh:id,people,area,air,wc'
+        ])->select('id', 'name', 'nik', 'address', 'lat', 'lng', 'year', 'type', 'source', 'district_id', 'village_id', 'rtlh_id')->findOrFail($house->id);
+
+        return view('house.show', compact('house'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(House $house)
     {
         abort_if(Gate::denies('house_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -134,6 +136,13 @@ class HouseController extends Controller
         $house->delete();
 
         return redirect()->route('app.house.index');
+    }
+
+    public function massDestroy(MassDestroyHouseRequest $request)
+    {
+        House::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     public function renov($rtlh_id)

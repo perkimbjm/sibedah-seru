@@ -91,7 +91,7 @@ Route::get('/bedah', function () {
 })->name('bedah');
 
 Route::get('/test', function () {
-    return Inertia::render('TestLogin');
+    return Inertia::render('HouseInfo');
 })->name('test');
 
 Route::get('/guide', function () {
@@ -120,6 +120,9 @@ Route::middleware([
         // Routes yang memerlukan permission `role_access`
         Route::middleware(['can:user_management_access'])->group(function () {
             // User Management
+            Route::delete('roles/destroy', [RoleController::class, 'massDestroy'])->name('roles.massDestroy');
+            Route::delete('users/destroy', [UserController::class, 'massDestroy'])->name('users.massDestroy');
+            Route::delete('permissions/destroy', [PermissionController::class, 'massDestroy'])->name('permissions.massDestroy');
             Route::resources([
                 'roles' => RoleController::class,
                 'users' => UserController::class,
@@ -128,25 +131,45 @@ Route::middleware([
             ]);
         });
 
-        // Content Management
+        // Data Management
         Route::middleware(['can:data_access'])->group(function () {
             Route::get('houses/getKecamatan', [HouseController::class, 'getKecamatan'])->name('houses.getKecamatan');
             Route::get('houses/check-nik', [HouseController::class, 'checkNIK'])->name('houses.checkNIK');
             Route::get('rtlh/getKecamatan', [RtlhController::class, 'getKecamatan'])->name('rtlh.getKecamatan');
+            Route::delete('houses/destroy', [HouseController::class, 'massDestroy'])->name('houses.massDestroy');
+            Route::delete('rtlh/destroy', [RtlhController::class, 'massDestroy'])->name('rtlh.massDestroy');
             Route::resources([
                 'houses' => HouseController::class,
                 'rtlh' => RtlhController::class,
-                'renovated-house-photos' => RenovatedHousePhotoController::class,
-                'house-photos' => HousePhotoController::class,
                 'documents' => DocumentController::class,
                 'reviews' => ReviewController::class,
             ]);
+            Route::prefix('houses/{house}/gallery')->group(function () {
+                Route::get('/', [RenovatedHousePhotoController::class, 'index'])->name('gallery.index');
+                Route::get('/create', [RenovatedHousePhotoController::class, 'create'])->name('gallery.create');
+                Route::post('/', [RenovatedHousePhotoController::class, 'store'])->name('gallery.store');
+                Route::get('/{photo}/edit', [RenovatedHousePhotoController::class, 'edit'])->name('gallery.edit');
+                Route::put('/{photo}', [RenovatedHousePhotoController::class, 'update'])->name('gallery.update');
+                Route::delete('/{photo}', [RenovatedHousePhotoController::class, 'massDestroy'])->name('gallery.massDestroy');
+            });
+            Route::prefix('rtlh/{rtlh}/rutilahu')->group(function () {
+                Route::get('/', [HousePhotoController::class, 'index'])->name('rutilahu.index');
+                Route::get('/create', [HousePhotoController::class, 'create'])->name('rutilahu.create');
+                Route::post('/', [HousePhotoController::class, 'store'])->name('rutilahu.store');
+                Route::get('/{photo}/edit', [HousePhotoController::class, 'edit'])->name('rutilahu.edit');
+                Route::put('/{photo}', [HousePhotoController::class, 'update'])->name('rutilahu.update');
+                Route::delete('/{photo}', [HousePhotoController::class, 'massDestroy'])->name('rutilahu.massDestroy');
+            });
+            
             Route::get('bedah/peta', [HouseMapController::class, 'index'])->name('bedah.peta');
             Route::get('rutilahu/peta', [RtlhMapController::class, 'index'])->name('rutilahu.peta');
         });
 
         // Content Management
         Route::middleware(['can:content_management_access'])->group(function () {
+            Route::delete('faqs/destroy', [FaqController::class, 'massDestroy'])->name('faqs.massDestroy');
+            Route::delete('downloads/destroy', [DownloadController::class, 'massDestroy'])->name('downloads.massDestroy');
+            Route::delete('links/destroy', [LinkController::class, 'massDestroy'])->name('links.massDestroy');
             Route::resources([
                 'faqs' => FaqController::class,
                 'downloads' => DownloadController::class,

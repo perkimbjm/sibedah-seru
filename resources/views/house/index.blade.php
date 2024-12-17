@@ -55,8 +55,10 @@
                         <th>
                             Sumber Dana
                         </th>
+                        <th>
+                            Galeri
+                        </th>
 
-                            
                         <th>
                             &nbsp;
                         </th>
@@ -96,6 +98,9 @@
                             <td>
                                 {{ $house->source ?? '' }}
                             </td>
+                            <td>
+                                <a class="btn btn-sm btn-warning font-bold text-dark" href="{{ route('app.gallery.index', $house) }}">Lihat Foto</a>
+                            </td>
 
                             <td>
                                 @can('house_show')
@@ -133,6 +138,7 @@
 @endsection
 @section('scripts')
 @parent
+@include('app.index-script')
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
@@ -140,6 +146,7 @@
   let deleteButtonTrans = 'Hapus'
   let deleteButton = {
     text: deleteButtonTrans,
+    url: "{{ route('app.houses.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {

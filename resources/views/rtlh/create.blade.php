@@ -160,8 +160,14 @@
             <div class="card mb-3">
                 <div class="card-header bg-dark text-white">Hasil Penilaian</div>
                 <div class="card-body">
-                    <x-condition-select name="status_safety" label="Hasil Penilaian Keselamatan Bangunan" :options="$kelayakanOptions" :errors="$errors" uppercase="true" />
-                    <x-condition-select name="status" label="Hasil Penilaian Seluruh Aspek" :options="$kelayakanOptions" :errors="$errors" uppercase="true" />
+                    <div class="form-group">
+                        <label for="status_safety">Hasil Penilaian Keselamatan Bangunan</label>
+                        <input type="text" class="form-control" name="status_safety" id="status_safety" readonly value="Menunggu Perhitungan">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Hasil Penilaian Seluruh Aspek</label>
+                        <input type="text" class="form-control" name="status" id="status" readonly value="Menunggu Perhitungan">
+                    </div>
                 </div>
             </div>
 
@@ -190,25 +196,107 @@
 @section('scripts')
 <script>
     $("#village_id").change(function(){
-    let selectedValue = $(this).val();
-    $.ajax({
-        url: "{{ route('app.rtlh.getKecamatan') }}?village_id=" + selectedValue,
-        type: 'GET',
-        success: function (data) {
-            if (data.district_name) {
-                $('#district_name').val(data.district_name);
-                $('#district_id').val(data.district_id);
-            } else {
-                $('#district_name').val('');
-                $('#district_id').val('');
-                alert('Kecamatan tidak ditemukan.');
+        let selectedValue = $(this).val();
+        $.ajax({
+            url: "{{ route('app.rtlh.getKecamatan') }}?village_id=" + selectedValue,
+            type: 'GET',
+            success: function (data) {
+                if (data.district_name) {
+                    $('#district_name').val(data.district_name);
+                    $('#district_id').val(data.district_id);
+                } else {
+                    $('#district_name').val('');
+                    $('#district_id').val('');
+                    alert('Kecamatan tidak ditemukan.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('Terjadi kesalahan: ' + error);
             }
-        },
-        error: function (xhr, status, error) {
-            console.log('Terjadi kesalahan: ' + error);
-        }
+        });
     });
-});
+
+    const kelayakanScores = {
+        'Layak': 20,
+        'Kurang Layak': 10,
+        'Tidak Layak': 0,
+    };
+
+    const airScores = {
+        'PDAM': 50,
+        'Isi Ulang': 50,
+        'Air Kemasan': 50,
+        'Sumur': 40,
+        'Pamsimas': 40,
+        'Mata Air': 30,
+        'Air Hujan': 20,
+    };
+
+    const jarakTinjaScores = {
+        '≥ 10 Meter': 50,
+        '≤ 10 Meter': 0,
+    };
+
+    const statusCategories = (score) => {
+        if (score > 80) return 'LAYAK';
+        if (score >= 60) return 'MENUJU LAYAK';
+        if (score >= 35) return 'KURANG LAYAK';
+        return 'TIDAK LAYAK';
+    };
+
+    function calculateSafetyScore() {
+        let pondasi = kelayakanScores[$("select[name='pondasi']").val()] || 0;
+        let kolomBlk = kelayakanScores[$("select[name='kolom_blk']").val()] || 0;
+        let rngkAtap = kelayakanScores[$("select[name='rngk_atap']").val()] || 0;
+
+        let structuralScore = pondasi + kolomBlk + rngkAtap;
+
+        let atap = kelayakanScores[$("select[name='atap']").val()] || 0;
+        let dinding = kelayakanScores[$("select[name='dinding']").val()] || 0;
+        let lantai = kelayakanScores[$("select[name='lantai']").val()] || 0;
+
+        let nonStructuralScore = atap + dinding + lantai;
+
+        return structuralScore + nonStructuralScore;
+    }
+
+    function calculateCleanWaterScore() {
+        let air = airScores[$("select[name='air']").val()] || 0;
+        let jarakTinja = jarakTinjaScores[$("select[name='jarak_tinja']").val()] || 0;
+        return air + jarakTinja;
+    }
+
+    function calculateOverallScore(safetyScore, cleanWaterScore) {
+        let people = parseInt($("#people").val()) || 0;
+        let area = parseInt($("#area").val()) || 0;
+
+        let roomAdequacyScore = area / people > 7 ? 100 : 0;
+
+        let sanitationScore = 0;
+        sanitationScore += $("select[name='wc']").val() === 'Milik Sendiri' ? 50 : 25;
+        sanitationScore += $("select[name='jenis_wc']").val() === 'Leher Angsa' ? 25 : 12.5;
+        sanitationScore += $("select[name='tpa_tinja']").val() === 'Tangki Septik' ? 25 : 0;
+
+        let totalScore = (safetyScore + cleanWaterScore + roomAdequacyScore + sanitationScore) / 4;
+        return totalScore;
+    }
+
+    function updateScores() {
+        let safetyScore = calculateSafetyScore();
+        $("#status_safety").val(statusCategories(safetyScore));
+
+        let cleanWaterScore = calculateCleanWaterScore();
+        let overallScore = calculateOverallScore(safetyScore, cleanWaterScore);
+        $("#status").val(statusCategories(overallScore));
+    }
+
+    // Event listener untuk semua input terkait
+    $("select, input").on("change keyup", function () {
+        updateScores();
+    });
+
+    // Perhitungan awal (default)
+    updateScores();
 </script>
     <x-coordinate></x-coordinate>
 @endsection

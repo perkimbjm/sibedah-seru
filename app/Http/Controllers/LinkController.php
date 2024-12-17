@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Link;
+use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\LinkStoreRequest;
 use App\Http\Requests\LinkUpdateRequest;
-use App\Models\Link;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\MassDestroyLinkRequest;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class LinkController extends Controller
 {
@@ -72,6 +73,13 @@ class LinkController extends Controller
         $link->delete();
 
         return redirect()->route('app.links.index');
+    }
+
+    public function massDestroy(MassDestroyLinkRequest $request)
+    {
+        Link::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     public function getData()

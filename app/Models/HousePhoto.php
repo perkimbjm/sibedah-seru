@@ -19,7 +19,6 @@ class HousePhoto extends Model
         'house_id',
         'photo_url',
         'description',
-        'rtlh_id',
     ];
 
     /**
@@ -30,16 +29,11 @@ class HousePhoto extends Model
     protected $casts = [
         'id' => 'integer',
         'house_id' => 'integer',
-        'rtlh_id' => 'integer',
     ];
 
     public function rtlh(): BelongsTo
     {
-        return $this->belongsTo(Rtlh::class);
+        return $this->belongsTo(Rtlh::class, 'house_id');
     }
 
-    public function house(): BelongsTo
-    {
-        return $this->belongsTo(Rtlh::class);
-    }
 }

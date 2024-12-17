@@ -37,8 +37,8 @@ class RenovatedHousePhoto extends Model
         'is_best' => 'boolean',
     ];
 
-    public function renovatedHouse(): BelongsTo
+    public function house() : BelongsTo
     {
-        return $this->belongsTo(House::class);
+        return $this->belongsTo(House::class, 'renovated_house_id');
     }
 }

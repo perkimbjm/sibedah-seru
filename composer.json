@@ -18,6 +18,7 @@
         "owen-it/laravel-auditing": "^13.6",
         "spatie/laravel-permission": "^6.10",
         "tightenco/ziggy": "^2.0",
+        "unisharp/laravel-filemanager": "^2.9",
         "yajra/laravel-datatables": "*"
     },
     "require-dev": {

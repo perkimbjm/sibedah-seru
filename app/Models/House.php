@@ -29,10 +29,6 @@ class House extends Model
         'note'
     ];
 
-    // public function getRouteKeyName()
-    // {
-    //     return 'slug';
-    // }
 
     // Relasi dengan rtlh
     public function rtlh()
@@ -50,6 +46,11 @@ class House extends Model
     public function village()
     {
         return $this->belongsTo(Village::class, 'village_id');
+    }
+
+    public function renovatedHousePhotos()
+    {
+        return $this->hasMany(RenovatedHousePhoto::class, 'renovated_house_id');
     }
 
 
