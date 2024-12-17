@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\DownloadStoreRequest;
 use App\Http\Requests\DownloadUpdateRequest;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Requests\MassDestroyDownloadRequest;
 
 class DownloadController extends Controller
 {
@@ -71,8 +72,17 @@ class DownloadController extends Controller
         return redirect()->route('app.downloads.index');
     }
 
+    public function massDestroy(MassDestroyDownloadRequest $request)
+    {
+        Download::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
+    }
+
     public function getData()
     {
         return Download::orderBy('id', 'asc')->get();
     }
+
+
 }

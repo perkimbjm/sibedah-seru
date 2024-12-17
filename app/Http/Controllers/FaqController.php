@@ -8,9 +8,10 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\FaqStoreRequest;
 use App\Http\Requests\FaqUpdateRequest;
+use App\Http\Requests\MassDestroyFaqRequest;
+use Symfony\Component\HttpFoundation\Response;
 
 class FaqController extends Controller
 {
@@ -69,6 +70,13 @@ class FaqController extends Controller
         $faq->delete();
 
         return redirect()->route('app.faqs.index');
+    }
+
+    public function massDestroy(MassDestroyFaqRequest $request)
+    {
+        Faq::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     public function getData()

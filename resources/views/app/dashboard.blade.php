@@ -296,7 +296,7 @@
     </div>
     <div class="mb-4 ml-4 d-md-flex justify-content-between">
         <div class="w-md-50 w-100 m-3">
-            <h4 class="font-weight-bold">Jumlah Rumah Berdasarkan Aspek Keselamatan dan Sanitasi</h4>
+            <h4 class="font-weight-bold">Jumlah Rumah Berdasarkan Aspek Keseluruhan</h4>
             <canvas id="statusChart" class="w-100 h-60"></canvas>
         </div>
         <div class="w-md-50 w-100 m-3">

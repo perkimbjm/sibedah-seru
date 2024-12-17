@@ -2,59 +2,143 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RenovatedHousePhotoControllerStoreRequest;
-use App\Http\Requests\RenovatedHousePhotoControllerUpdateRequest;
-use App\Models\RenovatedHousePhoto;
-use Illuminate\Http\RedirectResponse;
+use App\Models\House;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Http\Response;
+use App\Models\RenovatedHousePhoto;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\MassDestroyRenovatedHousePhotoRequest;
 
 class RenovatedHousePhotoController extends Controller
 {
-    public function index(Request $request): View
-    {
-        $renovatedHousePhotos = RenovatedHousePhoto::all();
-
-        return view('renovatedHousePhoto.index', compact('renovatedHousePhotos'));
+    public function index(House $house)
+    {   
+        abort_if(Gate::denies('renovated_house_photo_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $photos = $house->renovatedHousePhotos()->paginate(10);
+        return view('gallery.index', compact('house', 'photos'));
     }
 
-    public function create(Request $request): Response
+    public function create(House $house)
     {
-        return view('renovatedHousePhoto.create');
+        abort_if(Gate::denies('renovated_house_photo_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return view('gallery.create', compact('house'));
     }
 
-    public function store( RenovatedHousePhotoControllerStoreRequest $request): Response
+    public function store(Request $request, House $house)
     {
-        $renovatedHousePhoto =  RenovatedHousePhoto::create($request->validated());
+        abort_if(Gate::denies('renovated_house_photo_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $request->validate([
+            'photo' => 'required|image|max:6144',
+            'progres' => 'required|numeric',
+            'description' => 'nullable|string',
+            'is_primary' => 'nullable|boolean',
+            'is_best' => 'nullable|boolean',
+        ]);
 
-        $request->session()->flash('renovatedHousePhoto.id', $renovatedHousePhoto->id);
+        // Ambil file dari request
+        $file = $request->file('photo');
+        $progres = $request->progres;
 
-        return redirect()->route('renovatedHousePhotos.index');
+        // Konversi nama file sesuai format
+        $name = strtoupper(Str::slug($house->name, '-'));
+        $extension = $file->getClientOriginalExtension();
+        $filename = "{$house->id}_{$name}.{$extension}";
+
+        // Folder berdasarkan progres
+        $folder = "bedah/progres-{$progres}";
+
+        // Cek apakah file dengan nama yang sama sudah ada
+        if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+            // Tambahkan angka urut jika file sudah ada
+            $counter = 1;
+            while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+                $filename = "{$house->id}_{$name}_{$counter}.{$extension}";
+                $counter++;
+            }
+        }
+
+        // Simpan file ke folder storage/app/public/bedah/progres-{progres}
+        $file->storeAs($folder, $filename, 'public');
+
+        RenovatedHousePhoto::create([
+            'renovated_house_id' => $house->id,
+            'photo_url' => "{$folder}/{$filename}",
+            'description' => $request->description,
+            'progres' => $request->progres,
+            'is_primary' => $request->boolean('is_primary'),
+            'is_best' => $request->boolean('is_best'),
+        ]);
+
+        return redirect()->route('app.gallery.index', $house)->with('success', 'Photo uploaded successfully.');
     }
 
-    public function show(Request $request,  RenovatedHousePhoto $renovatedHousePhoto): Response
+    public function destroy(House $house, RenovatedHousePhoto $photo)
     {
-        return view('renovatedHousePhoto.show', compact('renovatedHousePhoto'));
+        abort_if(Gate::denies('renovated_house_photo_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $photo->delete();
+        return redirect()->route('app.gallery.index', $house)->with('success', 'Photo successfully removed.');
     }
 
-    public function edit(Request $request,  RenovatedHousePhoto $renovatedHousePhoto): Response
+    public function massDestroy(MassDestroyRenovatedHousePhotoRequest $request)
     {
-        return view('renovatedHousePhoto.edit', compact('renovatedHousePhoto'));
+        RenovatedHousePhoto::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function update( RenovatedHousePhotoControllerUpdateRequest $request, HousePhoto $renovatedHousePhoto): Response
+    public function edit(House $house, RenovatedHousePhoto $photo)
     {
-        $renovatedHousePhoto->update($request->validated());
-
-        $request->session()->flash('renovatedHousePhoto.id', $renovatedHousePhoto->id);
-
-        return redirect()->route('renovatedHousePhotos.index');
+        abort_if(Gate::denies('renovated_house_photo_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return view('gallery.edit', compact('house', 'photo'));
     }
 
-    public function destroy(Request $request,  RenovatedHousePhoto $renovatedHousePhoto): Response
+    public function update(Request $request, House $house, RenovatedHousePhoto $photo)
     {
-        $renovatedHousePhoto->delete();
+        abort_if(Gate::denies('renovated_house_photo_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        // Jika ada file foto baru
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama
+            Storage::disk('public')->delete($photo->photo_url);
 
-        return redirect()->route('app.renovatedHousePhotos.index');
+            // Proses file baru
+            $file = $request->file('photo');
+            $progres = $request->progres;
+
+            // Konversi nama file sesuai format
+            $name = strtoupper(Str::slug($house->name, '-'));
+            $extension = $file->getClientOriginalExtension();
+            $filename = "{$house->id}_{$name}.{$extension}";
+
+            // Folder berdasarkan progres
+            $folder = "bedah/progres-{$progres}";
+
+            // Cek apakah file dengan nama yang sama sudah ada
+            if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+                // Tambahkan angka urut jika file sudah ada
+                $counter = 1;
+                while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+                    $filename = "{$house->id}_{$name}_{$counter}.{$extension}";
+                    $counter++;
+                }
+            }
+
+            // Simpan file baru
+            $file->storeAs($folder, $filename, 'public');
+            
+            // Update path foto di database
+            $photo->photo_url = "{$folder}/{$filename}";
+        }
+
+        // Update data lainnya
+        $photo->update([
+            'description' => $request->description,
+            'progres' => $request->progres,
+            'is_primary' => $request->boolean('is_primary'),
+            'is_best' => $request->boolean('is_best'),
+        ]);
+
+        return redirect()->route('app.gallery.index', $house)->with('success', 'Photo updated successfully.');
     }
 }

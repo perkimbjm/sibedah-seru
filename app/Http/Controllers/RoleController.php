@@ -8,10 +8,11 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\RoleStoreRequest;
+use App\Http\Requests\RoleUpdateRequest;
 use Spatie\Permission\Models\Permission;
+use App\Http\Requests\MassDestroyRoleRequest;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\RoleControllerStoreRequest;
-use App\Http\Requests\RoleUpdateRequest;
 
 class RoleController extends Controller
 {
@@ -73,5 +74,12 @@ class RoleController extends Controller
         $role->delete();
 
         return redirect()->route('app.roles.index');
+    }
+
+    public function massDestroy(MassDestroyRoleRequest $request)
+    {
+        Role::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

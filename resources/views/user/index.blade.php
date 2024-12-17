@@ -113,6 +113,7 @@
 @endsection
 @section('scripts')
 @parent
+@include('app.index-script')
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
@@ -120,6 +121,7 @@
   let deleteButtonTrans = 'Hapus'
   let deleteButton = {
     text: deleteButtonTrans,
+    url: "{{ route('app.users.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {

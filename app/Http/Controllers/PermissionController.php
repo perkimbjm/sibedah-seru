@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\PermissionStoreRequest;
-use Symfony\Component\HttpFoundation\Response;
-use App\Http\Requests\PermissionControllerStoreRequest;
 use App\Http\Requests\PermissionUpdateRequest;
+use Symfony\Component\HttpFoundation\Response;
+use App\Http\Requests\MassDestroyPermissionRequest;
+use App\Http\Requests\PermissionControllerStoreRequest;
 
 class PermissionController extends Controller
 {  
@@ -61,5 +62,12 @@ class PermissionController extends Controller
         $permission->delete();
 
         return redirect()->route('app.permissions.index');
+    }
+
+    public function massDestroy(MassDestroyPermissionRequest $request)
+    {
+        Permission::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -25,7 +25,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table class=" table table-bordered table-striped table-hover datatable datatable-User">
+            <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-User">
                 <thead>
                     <tr>
                         <th rowspan="2" width="10" class="text-center align-middle"></th>
@@ -43,6 +43,7 @@
                         <th rowspan="2" class="text-center align-middle">Penilaian Keselamatan Bangunan</th>
                         <th rowspan="2" class="text-center align-middle">Penilaian Keselamatan Bangunan dan Sanitasi</th>
                         <th rowspan="2" class="text-center align-middle">Status Perbaikan</th>
+                        <th rowspan="2" class="text-center align-middle">Galeri Foto</th>
                         <th rowspan="2" class="text-center align-middle">&nbsp;</th>
                     </tr>
                     <tr>
@@ -59,126 +60,7 @@
                         <th class="text-center align-middle">TPA Tinja</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($rtlhs as $key => $rtlh)
-                        <tr data-entry-id="{{ $rtlh->id }}">
-                            <td>
 
-                            </td>
-                            <td>
-                                {{ $rtlh->id ?? '' }}
-                            </td>
-                            <td>
-                                {{ $rtlh->name ?? '' }}
-                            </td>
-                            <td>
-                                {{ $rtlh->nik ?? '' }}
-                            </td>
-                            <td>
-                                {{ $rtlh->address?? '' }}
-                            </td>
-                            <td>
-                                {{ $rtlh->districts->name ?? '' }}
-                            </td>
-                            <td>
-                                {{ $rtlh->people ?? '' }}
-                            </td>
-                            <td>
-                                {{ $rtlh->area ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->pondasi ?? '' }}
-                            </td>
-                           
-                            <td>
-                                {{ $rtlh->kolom_blk ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->rngk_atap ?? '' }}
-                            </td>
-                            <td>
-                                {{ $rtlh->atap ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->dinding ?? '' }}
-                            </td>
-                           
-                            <td>
-                                {{ $rtlh->lantai ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->air ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->jarak_tinja ?? '' }}
-                            </td>
-                           
-                            <td>
-                                {{ $rtlh->wc ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->jenis_wc ?? '' }}
-                            </td>
-                           
-                            <td>
-                                {{ $rtlh->tpa_tinja ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->status_safety ?? '' }}
-                            </td>
-
-                            <td>
-                                {{ $rtlh->status ?? '' }}
-                            </td>
-
-                            <td>
-                                @if($rtlh->is_renov)
-                                    <span class="badge bg-success">Sudah Diperbaiki</span>
-                                    @php
-                                        $house = \App\Models\House::where('rtlh_id', $rtlh->id)->first();
-                                    @endphp
-                                    @if($house)
-                                        <a class="btn btn-xs btn-primary" href="{{ route('app.houses.show', $house->id) }}">Lihat Data</a>
-                                    @endif
-                                @else
-                                    <span class="badge bg-danger">Belum Diperbaiki</span>
-                                @endif
-                            </td>
-
-
-                            <td>
-                                @can('rtlh_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('app.rtlh.show', $rtlh->id) }}">
-                                        Lihat
-                                    </a>
-                                @endcan
-
-                                @can('rtlh_edit')
-                                    <a class="btn btn-xs btn-info" href="{{ route('app.rtlh.edit', $rtlh->id) }}">
-                                        Edit
-                                    </a>
-                                @endcan
-
-                                @can('rtlh_delete')
-                                    <form action="{{ route('app.rtlh.destroy', $rtlh->id) }}" method="POST" onsubmit="return confirm('Apakah Anda Yakin ?');" style="display: inline-block;">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                        <input type="submit" class="btn btn-xs btn-danger" value="Hapus">
-                                    </form>
-                                @endcan
-
-                            </td>
-
-                        </tr>
-                    @endforeach
-                </tbody>
             </table>
         </div>
     </div>
@@ -189,26 +71,28 @@
 @endsection
 @section('scripts')
 @parent
+@include('app.index-script')
 <script>
-    $(function () {
+$(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 @can('rtlh_delete')
-  let deleteButtonTrans = 'Hapus Data'
+  let deleteButtonTrans = 'Multi Delete';
   let deleteButton = {
     text: deleteButtonTrans,
+    url: "{{ route('app.rtlh.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {
-          return $(entry).data('entry-id')
+      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
+          return entry.id
       });
 
       if (ids.length === 0) {
-        alert('Tidak Ada Data yang Dipilih ')
+        alert('belum ada data yang dipilih')
 
         return
       }
 
-      if (confirm('Apakah kamu Yakin ?')) {
+      if (confirm('Apakah kamu Yakin ingin menghapus ?')) {
         $.ajax({
           headers: {'x-csrf-token': _token},
           method: 'POST',
@@ -221,18 +105,71 @@
   dtButtons.push(deleteButton)
 @endcan
 
-  $.extend(true, $.fn.dataTable.defaults, {
-    orderCellsTop: true,
-    order: [[ 1, 'asc' ]], // Urutkan berdasarkan ID
-    pageLength: 10,
-  });
-  let table = $('.datatable-User:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+    let dtOverrideGlobals = {
+        buttons: dtButtons,
+        processing: true,
+        serverSide: true,
+        retrieve: true,
+        aaSorting: [],
+        ajax: "{{ route('app.rtlh.index') }}",
+        columns: [
+            {data: 'placeholder', name: 'placeholder', orderable: false, searchable: false},
+            {data: 'id', name: 'id'},
+            {data: 'name', name: 'name'},
+            {data: 'nik', name: 'nik'},
+            {data: 'address', name: 'address'},
+            {data: 'district_name', name: 'district_name'},
+            {data: 'people', name: 'people'},
+            {data: 'area', name: 'area'},
+            {data: 'pondasi', name: 'pondasi'},
+            {data: 'kolom_blk', name: 'kolom_blk'},
+            {data: 'rngk_atap', name: 'rngk_atap'},
+            {data: 'atap', name: 'atap'},
+            {data: 'dinding', name: 'dinding'},
+            {data: 'lantai', name: 'lantai'},
+            {data: 'air', name: 'air'},
+            {data: 'jarak_tinja', name: 'jarak_tinja'},
+            {data: 'wc', name: 'wc'},
+            {data: 'jenis_wc', name: 'jenis_wc'},
+            {data: 'tpa_tinja', name: 'tpa_tinja'},
+            {data: 'status_safety', name: 'status_safety'},
+            {data: 'status', name: 'status'},
+            {data: 'status_perbaikan', name: 'status_perbaikan'},
+            {data: 'gallery', name: 'gallery',orderable: false, searchable: false },
+            {data: 'action', name: 'action', orderable: false, searchable: false}
+        ],
+        order: [[1, 'asc']],
+        pageLength: 10,
+        dom: '<"dataTables_length"l>Bfrtip',
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
+    };
+        let table = $('.datatable-User').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
   
-})
+let visibleColumnsIndexes = null;
+$('.datatable thead').on('input', '.search', function () {
+      let strict = $(this).attr('strict') || false
+      let value = strict && this.value ? "^" + this.value + "$" : this.value
 
+      let index = $(this).parent().index()
+      if (visibleColumnsIndexes !== null) {
+        index = visibleColumnsIndexes[index]
+      }
+
+      table
+        .column(index)
+        .search(value, strict)
+        .draw()
+  });
+table.on('column-visibility.dt', function(e, settings, column, state) {
+      visibleColumnsIndexes = []
+      table.columns(":visible").every(function(colIdx) {
+          visibleColumnsIndexes.push(colIdx);
+      });
+  })
+});
 </script>
 @endsection

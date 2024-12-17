@@ -2,59 +2,124 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\HousePhotoControllerStoreRequest;
-use App\Http\Requests\HousePhotoControllerUpdateRequest;
+use App\Models\Rtlh;
 use App\Models\HousePhoto;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\MassDestroyHousePhotoRequest;
 
 class HousePhotoController extends Controller
 {
-    public function index(Request $request): View
-    {
-        $housePhotos = HousePhoto::all();
-
-        return view('housePhoto.index', compact('housePhotos'));
+    public function index(Rtlh $rtlh)
+    {   
+        abort_if(Gate::denies('house_photo_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $photos = $rtlh->housePhotos()->paginate(10);
+        return view('rutilahu.index', compact('rtlh', 'photos'));
     }
 
-    public function create(Request $request): Response
+    public function create(Rtlh $rtlh)
     {
-        return view('housePhoto.create');
+        abort_if(Gate::denies('house_photo_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return view('rutilahu.create', compact('rtlh'));
     }
 
-    public function store(HousePhotoControllerStoreRequest $request): Response
+    public function store(Request $request, Rtlh $rtlh)
     {
-        $housePhoto = HousePhoto::create($request->validated());
+        abort_if(Gate::denies('house_photo_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        // Ambil file dari request
+        $file = $request->file('photo');
 
-        $request->session()->flash('housePhoto.id', $housePhoto->id);
+        // Konversi nama file sesuai format
+        $name = strtoupper(Str::slug($rtlh->name, '-'));
+        $extension = $file->getClientOriginalExtension();
+        $filename = "{$rtlh->id}_{$name}.{$extension}";
+        $folder = "rtlh";
 
-        return redirect()->route('housePhotos.index');
+        // Cek apakah file dengan nama yang sama sudah ada
+        if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+            // Tambahkan angka urut jika file sudah ada
+            $counter = 1;
+            while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+                $filename = "{$rtlh->id}_{$name}_{$counter}.{$extension}";
+                $counter++;
+            }
+        }
+
+        // Simpan file ke folder storage/app/public/rtlh
+        $file->storeAs($folder, $filename, 'public');
+
+        HousePhoto::create([
+            'house_id' => $rtlh->id,
+            'photo_url' => "{$folder}/{$filename}",
+            'description' => $request->description,
+        ]);
+
+        return redirect()->route('app.rutilahu.index', $rtlh)->with('success', 'Photo uploaded successfully.');
     }
 
-    public function show(Request $request, HousePhoto $housePhoto): Response
+    public function destroy(Rtlh $rtlh, HousePhoto $photo)
     {
-        return view('housePhoto.show', compact('housePhoto'));
+        abort_if(Gate::denies('house_photo_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $photo->delete();
+        return redirect()->route('app.rutilahu.index', $rtlh)->with('success', 'Photo successfully removed.');
     }
 
-    public function edit(Request $request, HousePhoto $housePhoto): Response
+    public function massDestroy(MassDestroyHousePhotoRequest $request)
     {
-        return view('housePhoto.edit', compact('housePhoto'));
+        HousePhoto::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function update(HousePhotoControllerUpdateRequest $request, HousePhoto $housePhoto): Response
+    public function edit(Rtlh $rtlh, HousePhoto $photo)
     {
-        $housePhoto->update($request->validated());
-
-        $request->session()->flash('housePhoto.id', $housePhoto->id);
-
-        return redirect()->route('housePhotos.index');
+        abort_if(Gate::denies('house_photo_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return view('rutilahu.edit', compact('rtlh', 'photo'));
     }
 
-    public function destroy(Request $request, HousePhoto $housePhoto): Response
+    public function update(Request $request, Rtlh $rtlh, HousePhoto $photo)
     {
-        $housePhoto->delete();
+        abort_if(Gate::denies('house_photo_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return redirect()->route('housePhotos.index');
+        // Jika ada file foto baru
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama
+            Storage::disk('public')->delete($photo->photo_url);
+
+            // Proses file baru
+            $file = $request->file('photo');
+
+            // Konversi nama file sesuai format
+            $name = strtoupper(Str::slug($house->name, '-'));
+            $extension = $file->getClientOriginalExtension();
+            $filename = "{$house->id}_{$name}.{$extension}";
+            $folder = "rtlh";
+
+            // Cek apakah file dengan nama yang sama sudah ada
+            if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+                // Tambahkan angka urut jika file sudah ada
+                $counter = 1;
+                while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+                    $filename = "{$house->id}_{$name}_{$counter}.{$extension}";
+                    $counter++;
+                }
+            }
+
+            // Simpan file baru
+            $file->storeAs($folder, $filename, 'public');
+            
+            // Update path foto di database
+            $photo->photo_url = "{$folder}/{$filename}";
+        }
+
+        // Update data lainnya
+        $photo->update([
+            'description' => $request->description,
+        ]);
+
+        return redirect()->route('app.rutilahu.index', $rtlh)->with('success', 'Photo updated successfully.');
     }
 }

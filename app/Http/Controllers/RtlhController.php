@@ -13,24 +13,76 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreRtlhRequest;
 use App\Http\Requests\UpdateRtlhRequest;
+use Yajra\DataTables\Facades\DataTables;
+use App\Http\Requests\MassDestroyRtlhRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 class RtlhController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         abort_if(Gate::denies('rtlh_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $rtlhs = Rtlh::with([
-            'districts:id,name',
-            'villages:id,name'
-        ])->select(
-            'id', 'name', 'nik', 'kk', 'address', 'people', 'area', 'pondasi', 
-            'kolom_blk', 'rngk_atap', 'atap', 'dinding', 'lantai', 'air', 
-            'jarak_tinja', 'wc', 'jenis_wc', 'tpa_tinja', 'status_safety', 'status', 'is_renov', 
-            'district_id', 'village_id', 'note'
-        )->get();
+        
+        if ($request->ajax() || $request->wantsJson()) {
+            $query = Rtlh::query()
+                ->select([
+                    'rtlh.id',
+                    'rtlh.name',
+                    'rtlh.nik',
+                    'rtlh.address',
+                    'rtlh.district_id',
+                    'districts.name as district_name',
+                    'rtlh.people',
+                    'rtlh.area',
+                    'rtlh.pondasi',
+                    'rtlh.kolom_blk',
+                    'rtlh.rngk_atap',
+                    'rtlh.atap',
+                    'rtlh.dinding',
+                    'rtlh.lantai',
+                    'rtlh.air',
+                    'rtlh.jarak_tinja',
+                    'rtlh.wc',
+                    'rtlh.jenis_wc',
+                    'rtlh.tpa_tinja',
+                    'rtlh.status_safety',
+                    'rtlh.status',
+                    'rtlh.is_renov',
+                ])
+                ->leftJoin('districts', 'rtlh.district_id', '=', 'districts.id');
 
-        return view('rtlh.index', compact('rtlhs'));
+            return datatables()->of($query)
+                ->addColumn('placeholder', '&nbsp;')
+                ->filterColumn('district_name', function($query, $keyword) {
+                    $query->whereRaw("LOWER(districts.name) ILIKE ?", ["%{$keyword}%"]);
+                })
+                ->addColumn('status_perbaikan', function($row) {
+                    if ($row->is_renov) {
+                        $house = \App\Models\House::where('rtlh_id', $row->id)->first();
+                        $link = $house ? '<a class="btn btn-xs btn-primary" href="' . route('app.houses.show', $house->id) . '">Lihat Data</a>' : '';
+                        return '<span class="badge bg-success">Sudah Diperbaiki</span>' . $link;
+                    } else {
+                        return '<span class="badge bg-danger">Belum Diperbaiki</span>';
+                    }
+                })
+                ->addColumn('gallery', function ($row) {
+                    return '
+                    <a href="' . route('app.rutilahu.index', $row->id) . '" class="btn btn-md btn-warning rounded-lg px-2 py-1 d-inline-block text-gray-500">
+                        Foto
+                    </a>';
+                })
+                ->addColumn('action', function($row) {
+                    return view('rtlh.partials.action-buttons', compact('row'))->render();
+                })
+                ->rawColumns(['placeholder','status_perbaikan', 'gallery','action'])
+                ->setRowId(function ($row) {
+                    return 'row_'.$row->id;
+                })
+                ->smart(true)
+                ->toJson(); // Pastikan response Ajax mengembalikan JSON
+        }
+
+        return view('rtlh.index'); // Mengembalikan view saat bukan permintaan Ajax
     }
 
     public function create()
@@ -41,9 +93,8 @@ class RtlhController extends Controller
 
         $villages = Village::select('id','name', 'district_id')->pluck('name','id')->prepend("Pilih Kelurahan / Desa", '');
 
-        $kelayakanOptions = ['Layak', 'Menuju Layak', 'Agak Layak', 'Kurang Layak', 'Tidak Layak'];
+        $kelayakanOptions = ['Layak', 'Kurang Layak', 'Tidak Layak'];
         $airOptions = [
-            'Leher Angsa',
             'Air Kemasan',
             'Pamsimas',
             'Mata Air',
@@ -83,11 +134,23 @@ class RtlhController extends Controller
     
 
     // // Menampilkan detail satu data RTLH
-    public function show($id)
+    public function show(Rtlh $rtlh)
     {
         abort_if(Gate::denies('rtlh_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $rtlh = Rtlh::with('house')->findOrFail($id);
-        return response()->json($rtlh);
+        $rtlh = Rtlh::with([
+            'districts:id,name',
+            'villages:id,name',
+        ])->findOrFail($rtlh->id);
+        
+        
+        $spaceScore = $rtlh->calculateSpaceScore();
+        $cleanWaterScore = $rtlh->calculateCleanWaterScore();
+        $sanitationScore = $rtlh->calculateSanitationScore();
+        $safetyScore = $rtlh->calculateSafetyScore();
+        $finalScore = $rtlh->calculateFinalScore();
+
+        return view('rtlh.show', compact('rtlh', 'safetyScore', 'sanitationScore', 'cleanWaterScore', 'spaceScore', 'finalScore'));
+        
     }
 
     public function edit(Rtlh $rtlh)
@@ -98,10 +161,9 @@ class RtlhController extends Controller
 
         $villages = Village::select('id','name', 'district_id')->pluck('name','id')->prepend("Pilih Kelurahan / Desa", '');
 
-        $kelayakanOptions = ['Layak', 'Menuju Layak', 'Agak Layak', 'Kurang Layak', 'Tidak Layak'];
-        $bigOptions = ['LAYAK', 'MENUJU LAYAK', 'AGAK LAYAK', 'KURANG LAYAK', 'TIDAK LAYAK'];
+        $kelayakanOptions = ['Layak', 'Kurang Layak', 'Tidak Layak'];
+        $bigOptions = ['LAYAK', 'MENUJU LAYAK', 'KURANG LAYAK', 'TIDAK LAYAK'];
         $airOptions = [
-            'Leher Angsa',
             'Air Kemasan',
             'Pamsimas',
             'Mata Air',
@@ -156,6 +218,13 @@ class RtlhController extends Controller
         $rtlh->delete();
 
         return redirect()->route('app.rtlh.index');
+    }
+
+    public function massDestroy(MassDestroyRtlhRequest $request)
+    {
+        Rtlh::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     public function getKecamatan(Request $request)
