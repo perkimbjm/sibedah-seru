@@ -36,7 +36,7 @@
                 $mainPhoto = $house->renovatedHousePhotos()->where('is_primary', true)->first();
             @endphp
             @if ($mainPhoto)
-                <img id="mainImage" src="{{ asset('storage/' . $mainPhoto->photo_url) }}" alt="rumah">
+                <img id="mainImage" src="{{ asset($mainPhoto->photo_url) }}" alt="rumah">
             @else
                 <a href="{{ route('app.gallery.index', $house) }}">
                     <img class="w-50" id="mainImage" src="https://placehold.co/100x75/EEE/31343C?font=open-sans&text=Belum+Ada+Foto" alt="No Image Available">
@@ -49,7 +49,7 @@
     <div class="owl-carousel owl-theme row thumbnail-grid mb-4">
         @foreach ($house->renovatedHousePhotos()->get() as $photo)
             <div class="item">
-                <img src="{{ asset('storage/' . $photo->photo_url) }}" alt="progres" class="w-100 rounded" onclick="changeMainImage(this.src)">
+                <img src="{{ asset($photo->photo_url) }}" alt="progres" class="w-100 rounded" onclick="changeMainImage(this.src)">
             </div>
         @endforeach
     </div>

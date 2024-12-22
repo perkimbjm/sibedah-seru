@@ -128,14 +128,20 @@ const SCRIPTS = [
     {
         src: "https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js",
     },
+    {
+        src: "https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js"
+    },
     { src: "/js/Control.Geocoder.js" },
     { src: "/js/leaflet.groupedlayercontrol.js" },
     { src: "/js/leaflet.markercluster141.js" },
     { src: "/js/typeahead.bundle.min.js" },
     { src: "/js/iconLayers.js" },
+    { src: "/js/leaflet.draw-src.js" },
+    { src: "/js/shp.js" },
+    { src: "/js/leaflet.shapefile.js" },
+    { src: "/js/leaflet.draw-shapefile.js" },
     { src: "/js/Leaflet.PolylineMeasure.js" },
     { src: "/js/leaflet.toolbar.js" },
-    { src: "/js/leaflet.pm.min.js" },
     { src: "/js/leaflet-sidepanel.min.js" },
 ];
 
@@ -189,9 +195,15 @@ const initMap = async () => {
     };
 
     await waitForMap();
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    // Tambah delay untuk memastikan semua script sudah dimuat dengan benar
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     try {
+        // Pastikan semua script yang dibutuhkan sudah dimuat
+        if (!window.L || !window.L.Control || !window.L.Control.Draw) {
+            throw new Error("Required Leaflet libraries are not loaded yet");
+        }
+
         // Inisialisasi semua tile layers
         const layers = {};
         for (const [key, layer] of Object.entries(TILE_LAYERS)) {
@@ -214,18 +226,36 @@ const initMap = async () => {
         mapInstance.value = L.map("map", {
             zoom: mapZoom,
             center: mapCenter,
+            zoomControl: false,
             fullscreenControl: { pseudoFullscreen: true },
             layers: [layers.osm],
         });
 
         window.map = mapInstance.value;
 
-        const response = await fetch("/js/core.js");
-        const coreJsContent = await response.text();
-        const script = document.createElement("script");
-        script.textContent = coreJsContent;
-        document.head.appendChild(script);
+        // Load core.js dengan cara yang berbeda
+        try {
+            const response = await fetch("/js/core.js");
+            const coreJsContent = await response.text();
 
+            // Bungkus dalam IIFE untuk mengisolasi scope
+            const wrappedContent = `
+                (function(L, map) {
+                    ${coreJsContent}
+                })(L, window.map);
+            `;
+
+            const script = document.createElement("script");
+            script.textContent = wrappedContent;
+            document.head.appendChild(script);
+
+            // Tunggu sebentar untuk memastikan script dieksekusi
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+            console.error("Error loading core.js:", error);
+        }
+
+        // Lanjutkan dengan inisialisasi sidepanel
         const sidepanelLeft = L.control
             .sidepanel("mySidepanelLeft", {
                 tabsPosition: "left",
@@ -241,7 +271,6 @@ const initMap = async () => {
                 startTab: "tab-2",
             })
             .addTo(map);
-
 
         window.dispatchEvent(new Event("resize"));
     } catch (error) {
@@ -391,5 +420,19 @@ onBeforeUnmount(() => {
     color: none;
     text-shadow: 1px 1px 0px #fff, -1px -1px 0px #fff, 1px -1px 0px #fff,
         -1px 1px 0px #fff;
+}
+
+.leaflet-draw-toolbar .leaflet-draw-draw-shapefile {
+    background-image: url('/img/draw-shapefile.png') !important;
+    background-size: 20px 20px;
+}
+
+#leaflet-draw-draw-shapefile-btn {
+    height: 26px;
+    width: 26px;
+}
+
+#leaflet-draw-shapefile-selector {
+    display: none;
 }
 </style>

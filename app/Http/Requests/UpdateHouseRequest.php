@@ -35,7 +35,7 @@ class UpdateHouseRequest extends FormRequest
             'rtlh_id' => ['nullable', 'integer', 'exists:rtlh,id'],
             'district_id' => ['required', 'integer', 'exists:districts,id'],
             'village_id' => ['required', 'integer', 'exists:villages,id'],
-            'note' => ['nullable', 'text'],
+            'note' => ['nullable', 'string'],
         ];
     }
 }

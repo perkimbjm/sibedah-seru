@@ -18,12 +18,15 @@ export const loadMapStyles = () => {
             href: "https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css",
             crossorigin: "anonymous",
         },
+        {
+            href: "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css",
+            crossorigin: "anonymous",
+        },
         // Local CSS files don't need crossorigin
         "/css/locateControl.css",
         "/css/Control.Geocoder.css",
         "/css/iconLayers.css",
         "/css/markerCluster.css",
-        "/css/leaflet.pm.css",
         "/css/Leaflet.PolylineMeasure.css",
         "/css/leaflet.toolbar.css",
         "/css/leaflet-sidepanel.css",

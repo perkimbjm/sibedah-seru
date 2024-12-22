@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Rtlh;
 use App\Models\House;
 use App\Models\Village;
@@ -42,47 +43,41 @@ class HouseController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreHouseRequest $request)
+    public function store(StoreHouseRequest $request, House $house)
     {
         // Simpan data validasi
         $validated = $request->validated();
+        
+        try {
+            $house= House::create($validated);
+            $house->name = strtoupper($validated['name']);          
 
-        // Buat instance model House baru
-        $house = new House();
-        $house->name = strtoupper($validated['name']);
-        $house->nik = $validated['nik'];
-        $house->address = $validated['address'];
-        $house->village_id = $validated['village_id'];
-        $house->district_id = $validated['district_id'];
-        $house->lat = $validated['lat'];
-        $house->lng = $validated['lng'];
-        $house->year = $validated['year'];
-        $house->type = $validated['type'];
-        $house->source = $validated['source'];
-        $house->note = $validated['note'];
+            // Cari nama kecamatan dari district_id
+            $district = District::find($validated['district_id']);
+            if ($district) {
+                $house->district = strtoupper($district->name); // Simpan nama kecamatan
+            }
 
-        // Cari nama kecamatan dari district_id
-        $district = District::find($validated['district_id']);
-        if ($district) {
-            $house->district = strtoupper($district->name); // Simpan nama kecamatan
+            // Cek apakah ada rtlh_id berdasarkan nik
+            $rtlh = Rtlh::where('nik', $house->nik)->first();
+            if ($rtlh) {
+                $house->rtlh_id = $rtlh->id;
+            }
+
+            // Simpan rumah ke database
+            $house->save();
+
+            // Buat slug berdasarkan {id}-{name}
+            $house->slug = strtolower($house->id . '-' . Str::slug($house->name));
+            $house->save();
+
+            
+            // Redirect setelah berhasil menyimpan data
+            return redirect()->route('app.houses.index')->with('success', 'Data berhasil ditambahkan.');
+            } catch (Exception $e) {
+                return back()->withErrors(['error' => 'Gagal menyimpan data rumah: ' . $e->getMessage()]);
+            }
         }
-
-        // Cek apakah ada rtlh_id berdasarkan nik
-        $rtlh = Rtlh::where('nik', $house->nik)->first();
-        if ($rtlh) {
-            $house->rtlh_id = $rtlh->id;
-        }
-
-        // Simpan rumah ke database
-        $house->save();
-
-        // Buat slug berdasarkan {id}-{name}
-        $house->slug = strtolower($house->id . '-' . Str::slug($house->name));
-        $house->save();
-
-        // Redirect setelah berhasil menyimpan data
-        return redirect()->route('app.houses.index')->with('success', 'Data berhasil ditambahkan.');
-    }
 
 
     public function show(House $house)
@@ -131,11 +126,11 @@ class HouseController extends Controller
         $house = House::findOrFail($id);
 
         // Hapus relasi house jika ada
-        $house->house()->delete();
+        $house->renovatedHousePhotos()->delete();
 
         $house->delete();
 
-        return redirect()->route('app.house.index');
+        return redirect()->route('app.houses.index');
     }
 
     public function massDestroy(MassDestroyHouseRequest $request)

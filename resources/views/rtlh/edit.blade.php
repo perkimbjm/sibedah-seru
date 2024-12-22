@@ -140,7 +140,7 @@
 
                     <div class="form-group">
                         <label class="required" for="district_id">Kecamatan</label>
-                        <input type="text" class="form-control" id="district_name" value="{{ old('district_name', $rtlh->districts->name) }}" readonly>
+                        <input type="text" class="form-control" id="district_name" value="{{ old('district_name', $rtlh->district->name) }}" readonly>
                         <input type="hidden" name="district_id" id="district_id" value="{{ old('district_id', $rtlh->district_id) }}" required>
                     </div>
 

@@ -6,6 +6,8 @@ use App\Models\House;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 use App\Models\RenovatedHousePhoto;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -52,15 +54,18 @@ class RenovatedHousePhotoController extends Controller
         // Cek apakah file dengan nama yang sama sudah ada
         if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
             // Tambahkan angka urut jika file sudah ada
-            $counter = 1;
+            $counter = 2;
             while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
                 $filename = "{$house->id}_{$name}_{$counter}.{$extension}";
                 $counter++;
             }
         }
 
-        // Simpan file ke folder storage/app/public/bedah/progres-{progres}
-        $file->storeAs($folder, $filename, 'public');
+        $manager = new ImageManager(Driver::class);
+
+        $image = $manager->read($file)->scale(width: 600);
+
+        $image->toWebp(75)->save(storage_path("app/public/{$folder}/{$filename}"));
 
         RenovatedHousePhoto::create([
             'renovated_house_id' => $house->id,
@@ -117,17 +122,20 @@ class RenovatedHousePhotoController extends Controller
             // Cek apakah file dengan nama yang sama sudah ada
             if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
                 // Tambahkan angka urut jika file sudah ada
-                $counter = 1;
+                $counter = 2;
                 while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
                     $filename = "{$house->id}_{$name}_{$counter}.{$extension}";
                     $counter++;
                 }
             }
 
-            // Simpan file baru
-            $file->storeAs($folder, $filename, 'public');
-            
-            // Update path foto di database
+            $manager = new ImageManager(Driver::class);
+
+            $image = $manager->read($file)->scale(width: 600);
+
+
+            $image->toWebp(75)->save(storage_path("app/public/{$folder}/{$filename}"));
+
             $photo->photo_url = "{$folder}/{$filename}";
         }
 

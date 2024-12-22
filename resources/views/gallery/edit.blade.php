@@ -75,7 +75,7 @@
         <div class="form-group">
             <label for="thumbnail">Thumbnail Foto Lama:</label>
             <div>
-                <img src="{{ asset('storage/' . $photo->photo_url) }}" alt="Foto Lama" style="max-width: 200px; max-height: 150px;">
+                <img src="{{ asset($photo->photo_url) }}" alt="Foto Lama" style="max-width: 200px; max-height: 150px;">
             </div>
         </div>
 

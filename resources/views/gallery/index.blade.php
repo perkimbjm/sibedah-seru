@@ -27,7 +27,7 @@
             @else
                 @foreach ($photos as $photo)
                     <tr>
-                        <td><img src="{{ asset('storage/' . $photo->photo_url) }}" alt="Thumbnail" style="width: 300px;"></td>
+                        <td><img src="{{ asset($photo->photo_url) }}" alt="Thumbnail" style="width: 300px;"></td>
                         <td>{{ $photo->photo_url }}</td>
                         <td>{{ $photo->progres }}%</td>
                         <td>{{ $photo->description }}</td>

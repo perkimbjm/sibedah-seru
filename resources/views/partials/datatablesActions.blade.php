@@ -17,7 +17,7 @@
     </form>
 @endcan
 
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
     $('.show_confirm').click(function(event) {
           var form =  $(this).closest("form");
