@@ -23,7 +23,6 @@ class HousePhotoStoreRequest extends FormRequest
             'house_id' => ['required', 'integer', 'exists:houses,id'],
             'photo_url' => ['required', 'string'],
             'description' => ['nullable', 'string'],
-            'rtlh_id' => ['required', 'integer', 'exists:rtlh,id'],
         ];
     }
 }

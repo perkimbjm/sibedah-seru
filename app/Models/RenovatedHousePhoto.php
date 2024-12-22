@@ -41,4 +41,9 @@ class RenovatedHousePhoto extends Model
     {
         return $this->belongsTo(House::class, 'renovated_house_id');
     }
+
+    public function getPhotoUrlAttribute($value)
+    {
+        return 'storage/' . $value;
+    }
 }

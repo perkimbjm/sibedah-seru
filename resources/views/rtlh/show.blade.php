@@ -198,7 +198,7 @@
             <div class="rounded mb-3">
                 <div id="mapid" class="mb-3 mx-auto" style="min-height: 350px"></div>
             </div>
-            <p><i class="fas fa-map-marker-alt" style="color: #358dd0;"></i> {{ ucwords($rtlh->address) }} Kec. {{ ucwords($rtlh->districts->name) }} Kab. Balangan Kalimantan Selatan</p>
+            <p><i class="fas fa-map-marker-alt" style="color: #358dd0;"></i> {{ ucwords($rtlh->address) }} Kec. {{ ucwords($rtlh->district->name) }} Kab. Balangan Kalimantan Selatan</p>
         </div>
 
         
@@ -219,7 +219,7 @@
 
                     <h4 class="mt-4 mb-3">Lokasi</h4>
                     <div class="d-flex align-items-center"><i class="fas fa-street-view" aria-hidden="true"></i><p class="ml-2 mb-1 text-md">{{ $rtlh->address }}</p></div>
-                    <p class="font-bold mb-1 text-md"><i class="fas fa-map"></i> Kec. {{ $rtlh->districts ? $rtlh->districts->name : 'Tidak ada kecamatan' }}</p>
+                    <p class="font-bold mb-1 text-md"><i class="fas fa-map"></i> Kec. {{ $rtlh->district ? $rtlh->district->name : 'Tidak ada kecamatan' }}</p>
                     <p class="font-bold mb-1 text-md"><i class="fas fa-map-pin"></i> Lat {{ $rtlh->lat }} ,Lng {{ $rtlh->lng}}</p>
                     <a target='_blank' href='https://maps.google.com/maps?q={{ $rtlh->lat }},{{ $rtlh->lng }}&z=20&ll={{ $rtlh->lat }},s{{ $rtlh->lng }}'><button class='btn btn-outline-success btn-block'>Google Maps</button></a>
 

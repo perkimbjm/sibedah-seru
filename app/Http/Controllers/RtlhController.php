@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Rtlh;
 use App\Models\House;
 use App\Models\Village;
@@ -119,17 +120,23 @@ class RtlhController extends Controller
 
     public function store(StoreRtlhRequest $request)
     {
-        $validatedData = $request->validated();
-        $validatedData['is_renov'] = false;
+        try {
+            $validatedData = $request->validated();
+            $validatedData['is_renov'] = false;          
 
-        $rtlh = Rtlh::create($validatedData);
+            $rtlh = Rtlh::create($validatedData);
+            $rtlh['name'] = strtoupper($rtlh['name']);
+            $rtlh['status_safety'] = strtoupper($rtlh['status_safety']);
 
-        $rtlh['status'] = strtoupper($rtlh['status']);
-        $rtlh->slug = strtolower($rtlh->id . '-' . Str::slug($rtlh->name));
-        $rtlh->save();
+            $rtlh['status'] = strtoupper($rtlh['status']);
+            $rtlh->slug = strtolower($rtlh->id . '-' . Str::slug($rtlh->name));
+            $rtlh->save();
 
-        $request->session()->flash('rtlh.id', $rtlh->id);
-        return redirect()->route('app.rtlh.index')->with('success', 'Data berhasil ditambahkan.');
+            $request->session()->flash('rtlh.id', $rtlh->id);
+            return redirect()->route('app.rtlh.index')->with('success', 'Data berhasil ditambahkan.');
+        } catch (Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menyimpan data RTLH: ' . $e->getMessage()]);
+        }
     }
     
 
@@ -138,8 +145,8 @@ class RtlhController extends Controller
     {
         abort_if(Gate::denies('rtlh_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $rtlh = Rtlh::with([
-            'districts:id,name',
-            'villages:id,name',
+            'district:id,name',
+            'village:id,name',
         ])->findOrFail($rtlh->id);
         
         
@@ -182,7 +189,7 @@ class RtlhController extends Controller
 
         $tpaTinjaOptions = ['Tangki Septik', 'Lubang Tanah', 'IPAL', 'Kolam/Sawah/Sungai/Danau/Laut', 'Pantai/Tanah Lapang/Kebun'];
 
-        $rtlh->load('districts', 'villages');
+        $rtlh->load('district', 'village');
 
         return view('rtlh.edit', compact('districts', 'villages', 'rtlh', 'kelayakanOptions', 'bigOptions','jenisWcOptions', 'airOptions', 'jarakTinjaOptions', 'wcOptions', 'tpaTinjaOptions'));
     }
@@ -193,6 +200,7 @@ class RtlhController extends Controller
     public function update(UpdateRtlhRequest $request, $id)
     {
         $rtlh = Rtlh::findOrFail($id);
+        $rtlh['name'] = strtoupper($rtlh['name']);
 
         $rtlh->update($request->all());
         $data['is_renov'] = isset($data['is_renov']) && $data['is_renov'] === '1';
@@ -213,7 +221,7 @@ class RtlhController extends Controller
         $rtlh = Rtlh::findOrFail($id);
 
         // Hapus relasi house jika ada
-        $rtlh->house()->delete();
+        $rtlh->housePhotos()->delete();
 
         $rtlh->delete();
 

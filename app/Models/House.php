@@ -85,7 +85,7 @@ class House extends Model
 
     public function getNameLinkAttribute()
     {
-        $title = __('global.show_detail_title');
+        $title = __('Lihat Detail');
         $link = '<a href="' . route('app.houses.show', $this) . '"';
         $link .= ' title="' . $title . '">';
         $link .= $this->id;

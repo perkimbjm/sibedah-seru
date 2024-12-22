@@ -7,6 +7,8 @@ use App\Models\HousePhoto;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\MassDestroyHousePhotoRequest;
@@ -41,15 +43,18 @@ class HousePhotoController extends Controller
         // Cek apakah file dengan nama yang sama sudah ada
         if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
             // Tambahkan angka urut jika file sudah ada
-            $counter = 1;
+            $counter = 2;
             while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
                 $filename = "{$rtlh->id}_{$name}_{$counter}.{$extension}";
                 $counter++;
             }
         }
 
-        // Simpan file ke folder storage/app/public/rtlh
-        $file->storeAs($folder, $filename, 'public');
+        $manager = new ImageManager(Driver::class);
+
+        $image = $manager->read($file)->scale(width: 600);
+
+        $image->toWebp(75)->save(storage_path("app/public/{$folder}/{$filename}"));
 
         HousePhoto::create([
             'house_id' => $rtlh->id,
@@ -93,23 +98,27 @@ class HousePhotoController extends Controller
             $file = $request->file('photo');
 
             // Konversi nama file sesuai format
-            $name = strtoupper(Str::slug($house->name, '-'));
+            $name = strtoupper(Str::slug($rtlh->name, '-'));
             $extension = $file->getClientOriginalExtension();
-            $filename = "{$house->id}_{$name}.{$extension}";
+            $filename = "{$rtlh->id}_{$name}.{$extension}";
             $folder = "rtlh";
 
             // Cek apakah file dengan nama yang sama sudah ada
             if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
                 // Tambahkan angka urut jika file sudah ada
-                $counter = 1;
+                $counter = 2;
                 while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
-                    $filename = "{$house->id}_{$name}_{$counter}.{$extension}";
+                    $filename = "{$rtlh->id}_{$name}_{$counter}.{$extension}";
                     $counter++;
                 }
             }
 
-            // Simpan file baru
-            $file->storeAs($folder, $filename, 'public');
+            $manager = new ImageManager(Driver::class);
+
+            $image = $manager->read($file)->scale(width: 600);
+
+
+            $image->toWebp(75)->save(storage_path("app/public/{$folder}/{$filename}"));
             
             // Update path foto di database
             $photo->photo_url = "{$folder}/{$filename}";

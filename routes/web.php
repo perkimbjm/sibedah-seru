@@ -68,13 +68,6 @@ Route::get('/home', function () {
 })->name('home');
 
 
-Route::get('/gallery/{gallery:slug}', function (Gallery $gallery) {
-    
-    // $gallery = Gallery::find($slug);
-    return view('gallery-detail', ['title' => 'Galeri Detail', 'gallery' => $gallery]);
-});
-
-
 Route::get('/map', function () {
     return Inertia::render('Map/index');
 })->name('map');
@@ -150,7 +143,7 @@ Route::middleware([
                 Route::post('/', [RenovatedHousePhotoController::class, 'store'])->name('gallery.store');
                 Route::get('/{photo}/edit', [RenovatedHousePhotoController::class, 'edit'])->name('gallery.edit');
                 Route::put('/{photo}', [RenovatedHousePhotoController::class, 'update'])->name('gallery.update');
-                Route::delete('/{photo}', [RenovatedHousePhotoController::class, 'massDestroy'])->name('gallery.massDestroy');
+                Route::delete('/{photo}', [RenovatedHousePhotoController::class, 'destroy'])->name('gallery.destroy');
             });
             Route::prefix('rtlh/{rtlh}/rutilahu')->group(function () {
                 Route::get('/', [HousePhotoController::class, 'index'])->name('rutilahu.index');
@@ -158,7 +151,7 @@ Route::middleware([
                 Route::post('/', [HousePhotoController::class, 'store'])->name('rutilahu.store');
                 Route::get('/{photo}/edit', [HousePhotoController::class, 'edit'])->name('rutilahu.edit');
                 Route::put('/{photo}', [HousePhotoController::class, 'update'])->name('rutilahu.update');
-                Route::delete('/{photo}', [HousePhotoController::class, 'massDestroy'])->name('rutilahu.massDestroy');
+                Route::delete('/{photo}', [HousePhotoController::class, 'destroy'])->name('rutilahu.destroy');
             });
             
             Route::get('bedah/peta', [HouseMapController::class, 'index'])->name('bedah.peta');

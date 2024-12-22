@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Exception;
 use App\Models\House;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class HouseController extends Controller
 {
@@ -181,64 +182,199 @@ class HouseController extends Controller
         return response()->json(json_decode($geojson[0]->jsonb_build_object));
     }
 
-    // Method untuk mendapatkan daftar tahun yang tersedia
-    public function getYears()
+    
+    public function getHouses(Request $request)
     {
-        $years = House::select('year')
-            ->distinct()
-            ->orderBy('year', 'desc')
-            ->pluck('year');
+        $validated = $request->validate([
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
+            'district_id' => 'nullable|array',
+            'district_id.*' => 'nullable|integer',
+            'village_id' => 'nullable|array',
+            'village_id.*' => 'nullable|integer',
+            'year' => 'nullable|array',
+            'year.*' => 'nullable|integer',
+            'source' => 'nullable|array',
+            'source.*' => 'nullable|string',
+            'type' => 'nullable|array',
+            'type.*' => 'nullable|string'
+    ]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $years
-        ]);
+        try {
+            $query = House::query();
+
+            // Filter berdasarkan radius jika koordinat diberikan
+            if (!empty($validated['lat']) && !empty($validated['lng'])) {
+                $lat = $validated['lat'];
+                $lng = $validated['lng'];
+
+                $query->selectRaw("
+                    id, name, address, year, type, district_id, village_id, source, 
+                    ST_X(geom::geometry) as lng, ST_Y(geom::geometry) as lat,
+                    ST_DistanceSphere(ST_MakePoint(?, ?), geom) AS distance
+                ", [$lng, $lat])
+                ->orderBy('distance');
+            } else {
+                $query->selectRaw("
+                    id, name, address, year, type, district_id, village_id, source,
+                    ST_X(geom::geometry) as lng, ST_Y(geom::geometry) as lat
+                ");
+            }
+
+            // Terapkan semua filter menggunakan data tervalidasi
+            if (!empty($validated['district_id'])) {
+                $query->whereIn('district_id', $validated['district_id']);
+            }
+
+            if (!empty($validated['village_id'])) {
+                $query->whereIn('village_id', $validated['village_id']);
+            }
+
+            if (!empty($validated['year'])) {
+                $query->whereIn('year', $validated['year']);
+            }
+
+            if (!empty($validated['source'])) {
+                $query->whereIn('source', $validated['source']);
+            }
+
+            if (!empty($validated['type'])) {
+                $query->whereIn('type', $validated['type']);
+            }
+
+            $houses = $query->with([
+                'renovatedHousePhotos' => function ($query) {
+                    $query->select('renovated_house_id', 'photo_url')
+                    ->where('is_primary', true)
+                    ->where('photo_url', 'like', '%progres-100%');
+                },
+                'district:id,name',
+                'village:id,name',
+            ])
+            ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $houses,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
-    // Method untuk mendapatkan daftar tipe yang tersedia
-    public function getTypes()
+    public function getHousesByRadius(Request $request)
     {
-        $types = House::select('type')
-            ->distinct()
-            ->orderBy('type')
-            ->pluck('type');
-
-        return response()->json([
-            'success' => true,
-            'data' => $types
+        $validated = $request->validate([
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
+            'radius' => 'nullable|numeric|min:1|max:5', // Radius maksimal 5 km
         ]);
+
+        $lat = $validated['lat'];
+        $lng = $validated['lng'];
+        $radius = $validated['radius'] ?? 1; // Default 1 km
+
+        try {
+            $houses = House::selectRaw("
+                id, name, address, year, type,
+                ST_DistanceSphere(geom, ST_MakePoint(?, ?)) AS distance
+            ", [$lng, $lat])
+            ->whereRaw("ST_DistanceSphere(geom, ST_MakePoint(?, ?)) <= ?", [$lng, $lat, $radius * 1000])
+            ->orderBy('distance')
+            ->get();
+            
+
+            return response()->json([
+                'success' => true,
+                'data' => $houses,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
-    // Method untuk spatial query
-    public function findByLocation(Request $request)
+    public function getHousesInBounds(Request $request)
     {
-        $lat = $request->input('lat');
-        $lng = $request->input('lng');
-        $radius = $request->input('radius', 200);
-
-        $houses = DB::select("
-            SELECT h.*, 
-                d.name as district_name,
-                v.name as village_name,
-                ST_Distance(
-                    h.geom::geography,
-                    ST_SetSRID(ST_Point(?, ?), 4326)::geography
-                ) as distance
-            FROM houses h
-            JOIN districts d ON h.district_id = d.id
-            JOIN villages v ON h.village_id = v.id
-            WHERE ST_DWithin(
-                h.geom::geography,
-                ST_SetSRID(ST_Point(?, ?), 4326)::geography,
-                ?
-            )
-            ORDER BY distance
-        ", [$lng, $lat, $lng, $lat, $radius]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $houses
+        $validated = $request->validate([
+            'south' => 'nullable|numeric',
+            'west' => 'nullable|numeric',
+            'north' => 'nullable|numeric',
+            'east' => 'nullable|numeric',
+            'district_id' => 'nullable|array',
+            'district_id.*' => 'nullable|integer',
+            'village_id' => 'nullable|array',
+            'village_id.*' => 'nullable|integer',
+            'year' => 'nullable|array',
+            'year.*' => 'nullable|integer',
+            'source' => 'nullable|array',
+            'source.*' => 'nullable|string',
+            'type' => 'nullable|array',
+            'type.*' => 'nullable|string'
         ]);
+
+        try {
+            $query = House::query();
+
+            // Filter bounds menggunakan geom
+            $query->whereRaw("ST_Intersects(
+                geography(ST_MakeEnvelope(?, ?, ?, ?)),
+                geography(geom)
+            )", [
+                $validated['west'], $validated['south'],
+                $validated['east'], $validated['north']
+            ]);
+
+            // Filter tambahan
+            if ($request->filled('district_id')) {
+                $query->whereIn('district_id', $request->district_id);
+            }
+
+            if ($request->filled('village_id')) {
+                $query->whereIn('village_id', $request->village_id);
+            }
+
+            if ($request->filled('year')) {
+                $query->whereIn('year', $request->year);
+            }
+
+            if ($request->filled('source')) {
+                $query->whereIn('source', $request->source);
+            }
+
+            if ($request->filled('type')) {
+                $query->whereIn('type', $request->type);
+            }
+
+            $houses = $query->select('id', 'name', 'address', 'year', 'type', 'district_id', 'village_id', 'source', 'lat', 'lng')
+            ->with([
+                'renovatedHousePhotos' => function ($query) {
+                    $query->select('renovated_house_id', 'photo_url')
+                    ->where('is_primary', true)
+                        ->where('photo_url', 'like', '%progres-100%');
+                },
+                'district:id,name',
+                'village:id,name',
+            ])
+            ->get();
+
+                
+
+            return response()->json([
+                'success' => true,
+                'data' => $houses,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
 

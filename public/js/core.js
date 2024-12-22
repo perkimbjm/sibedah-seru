@@ -131,48 +131,6 @@ let options = {
     removalMode: true,
 };
 
-if (L && L.easyButton) {
-    L.easyButton({
-        states: [
-            {
-                stateName: "draw",
-                icon: "fa fa-wrench fa-lg",
-                title: "draw this map",
-                onClick: function (btn, map) {
-                    togglePMToolbar();
-                },
-            },
-        ],
-    }).addTo(map);
-}
-
-// Fungsi untuk menampilkan atau menyembunyikan tombol-tombol leaflet.pm
-function togglePMToolbar() {
-    let pmToolbar = document.querySelector(".leaflet-pm-toolbar");
-    if (pmToolbar) {
-        if (
-            pmToolbar.style.display === "none" ||
-            pmToolbar.style.display === ""
-        ) {
-            pmToolbar.style.display = "block";
-        } else {
-            pmToolbar.style.display = "none";
-        }
-    }
-}
-
-// Aktifkan toolbar leaflet.pm dan sembunyikan saat pertama kali peta dimuat
-map.pm.addControls({
-    position: "topleft",
-    drawCircle: false,
-});
-console.log("PM toolbar berhasil dimuat");
-
-let pmToolbar = document.querySelector(".leaflet-pm-toolbar");
-if (pmToolbar) {
-    pmToolbar.style.display = "none";
-}
-
 let ctlMeasure = L.control.polylineMeasure({ position: "topleft" }).addTo(map);
 console.log("Measure control berhasil dimuat");
 
@@ -187,6 +145,28 @@ function showModal(title, content) {
 
 function zoomToFeature(e) {
     map.fitBounds(e.target.getBounds());
+}
+
+function loadGeoJsonData(url, geoLayer, tooltipLayer, tooltipProp) {
+    fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+            L.geoJson(data, {
+                onEachFeature: function (feature, layer) {
+                    let tooltip = L.tooltip({
+                        permanent: true,
+                        direction: "center",
+                        className: "no-background",
+                    })
+                        .setContent(feature.properties[tooltipProp])
+                        .setLatLng(layer.getBounds().getCenter());
+                    tooltipLayer.addLayer(tooltip);
+                },
+            });
+            geoLayer.addData(data);
+            console.log("Data successfully loaded from " + url);
+        })
+        .catch((error) => console.error("Error loading data:", error));
 }
 
 // Buat fungsi untuk memuat data kecamatan
@@ -236,29 +216,13 @@ let isKecamatanLoaded = false;
 // Fungsi untuk memuat data kecamatan
 function loadKecamatanData() {
     if (!isKecamatanLoaded) {
-        fetch("/api/kecamatan/geojson")
-            .then((response) => response.json())
-            .then((data) => {
-                L.geoJson(data, {
-                    onEachFeature: function (feature, layer) {
-                        let tooltip = L.tooltip({
-                            permanent: true,
-                            direction: "center",
-                            className: "no-background",
-                        })
-                            .setContent(feature.properties.name)
-                            .setLatLng(layer.getBounds().getCenter());
-
-                        tooltipKecamatan.addLayer(tooltip);
-                    },
-                });
-                kecamatan.addData(data);
-                isKecamatanLoaded = true;
-                console.log("Data kecamatan berhasil dimuat");
-            })
-            .catch((error) => {
-                console.error("Error loading kecamatan data:", error);
-            });
+        loadGeoJsonData(
+            "/api/kecamatan/geojson",
+            kecamatan,
+            tooltipKecamatan,
+            "name"
+        );
+        isKecamatanLoaded = true;
     }
 }
 
@@ -305,29 +269,8 @@ let isDesaLoaded = false;
 // Fungsi untuk memuat data desa
 function loadDesaData() {
     if (!isDesaLoaded) {
-        fetch("api/desa/geojson")
-            .then((response) => response.json())
-            .then((data) => {
-                L.geoJson(data, {
-                    onEachFeature: function (feature, layer) {
-                        let tooltip = L.tooltip({
-                            permanent: true,
-                            direction: "center",
-                            className: "no-background",
-                        })
-                            .setContent(feature.properties.name)
-                            .setLatLng(layer.getBounds().getCenter());
-
-                        tooltipDesa.addLayer(tooltip);
-                    },
-                });
-                desa.addData(data);
-                isDesaLoaded = true;
-                console.log("Data desa berhasil dimuat");
-            })
-            .catch((error) => {
-                console.error("Error loading desa data:", error);
-            });
+        loadGeoJsonData("/api/desa/geojson", desa, tooltipDesa, "name");
+        isDesaLoaded = true;
     }
 }
 
@@ -821,19 +764,21 @@ map.on("overlayremove", function (e) {
 
 // Event handler untuk memuat data
 let groupedOverlays = {
-    TEMATIK: {
+    ADMINISTRASI: {
         "Kecamatan ": kecamatan || {},
         "Nama Kecamatan": tooltipKecamatan || {},
         "Kel / Desa": desa || {},
         "Nama Desa": tooltipDesa || {},
-        "Deliniasi Kumuh": kumuh || {},
         "RTRW ": polaruang || {},
+    },
+    TEMATIK: {
+        "Deliniasi Kumuh": kumuh || {},
         "Bedah Rumah": houseCluster || {},
         "RTLH ": rtlhCluster || {},
     },
 };
 
-let baseLayers = null;
+let baseLayers;
 
 // Buat custom layer control
 let layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
@@ -867,3 +812,202 @@ let onClicked = function (e) {
 };
 
 map.on("contextmenu", onClicked);
+
+// DrawItems control script
+var drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+map.on("draw:created", function (e) {
+    drawnItems.addLayer(e.layer);
+});
+
+// PopUp for Vector Layers
+function popUp(geo) {
+    map.fitBounds(geo.getBounds());
+    geo.eachLayer(function (layer) {
+        let properties = layer.feature.properties;
+        let popupContent =
+            "<div class='popup-content'><table class='table-auto w-full border-collapse border border-gray-300'>";
+        Object.entries(properties).forEach(([key, value]) => {
+            popupContent += `<tr><th class='text-left border border-gray-300 p-2'>${key}</th><td class='border border-gray-300 p-2'>${value}</td></tr>`;
+        });
+        popupContent += "</table></div>";
+        layer.bindPopup(popupContent);
+    });
+}
+
+let geo;
+
+function geoJsonData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        geo = omnivore
+            .geojson(reader.result)
+            .on("ready", function () {
+                popUp(geo);
+            })
+            .addTo(map);
+    };
+    reader.readAsDataURL(file);
+}
+
+function gpxData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        geo = omnivore
+            .gpx(reader.result)
+            .on("ready", function () {
+                popUp(geo);
+            })
+            .addTo(map);
+    };
+    reader.readAsDataURL(file);
+}
+
+function csvData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        geo = omnivore.csv.parse(reader.result).addTo(map);
+        popUp(geo);
+    };
+    reader.readAsText(file);
+}
+
+function kmlData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        geo = omnivore.kml.parse(reader.result).addTo(map);
+        popUp(geo);
+    };
+    reader.readAsText(file);
+}
+
+function wktData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        geo = omnivore.wkt.parse(reader.result).addTo(map);
+        popUp(geo);
+    };
+    reader.readAsText(file);
+}
+
+// Add Vector Layers
+function vectorData() {
+    let inputNode = document.createElement("input");
+    inputNode.setAttribute("type", "file");
+    inputNode.setAttribute("id", "leaflet-draw-shapefile-selector");
+    inputNode.setAttribute("accept", ".geojson,.gpx,.csv,.kml,.wkt");
+
+    inputNode.addEventListener("change", function (e) {
+        let files = inputNode.files;
+        let file = files[0];
+        let parts = file.name.split(".");
+        let ext = parts[parts.length - 1];
+
+        if (ext.toLowerCase() == "geojson") {
+            geoJsonData(file);
+        } else if (ext.toLowerCase() == "gpx") {
+            gpxData(file);
+        } else if (ext.toLowerCase() == "csv") {
+            csvData(file);
+        } else if (ext.toLowerCase() == "kml") {
+            kmlData(file);
+        } else if (ext.toLowerCase() == "wkt") {
+            wktData(file);
+        }
+    });
+    inputNode.click();
+}
+
+if (L && L.easyButton) {
+    L.easyButton({
+        states: [
+            {
+                stateName: "upload",
+                icon: "fa fa-upload fa-lg",
+                title: "Add Layers (geojson, gpx, csv, kml, wkt)",
+                onClick: function (btn, map) {
+                    vectorData();
+                },
+            },
+        ],
+    }).addTo(map);
+}
+
+map.on(L.Draw.Event.CREATED, function (e) {
+    drawnItems.addLayer(e.layer);
+    let type = e.layerType,
+        layer = e.layer;
+    if (type === "marker") {
+        let cord = layer.getLatLng().toString();
+        layer.bindPopup(cord).openPopup();
+    }
+    map.addLayer(layer);
+});
+
+drawnItems.on("click", function (e) {
+    return;
+});
+
+// Konfigurasi Draw Control dan tambahkan ke peta
+var drawControl = new L.Control.DrawPlus({
+    draw: {
+        polyline: true,
+        polygon: true,
+        rectangle: true,
+        circle: true,
+        marker: true,
+        circlemarker: true,
+        shapefile: {
+            shapeOptions: {
+                color: "blue",
+                weight: 3,
+                opacity: 1,
+                fillOpacity: 0.1,
+            },
+        }, //Turn on my custom extension
+        geojson: true,
+    },
+    edit: {
+        featureGroup: drawnItems, // Layer group untuk fitur yang digambar
+    },
+});
+map.addControl(drawControl);
+
+// Sembunyikan toolbar saat inisialisasi
+document.querySelector(".leaflet-draw-toolbar").style.display = "none";
+
+// Sembunyikan semua elemen draw control saat inisialisasi
+document
+    .querySelectorAll(".leaflet-draw-toolbar, .leaflet-draw-actions")
+    .forEach(function (element) {
+        element.style.display = "none";
+    });
+
+if (L && L.easyButton) {
+    L.easyButton({
+        states: [
+            {
+                stateName: "draw",
+                icon: "fa fa-wrench fa-lg",
+                title: "toggle draw toolbar",
+                onClick: function (btn, map) {
+                    toggleDrawToolbar();
+                },
+            },
+        ],
+    }).addTo(map);
+}
+
+// Fungsi untuk menampilkan atau menyembunyikan tombol-tombol leaflet draw
+function toggleDrawToolbar() {
+    document
+        .querySelectorAll(".leaflet-draw-toolbar, .leaflet-draw-actions")
+        .forEach(function (element) {
+            if (element.style.display === "none") {
+                element.style.display = "block";
+            } else {
+                element.style.display = "none";
+            }
+        });
+}

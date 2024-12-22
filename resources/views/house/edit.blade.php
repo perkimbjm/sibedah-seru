@@ -69,9 +69,8 @@
           
             <div class="form-group">
                 <label class="required" for="district_id">Kecamatan</label>
-                <input type="text" class="form-control" id="district_name" value="{{ old('district_name', $house->district) }}"readonly>
-                <input type="hidden" name="district_id" id="district_id" value="{{ old('district_id', $house->district_id) }}" required>
-
+                <input type="text" class="form-control {{ $errors->has('district_name') ? 'is-invalid' : '' }}" id="district_name" value="{{ old('district_name', $house->district) }}" readonly>
+                <input type="hidden" class="{{ $errors->has('district_id') ? 'is-invalid' : '' }}" name="district_id" id="district_id" value="{{ old('district_id', $house->district_id) }}" required>
             </div>
 
             <label>Geser Marker pada Peta</label>

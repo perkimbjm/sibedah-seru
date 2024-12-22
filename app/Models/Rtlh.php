@@ -55,13 +55,13 @@ class Rtlh extends Model
     }
 
     // Relasi dengan District
-    public function districts()
+    public function district()
     {
         return $this->belongsTo(District::class, 'district_id');
     }
 
     // Relasi dengan Village
-    public function villages()
+    public function village()
     {
         return $this->belongsTo(Village::class, 'village_id');
     }

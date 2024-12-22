@@ -15,10 +15,10 @@ class RtlhController extends Controller
    
     public function index(Request $request)
     {
-        $query = Rtlh::selectRaw("id, name, address, people, area, pondasi, kolom_blk, rngk_atap, atap, dinding, lantai, air, jarak_tinja, wc, jenis_wc, tpa_tinja, status, is_renov, note, district_id, village_id, ST_X(geom::geometry) AS lng, ST_Y(geom::geometry) AS lat")
+        $query = Rtlh::selectRaw("id, name, address, people, area, pondasi, kolom_blk, rngk_atap, atap, dinding, lantai, air, jarak_tinja, wc, jenis_wc, tpa_tinja, status_safety, status, is_renov, note, district_id, village_id, ST_X(geom::geometry) AS lng, ST_Y(geom::geometry) AS lat")
         ->with([
-            'districts:id,name',
-            'villages:id,name'
+            'district:id,name',
+            'village:id,name'
         ]);
 
 
@@ -103,20 +103,7 @@ class RtlhController extends Controller
         ]);
     }
 
-    // Method untuk mendapatkan daftar tahun yang tersedia
-    public function getYears()
-    {
-        $years = House::select('year')
-            ->distinct()
-            ->orderBy('year', 'desc')
-            ->pluck('year');
-
-        return response()->json([
-            'success' => true,
-            'data' => $years
-        ]);
-    }
-
+    
     // Method untuk mendapatkan daftar tipe yang tersedia
     public function getStatus()
     {
@@ -154,7 +141,7 @@ class RtlhController extends Controller
             'people' => 'nullable|integer',
             'lat'=> 'nullable|string',
             'lng'=> 'nullable|string',
-            'area'=> 'nullable|float',
+            'area'=> 'nullable|numeric',
             'pondasi'=> 'nullable|string', 
             'kolom_blk'=> 'nullable|string',
             'rngk_atap' => 'nullable|string',
@@ -197,7 +184,7 @@ class RtlhController extends Controller
             'people' => 'nullable|integer',
             'lat'=> 'nullable|string',
             'lng'=> 'nullable|string',
-            'area'=> 'nullable|float',
+            'area'=> 'nullable|numeric',
             'pondasi'=> 'nullable|string', 
             'kolom_blk'=> 'nullable|string',
             'rngk_atap' => 'nullable|string',
@@ -239,6 +226,120 @@ class RtlhController extends Controller
             'success' => true,
             'message' => 'Rtlh deleted successfully'
         ]);
+    }
+
+
+    public function getRtlh(Request $request)
+    {
+        $validated = $request->validate([
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
+            'district_id' => 'nullable|array',
+            'district_id.*' => 'nullable|integer',
+            'village_id' => 'nullable|array',
+            'village_id.*' => 'nullable|integer',
+            'area'=> 'nullable|numeric',
+            'air'=> 'nullable|array',
+            'air.*'=> 'nullable|string',
+            'jarak_tinja'=> 'nullable|string',
+            'wc'=> 'nullable|array',
+            'wc.*'=> 'nullable|string',
+            'jenis_wc' => 'nullable|array',
+            'jenis_wc.*' => 'nullable|string',
+            'tpa_tinja' => 'nullable|array',
+            'tpa_tinja.*' => 'nullable|string',
+            'status_safety' => 'nullable|array',
+            'status_safety.*' => 'nullable|string',
+            'status'=> 'nullable|array',
+            'status.*'=> 'nullable|string',
+        ]);
+
+        try {
+            // Definisikan $query
+            $query = Rtlh::query();
+
+            // Filter berdasarkan radius jika koordinat dan radius diberikan
+            if (!empty($validated['lat']) && !empty($validated['lng'])) {
+                $lat = $validated['lat'];
+                $lng = $validated['lng'];
+
+                
+                $query->selectRaw("
+                    id, name, address, people, area, pondasi, kolom_blk, rngk_atap, atap, dinding, lantai, air, jarak_tinja, wc, jenis_wc, tpa_tinja, status, is_renov, note, district_id, village_id, ST_X(geom::geometry) AS lng, ST_Y(geom::geometry) AS lat,
+                    ST_DistanceSphere(ST_MakePoint(?, ?), ST_MakePoint(lng, lat)) AS distance
+                ", [$lng, $lat])
+                ->orderBy('distance');
+            } else {
+                // Jika tidak ada lat dan lng, ambil semua data
+                $query->select('id', 'name', 'address', 'people', 'area', 'pondasi', 'kolom_blk', 'rngk_atap', 'atap', 'dinding', 'lantai', 'air', 'jarak_tinja', 'wc', 'jenis_wc', 'tpa_tinja', 'status', 'is_renov', 'note', 'district_id', 'village_id', 'lat', 'lng');
+            }
+
+            // Terapkan semua filter menggunakan data tervalidasi
+            if (!empty($validated['district_id'])) {
+                $query->whereIn('district_id', $validated['district_id']);
+            }
+
+            if (!empty($validated['village_id'])) {
+                $query->whereIn('village_id', $validated['village_id']);
+            }
+
+            if (!empty($validated['area'])) {
+                $query->where('area', $validated['area']);
+            }
+
+            if (!empty($validated['air'])) {
+                $query->whereIn('air', $validated['air']);
+            }
+
+            if (!empty($validated['jarak_tinja'])) {
+                $query->where('jarak_tinja', $validated['jarak_tinja']);
+            }
+
+            if (!empty($validated['wc'])) {
+                $query->whereIn('wc', $validated['wc']);
+            }
+
+            if (!empty($validated['jenis_wc'])) {
+                $query->whereIn('jenis_wc', $validated['jenis_wc']);
+            }
+
+            if (!empty($validated['tpa_tinja'])) {
+                $query->whereIn('tpa_tinja', $validated['tpa_tinja']);
+            }
+
+            if (!empty($validated['status_safety'])) {
+                $query->whereIn('status_safety', $validated['status_safety']);
+            }
+
+            if (!empty($validated['status'])) {
+                $query->whereIn('status', $validated['status']);
+            }
+
+            // Jika terdapat radius, filter berdasarkan radius
+            if (!empty($validated['lat']) && !empty($validated['lng'])) {
+                $query->havingRaw("distance <=?", [$validated['area'] * 1000]);
+            }
+
+            // Eksekusi query
+            $houses = $query->with([
+                'housePhotos' => function ($query) {
+                    $query->select('house_id', 'photo_url')->limit(1);
+                },
+                'district:id,name',
+                'village:id,name',
+            ])
+            ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $houses,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
 }

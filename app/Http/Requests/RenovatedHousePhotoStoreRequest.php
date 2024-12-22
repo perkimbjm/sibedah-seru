@@ -23,9 +23,9 @@ class HousePhotoStoreRequest extends FormRequest
             'renovated_house_id' => ['required', 'integer', 'exists:houses,id'],
             'photo_url' => ['required', 'string'],
             'description' => ['nullable', 'string'],
-            'progres' => ['required', 'numeric'],
-            'is_primary' => ['required'],
-            'is_best' => ['required'],
+            'progres' => ['required', 'numeric', 'in:0,30,50,80,100'],
+            'is_primary' => 'nullable|boolean',
+            'is_best' => 'nullable|boolean',
         ];
     }
 }
