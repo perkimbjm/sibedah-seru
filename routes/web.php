@@ -88,7 +88,9 @@ Route::get('/test', function () {
 })->name('test');
 
 Route::get('/guide', function () {
-    return Inertia::render('Guide');
+    $linkController = app(LinkController::class);
+    $links = $linkController->getData();
+    return Inertia::render('Guide', ['links' => $links]);
 })->name('guide');
 
 Route::post('/logout', function () {

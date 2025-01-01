@@ -25,7 +25,7 @@ class StoreHouseRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'nik' => ['nullable', 'string', 'max:16', 'unique:houses,nik'],
+            'nik' => ['nullable', 'string', 'size:16', 'unique:houses,nik'],
             'address' => ['nullable', 'string'],
             'lat' => ['required', 'string'],
             'lng' => ['required', 'string'],

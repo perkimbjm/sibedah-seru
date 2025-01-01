@@ -24,7 +24,7 @@ class UpdateHouseRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'nik' => ['nullable', 'string'],
+            'nik' => ['nullable', 'string', 'size:16'],
             'address' => ['nullable', 'string'],
             'district' => ['nullable', 'string'],
             'lat' => ['required', 'string'],

@@ -31,24 +31,26 @@
 <div class="container mt-4">
     <div class="mb-4">
         <div class="main-image">
-            <img id="mainImage" src="{{ asset('img/rumah/rumah2.png') }}" alt="Gambar Rumah">
+            @php
+                $mainPhoto = $rtlh->housePhotos()->first();
+            @endphp
+            @if ($mainPhoto)
+                <img id="mainImage" src="{{ asset($mainPhoto->photo_url) }}" alt="rumah">
+            @else
+                <a href="{{ route('app.rutilahu.index', $rtlh) }}">
+                    <img class="w-50" id="mainImage" src="https://placehold.co/100x75/EEE/31343C?font=open-sans&text=Belum+Ada+Foto" alt="No Image Available">
+                </a>
+            @endif
         </div>
     </div>
 
     <!-- Thumbnail Grid -->
     <div class="owl-carousel owl-theme row thumbnail-grid mb-4">
-        <div class="item">
-            <img src="{{ asset('img/rumah/rumah2.png') }}" alt="Pool" class="w-100 rounded" onclick="changeMainImage(this.src)">
-        </div>
-        <div class="item">
-            <img src="{{ asset('img/rumah/rumah1.jpg') }}" alt="Living Room" class="w-100 rounded" onclick="changeMainImage(this.src)">
-        </div>
-        <div class="item">
-            <img src="{{ asset('img/rumah/rumah3.png') }}" alt="Bedroom" class="w-100 rounded" onclick="changeMainImage(this.src)">
-        </div>
-        <div class="item">
-            <img src="{{ asset('img/rumah/rumah4.jpg') }}" alt="Gym" class="w-100 rounded" onclick="changeMainImage(this.src)">
-        </div>
+        @foreach ($rtlh->housePhotos()->get() as $photo)
+            <div class="item">
+                <img src="{{ asset($photo->photo_url) }}" alt="rtlh" class="w-100 rounded" onclick="changeMainImage(this.src)">
+            </div>
+        @endforeach
     </div>
 
 

@@ -19,7 +19,7 @@
                         </span>
                     </dt>
                     <dd class="flex items-center text-gray-500 dark:text-gray-400 gap-2 text-lg">
-                        <component :is="iconMap[statistic.icon]" class="w-6 h-6" :stroke-width="2" />
+                        <font-awesome-icon :icon="iconMap[statistic.icon]" class="w-10 h-10 text-green-500 2xl" />
                         {{ statistic.label }}
                     </dd>
                 </div>
@@ -30,7 +30,13 @@
 
 <script setup>
 import { ref, onMounted, defineProps } from "vue";
-import { MapPinHouse, HousePlus, House } from "lucide-vue-next";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+// Mengimpor icon secara individual
+import { 
+    faMapMarkerAlt as mapPin,
+    faHouseCircleCheck as housePlus,
+    faHouseCircleExclamation as houseLogo
+} from '@fortawesome/free-solid-svg-icons/index';
 
 // Data diterima dari Inertia
 defineProps({
@@ -41,16 +47,16 @@ defineProps({
 });
 
 const iconMap = {
-    "map-pin-house": MapPinHouse,
-    "house-plus": HousePlus,
-    "house-logo": House,
+    "map-pin-house": mapPin,
+    "house-plus": housePlus,
+    "house-logo": houseLogo,
 };
 
 const counterRefs = ref([]);
 
 const animateCounter = (element, target) => {
-    const duration = 2000; // Animation duration in milliseconds
-    const steps = 50; // Number of steps in the animation
+    const duration = 2000;
+    const steps = 50;
     const stepDuration = duration / steps;
     let current = 0;
 
@@ -83,7 +89,6 @@ onMounted(() => {
         threshold: 0.5,
     });
 
-    // Get all counter elements and observe them
     const counterElements = document.querySelectorAll("[data-target]");
     counterElements.forEach((element) => {
         observer.observe(element);

@@ -10,26 +10,32 @@
                 <Link href="/bedah"
                     class="inline-flex items-center px-4 py-2 rounded-full border bg-lime-300 hover:bg-lime-500 hover:text-white transition-colors">
                 Lihat Semua
-                <ChevronDownIcon class="w-4 h-4 ml-2" />
+                <font-awesome-icon :icon="['fas', 'chevron-down']" class="w-4 h-4 ml-2" />
                 </Link>
             </div>
         </div>
 
         <Carousel :settings="settings" :breakpoints="breakpoints" :wrap-around="true" :transition="1000"
-            :autoplay="2000" class="gallery-carousel">
+            :autoplay="5000" class="gallery-carousel">
             <Slide v-for="property in properties" :key="property.id">
                 <div class="carousel__item px-2">
                     <div class="relative group cursor-pointer">
                         <img :src="property.image" :alt="property.title" loading="lazy"
-                            class="w-full h-[300px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-200" />
+                            class="w-full h-[400px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-200" />
+                        <div class="ribbon">
+                            {{ property.year }}
+                        </div>
                         <div
                             class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent rounded-b-lg">
+                            <h2 class="text-white font-bold">
+                                {{ property.type }}
+                            </h2>
                             <h3 class="text-white font-medium">
-                                {{ property.title }}
+                                a.n {{ property.name }}
                             </h3>
-                            <p v-if="property.location" class="text-white/80 text-sm flex items-center mt-1">
-                                <MapPinIcon class="w-4 h-4 mr-1" />
-                                {{ property.location }}
+                            <p v-if="property.address" class="text-white/80 text-sm flex items-center mt-1">
+                                <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="w-4 h-4 mr-1" />
+                                {{ property.address }} Kec. {{ property.district }}
                             </p>
                         </div>
                     </div>
@@ -47,39 +53,94 @@
 <script setup>
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import { Link } from "@inertiajs/vue3";
-import { ChevronDownIcon, MapPinIcon } from "lucide-vue-next";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faMapMarkerAlt, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import "vue3-carousel/dist/carousel.css";
+
+library.add(faMapMarkerAlt, faChevronDown);
 
 const properties = [
     {
         id: 1,
-        title: "BSPS 2023",
-        image: "/img/rumah/rumah1.jpg",
-        location: "Paringin",
+        name: "Saukani",
+        type: "Bantuan Korban Bencana",
+        year: "2022",
+        image: "/img/rumah/1131_SAUKANI.jpg",
+        address: "Muara Jaya RT. 04",
+        district: "Awayan"
     },
     {
         id: 2,
-        title: "BSPS 2023",
-        image: "/img/rumah/IMG_20221015_091740.jpg",
-        location: "Juai",
+        name: "Sabirin",
+        type: "Bantuan Rumah Swadaya",
+        year: "2023",
+        image: "/img/rumah/142_SABIRIN.jpg",
+        address: "Bakung RT. 03",
+        district: "Batumandi"
     },
     {
         id: 3,
-        title: "BSPS 2023",
-        image: "/img/rumah/rumah2.png",
-        location: "Awayan",
+        name: "Rusmilawati",
+        type: "Bantuan Korban Bencana",
+        year: "2022",
+        image: "/img/rumah/1125_RUSMILAWATI.jpg",
+        address: "Muara Jaya RT. 04",
+        district: "Awayan"
     },
     {
         id: 4,
-        title: "BSPS 2023",
-        image: "/img/rumah/rumah3.png",
-        location: "Paringin Selatan",
+        name: "Misnawati",
+        type: "Bantuan Korban Bencana",
+        year: "2022",
+        image: "/img/rumah/1133_MISNAWATI.jpg",
+        address: "Muara Jaya RT. 04",
+        district: "Awayan"
     },
     {
         id: 5,
-        title: "BSPS 2023",
-        image: "/img/rumah/rumah4.jpg",
-        location: "Awayan",
+        name: "M. Sidik",
+        type: "Bantuan Korban Bencana",
+        year: "2022",
+        image: "/img/rumah/1127_M-SIDIK.jpg",
+        address: "Muara Jaya RT. 02",
+        district: "Awayan"
+    },
+    {
+        id: 6,
+        name: "Hapsah",
+        type: "Bantuan Korban Bencana",
+        year: "2022",
+        image: "/img/rumah/1134_HAPSAH.jpg",
+        address: "Muara Jaya RT. 03",
+        district: "Awayan"
+    },
+    {
+        id: 7,
+        name: "Haniyati",
+        type: "Bantuan Korban Bencana",
+        year: "2023",
+        image: "/img/rumah/1115_HANIYATI.jpg",
+        address: "Murung Abuin RT. 02",
+        district: "Paringin Selatan"
+    },
+    {
+        id: 8,
+        name: "Ardiansyah",
+        type: "Bantuan Korban Bencana",
+        year: "2022",
+        image: "/img/rumah/1124_ARDIANSYAH.jpg",
+        address: "Muara Jaya RT. 01",
+        district: "Awayan"
+    },
+    {
+        id: 9,
+        name: "Arbani",
+        type: "Bantuan Rumah Swadaya",
+        year: "2023",
+        image: "/img/rumah/356_ARBANI.jpg",
+        address: "Gunung Batu RT. 03",
+        district: "Tebing Tinggi"
     },
 ];
 
@@ -128,5 +189,20 @@ const breakpoints = {
 
 .gallery-carousel :deep(.carousel__slide) {
     padding: 1px;
+}
+
+.ribbon {
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    width: 120px;
+    background-color: #f64444;
+    color: #fff;
+    text-align: center;
+    line-height: 30px;
+    transform: rotate(45deg);
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
+    font-weight: bold;
+    z-index: 10;
 }
 </style>

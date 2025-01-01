@@ -11,14 +11,16 @@ class VillageController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Village::with('district');
+        $query = Village::with(['district' => function ($query) {
+            $query->select('id', 'name');
+        }]);
         
         // Filter by district if provided
         if ($request->has('district_id')) {
             $query->where('district_id', $request->district_id);
         }
 
-        $villages = $query->get();
+        $villages = $query->select('id', 'name', 'district_id')->get();
         
         return response()->json([
             'success' => true,
@@ -61,8 +63,17 @@ class VillageController extends Controller
                 JOIN districts d ON v.district_id = d.id
         ";
 
+        $conditions = [];
         if ($request->has('district_id')) {
-            $query .= " WHERE v.district_id = " . intval($request->district_id);
+            $conditions[] = "v.district_id = " . intval($request->district_id);
+        }
+
+        if ($request->has('village_id')) {
+            $conditions[] = "v.id = " . intval($request->village_id);
+        }
+
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
         }
 
         $query .= ") features;";

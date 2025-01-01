@@ -25,7 +25,7 @@ class StoreRtlhRequest extends FormRequest
     {
         return [
             'name'=> ['required','string'],
-            'nik'=> ['nullable','string','max:16','unique:rtlh,nik'],
+            'nik'=> ['nullable','string','size:16','unique:rtlh,nik'],
             'kk'=> ['nullable','string', 'unique:rtlh,kk'],
             'address'=> ['required','string'],
             'people'=> ['nullable','integer'],

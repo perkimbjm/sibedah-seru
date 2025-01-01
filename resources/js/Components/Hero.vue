@@ -41,6 +41,9 @@
                         alt="bedah-seribu-rumah"
                         data-aos="zoom-out"
                         data-aos-delay="600"
+                        width="629" 
+                        height="512"
+                        loading="eager"
                     />
                 </div>
             </div>

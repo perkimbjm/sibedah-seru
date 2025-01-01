@@ -14,17 +14,20 @@
 </template>
 
 <script setup>
+import { defineAsyncComponent, shallowRef } from 'vue';
 import { Head } from "@inertiajs/vue3";
 import { defineProps } from "vue";
-import MainLayout from "@/Layouts/MainLayout.vue";
-import Hero from "@/Components/Hero.vue";
-import ScrollTop from "@/Components/ScrollTop.vue";
-import Cta from "@/Components/Cta.vue";
-import FeaturesList from "@/Components/FeaturesList.vue";
-import GalleryCard from "@/Components/GalleryCard.vue";
-import Faq from "@/Pages/Faq.vue";
-import StatisticCard from "@/Pages/StatisticCard.vue";
-import FooterBar from "@/Components/FooterBar.vue";
+
+// Lazy load components
+const MainLayout = defineAsyncComponent(() => import('@/Layouts/MainLayout.vue'));
+const Hero = defineAsyncComponent(() => import('@/Components/Hero.vue'));
+const ScrollTop = defineAsyncComponent(() => import('@/Components/ScrollTop.vue'));
+const Cta = defineAsyncComponent(() => import('@/Components/Cta.vue'));
+const FeaturesList = defineAsyncComponent(() => import('@/Components/FeaturesList.vue'));
+const GalleryCard = defineAsyncComponent(() => import('@/Components/GalleryCard.vue'));
+const Faq = defineAsyncComponent(() => import('@/Pages/Faq.vue'));
+const StatisticCard = defineAsyncComponent(() => import('@/Pages/StatisticCard.vue'));
+const FooterBar = defineAsyncComponent(() => import('@/Components/FooterBar.vue'));
 
 defineProps({
     statistics: {
@@ -40,8 +43,15 @@ defineProps({
         required: true,
     }
 });
+
 </script>
 
 <style>
-/* Anda bisa menambahkan gaya tambahan jika diperlukan */
+#text-hero {
+    min-height: 300px; /* Sesuaikan dengan tinggi teks */
+}
+
+.hero-img {
+    aspect-ratio: 629 / 512; /* Sesuaikan dengan rasio gambar */
+}
 </style>

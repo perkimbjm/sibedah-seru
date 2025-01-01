@@ -455,4 +455,40 @@ class HouseController extends Controller
             'message' => 'House deleted successfully'
         ]);
     }
+
+    public function getHouse(Request $request, $id)
+    {
+        $house = House::find($id);
+        if (!$house) {
+            return response()->json(['success' => false, 'message' => 'House not found'], 404);
+        }
+        return $this->formatGeoJSON([$house]);
+    }
+
+    protected function formatGeoJSON($houses)
+    {
+        $features = collect($houses)->map(function ($house) {
+            $properties = $house->toArray();
+            unset($properties['geom']);
+            unset($properties['nik']);
+            unset($properties['coordinate']);
+            unset($properties['map_popup_content']);
+            unset($properties['created_at']);
+            unset($properties['updated_at']);
+            $properties['renovated_house_photos'] = $house->renovatedHousePhotos()->where('is_primary', true)->pluck('photo_url')->first();
+            return [
+                'type' => 'Feature',
+                'geometry' => [
+                    'type' => 'Point',
+                    'coordinates' => [(float)$house->lng, (float)$house->lat]
+                ],
+                'properties' => $properties
+            ];
+        });
+
+        return response()->json([
+            'type' => 'FeatureCollection',
+            'features' => $features->toArray()
+        ]);
+    }
 }

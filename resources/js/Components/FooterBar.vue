@@ -5,9 +5,8 @@
                 <!-- Logo & Info Section -->
                 <div class="lg:w-1/2 mb-10 lg:mb-0">
                     <div class="flex items-center justify-center">
-                        <img src="/img/logobalangan.webp" alt="logo balangan" loading="lazy" class="mb-4 h-14 mr-2" />
-                        <img src="/img/sibedahseru-tiny.png" alt="logo sibedah-seru" loading="lazy"
-                            class="mb-4 h-14 mr-2" />
+                        <img src="/img/logobalangan.webp" alt="logo balangan" loading="lazy" class="mb-4 mr-2" width="42" height="56" />
+                        <img src="/img/sibedahseru-tiny.png" alt="logo sibedah-seru" loading="lazy" class="mb-4 h-14 mr-2" width="219" height="56" />
                     </div>
                     <p class="text-gray-800 text-md text-left md:text-center font-semibold space-y-2">
                         Dinas Pekerjaan Umum, Penataan Ruang, Perumahan Rakyat
@@ -72,7 +71,7 @@
                 <div class="text-center lg:text-left mt-6 lg:mt-0">
                     <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
                         <img alt="Creative Commons License" style="border-width: 0"
-                            src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" />
+                            src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" width="88" height="31" />
                     </a>
                 </div>
                 <div class="flex space-x-4">
@@ -123,6 +122,19 @@ defineProps({
         required: true
     }
 });
-
-
 </script>
+
+<style>
+footer {
+    min-height: 400px; /* Sesuaikan dengan tinggi footer */
+}
+
+img {
+    aspect-ratio: attr(width) / attr(height);
+}
+
+a {
+    display: inline-block;
+    padding: 5px 10px;
+}
+</style>
