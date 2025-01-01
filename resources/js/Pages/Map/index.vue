@@ -1,10 +1,9 @@
 <template>
     <MainLayout>
-
         <Head title="Peta Digital" />
         <div class="relative">
             <div id="map" role="map" class="h-[87vh] w-full mx-auto overflow-hidden relative z-5">
-                <SidePanel />
+                <SidePanel :map="mapInstance" v-if="mapInstance" />
             </div>
             <MapModals />
         </div>
@@ -112,13 +111,16 @@ const SCRIPTS = [
         critical: true,
     },
     {
-        src: "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",
+        src: "https://code.jquery.com/jquery-3.7.1.min.js",
         critical: true,
     },
     { src: "https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" },
     {
         src: "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js",
     },
+    { src: "https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.5/typeahead.bundle.min.js" },
+    { src: "https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js" },
+    { src: "https://cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js" },
     {
         src: "https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js",
     },
@@ -136,10 +138,9 @@ const SCRIPTS = [
     { src: "/js/leaflet.markercluster141.js" },
     { src: "/js/typeahead.bundle.min.js" },
     { src: "/js/iconLayers.js" },
-    { src: "/js/leaflet.draw-src.js" },
+    { src: "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.js" },
     { src: "/js/shp.js" },
     { src: "/js/leaflet.shapefile.js" },
-    { src: "/js/leaflet.draw-shapefile.js" },
     { src: "/js/Leaflet.PolylineMeasure.js" },
     { src: "/js/leaflet.toolbar.js" },
     { src: "/js/leaflet-sidepanel.min.js" },
@@ -221,7 +222,7 @@ const initMap = async () => {
         window.rbi = layers.rbi;
 
         const mapCenter = [-2.33668, 115.46028];
-        const mapZoom = 18;
+        const mapZoom = 15;
 
         mapInstance.value = L.map("map", {
             zoom: mapZoom,
@@ -229,7 +230,11 @@ const initMap = async () => {
             zoomControl: false,
             fullscreenControl: { pseudoFullscreen: true },
             layers: [layers.osm],
+            preferCanvas: true,
+            wheelDebounceTime: 150,
+            wheelPxPerZoomLevel: 120,
         });
+
 
         window.map = mapInstance.value;
 
@@ -267,7 +272,6 @@ const initMap = async () => {
             .sidepanel("mySidepanelRight", {
                 panelPosition: "right",
                 tabsPosition: "top",
-                darkMode: true,
                 startTab: "tab-2",
             })
             .addTo(map);
@@ -298,67 +302,112 @@ const getToken = async () => {
 };
 
 onMounted(async () => {
-    console.log("Component mounted");
-    try {
-        const token = await getToken();
-        await loadMapStyles();
-        await loadAllScripts();
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        await initMap();
-    } catch (error) {
-        console.error("Error during initialization:", error);
+    if (document.getElementById('map')) {
+        console.log("Component mounted");
+        try {
+            const token = await getToken();
+            await loadMapStyles();
+            await loadAllScripts();
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            await initMap();
+        } catch (error) {
+            console.error("Error during initialization:", error);
+        }
     }
 });
 
 onBeforeUnmount(() => {
-    if (mapInstance.value) {
-        // Hapus semua kontrol dan layer
-        mapInstance.value.eachLayer((layer) => {
-            mapInstance.value.removeLayer(layer);
+    try {
+        if (mapInstance.value) {
+            // Hapus semua kontrol draw terlebih dahulu
+            if (mapInstance.value.drawControl) {
+                mapInstance.value.removeControl(mapInstance.value.drawControl);
+            }
+
+            // Hapus event listeners
+            mapInstance.value.off();
+            mapInstance.value.eachLayer((layer) => {
+                if (layer.off) {
+                    layer.off();
+                }
+                mapInstance.value.removeLayer(layer);
+            });
+
+            // Hapus semua kontrol
+            const controls = { ...mapInstance.value._controlCorners };
+            for (const [key, control] of Object.entries(controls)) {
+                while (control.firstChild) {
+                    control.removeChild(control.firstChild);
+                }
+                if (control.parentNode) {
+                    control.parentNode.removeChild(control);
+                }
+            }
+
+            // Pastikan toolbar dihapus
+            if (window.L && window.L.EditToolbar) {
+                const toolbars = mapInstance.value._toolbars;
+                if (toolbars) {
+                    for (const toolbar of Object.values(toolbars)) {
+                        if (toolbar && toolbar.dispose) {
+                            toolbar.dispose();
+                        }
+                    }
+                }
+            }
+
+            // Hapus instance map
+            mapInstance.value.remove();
+            mapInstance.value = null;
+        }
+
+        // Hapus semua script yang telah dimuat
+        loadedScripts.value.forEach((script) => {
+            if (script && script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
         });
 
-        // Hapus semua kontrol
-        for (const [, control] of Object.entries(
-            mapInstance.value._controlCorners
-        )) {
-            control.innerHTML = "";
+        // Reset semua window objects
+        const windowObjects = [
+            'map', 'cartoLight', 'googleSatellite', 'googleMaps', 
+            'cartoDark', 'otopomap', 'osm', 'cartoVoyager', 'rbi'
+        ];
+        
+        windowObjects.forEach(obj => {
+            if (window[obj]) {
+                window[obj] = undefined;
+                delete window[obj];
+            }
+        });
+
+        // Bersihkan referensi lain
+        loadedScripts.value = [];
+        if (typeof loadMapStyles !== 'undefined') {
+            loadMapStyles.value = null;
+        }
+        if (typeof loadAllScripts !== 'undefined') {
+            loadAllScripts.value = null;
         }
 
-        // Hapus instance map
-        mapInstance.value.remove();
-        mapInstance.value = null;
-    }
-
-    // Hapus semua script yang telah dimuat
-    loadedScripts.value.forEach((script) => {
-        if (script && script.parentNode) {
-            script.parentNode.removeChild(script);
+        // Bersihkan DOM
+        const mapElement = document.getElementById('map');
+        if (mapElement) {
+            mapElement.innerHTML = '';
         }
-    });
 
-    // Reset semua referensi
-    loadedScripts.value = [];
+        // Reset Leaflet global objects
+        if (window.L) {
+            if (window.L.Draw) {
+                window.L.Draw = undefined;
+            }
+            if (window.L.EditToolbar) {
+                window.L.EditToolbar = undefined;
+            }
+        }
 
-    // Hapus referensi map dari window object
-    window.map = undefined;
-    window.cartoLight = undefined;
-    window.googleSatellite = undefined;
-    window.googleMaps = undefined;
-    window.cartoDark = undefined;
-    window.otopomap = undefined;
-    window.osm = undefined;
-    window.cartoVoyager = undefined;
-    window.rbi = undefined;
-
-    loadedScripts.value = [];
-    // Reset fungsi dan nilai
-    loadMapStyles.value = null;
-    loadAllScripts.value = null;
-
-    // Bersihkan elemen DOM map
-    const mapElement = document.getElementById("map");
-    if (mapElement) {
-        mapElement.innerHTML = "";
+    } catch (error) {
+        console.error('Error during cleanup:', error);
     }
 });
 </script>

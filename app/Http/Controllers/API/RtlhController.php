@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Rtlh;
+use App\Models\Village;
+use App\Models\District;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 
 class RtlhController extends Controller
@@ -276,11 +278,18 @@ class RtlhController extends Controller
 
             // Terapkan semua filter menggunakan data tervalidasi
             if (!empty($validated['district_id'])) {
-                $query->whereIn('district_id', $validated['district_id']);
+                if (is_array($validated['district_id'])) {
+                    $query->whereIn('district_id', $validated['district_id']);
+                } else {
+                    $query->where('district_id', $validated['district_id']);
+                }
             }
-
             if (!empty($validated['village_id'])) {
-                $query->whereIn('village_id', $validated['village_id']);
+                if (is_array($validated['village_id'])) {
+                    $query->whereIn('village_id', $validated['village_id']);
+                } else {
+                    $query->where('village_id', $validated['village_id']);
+                }
             }
 
             if (!empty($validated['area'])) {
@@ -340,6 +349,32 @@ class RtlhController extends Controller
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function getDistricts()
+    {
+        try {
+            $districts = District::select('id', 'name')
+                ->orderBy('name')
+                ->get();
+                
+            return response()->json($districts);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error fetching districts: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function getVillages() {
+        $villages = Village::all(['id', 'name']);
+        return response()->json($villages);
+    }
+    
+    public function getVillagesByDistrict($districtId) {
+        $villages = Village::where('district_id', $districtId)
+                          ->get(['id', 'name']);
+        return response()->json($villages);
     }
 
 }

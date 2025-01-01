@@ -42,6 +42,7 @@ Route::prefix('bedah')->group(function() {
     Route::get('/nearby', [HouseController::class, 'getHousesByRadius'])->name('api.bedah.nearby');
     Route::get('/houses', [HouseController::class, 'getHouses'])->name('api.bedah.houses'); // Untuk <768px
     Route::get('/houses/in-bounds', [HouseController::class, 'getHousesInBounds'])->name('api.bedah.houses.inbounds'); // Untuk >=768px
+    Route::get('/houses/{id}', [HouseController::class, 'getHouse'])->name('api.bedah.house'); // Untuk detail rumah
 });
 
 // Public District routes
@@ -64,10 +65,13 @@ Route::prefix('desa')->group(function() {
 Route::prefix('rtlh')->group(function() {
     Route::get('/', [RtlhController::class, 'index'])->name('api.rtlh');
     Route::get('/houses', [RtlhController::class, 'getRtlh'])->name('api.rtlh.houses');
-    Route::get('/{slug}', [RtlhController::class, 'show']);
+    Route::get('/districts', [RtlhController::class, 'getDistricts']);
+    Route::get('/villages/{district_id}', [RtlhController::class, 'getVillagesByDistrict']);
+    Route::get('/villages', [RtlhController::class, 'getVillages']);
     Route::post('/', [RtlhController::class, 'store']);
     Route::put('/{slug}', [RtlhController::class, 'update']);
     Route::delete('/{slug}', [RtlhController::class, 'destroy']);
     Route::get('/status', [RtlhController::class, 'getStatus']);
     Route::get('/find-by-location', [RtlhController::class, 'findByLocation']);
+    Route::get('/{slug}', [RtlhController::class, 'show']);
 });

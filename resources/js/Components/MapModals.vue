@@ -32,7 +32,9 @@
 </template>
 
 <script setup>
-import { defineExpose } from "vue";
+import { onBeforeUnmount } from "vue";
+
+// Fungsi untuk menampilkan atau menyembunyikan modal
 const toggleModal = (show) => {
     const modal = document.getElementById("featureModal");
     if (modal) {
@@ -44,6 +46,25 @@ const toggleModal = (show) => {
     }
 };
 
+// Membersihkan modal sebelum komponen di-unmount
+onBeforeUnmount(() => {
+    try {
+        // Sembunyikan modal saat komponen di-unmount
+        toggleModal(false);
+
+        // Hapus referensi ke elemen DOM jika ada
+        const modal = document.getElementById("featureModal");
+        if (modal) {
+            modal.remove(); // Hapus elemen modal dari DOM
+        }
+
+        console.log("MapModals cleanup completed."); // Log untuk debugging
+    } catch (error) {
+        console.error("Error during MapModals cleanup:", error);
+    }
+});
+
+// Expose fungsi toggleModal ke komponen lain
 defineExpose({ toggleModal });
 </script>
 

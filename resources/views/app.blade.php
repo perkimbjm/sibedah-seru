@@ -6,9 +6,7 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-
+        <link rel="preload" href="/img/hero_c.webp" as="image" />
 
         <!-- Scripts -->
         @routes

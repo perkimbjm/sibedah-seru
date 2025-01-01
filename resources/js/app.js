@@ -6,6 +6,7 @@ import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import { createPinia } from "pinia";
+import { loadAOS } from "./utils/aos";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -23,14 +24,7 @@ createInertiaApp({
 
         // Inisialisasi Pinia untuk state management
         const pinia = createPinia();
-
-        // Fungsi untuk memuat AOS (Animate on Scroll)
-        const loadAOS = async () => {
-            const { default: AOS } = await import("aos");
-            await import("aos/dist/aos.css");
-            AOS.init();
-        };
-
+       
         // Tambahkan event listener untuk memuat AOS setelah halaman selesai dimuat
         window.addEventListener("load", loadAOS);
 
