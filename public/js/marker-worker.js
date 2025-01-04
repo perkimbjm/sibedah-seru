@@ -30,8 +30,7 @@ self.addEventListener('message', async (e) => {
 });
 
 function isValidLatLng(lat, lng) {
-    return lat !== null && lng !== null &&
-           !isNaN(lat) && !isNaN(lng) &&
+    return [lat, lng].every(coord => coord !== null && !isNaN(coord)) &&
            lat >= -90 && lat <= 90 &&
            lng >= -180 && lng <= 180;
 }

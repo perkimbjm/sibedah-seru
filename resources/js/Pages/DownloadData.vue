@@ -10,7 +10,6 @@
 <script setup>
 import MainLayout from "@/Layouts/MainLayout.vue";
 import { Head } from "@inertiajs/vue3";
-import { defineProps } from "vue";
 import FooterBar from "@/Components/FooterBar.vue";
 import DocumentDownload from "./DocumentDownload.vue";
 

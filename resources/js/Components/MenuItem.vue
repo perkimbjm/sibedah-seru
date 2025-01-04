@@ -16,11 +16,11 @@
 </template>
 
 <script setup>
-import { defineProps, computed } from "vue";
+import { computed } from "vue";
 
 const props = defineProps({
     item: Object,
-    isCurrentRoute: Function, // Menerima isCurrentRoute sebagai prop
+    isCurrentRoute: Function,
 });
 
 // Class binding for links

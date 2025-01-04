@@ -1,6 +1,6 @@
 <template>
     <MainLayout>
-
+        <link rel="preload" href="/img/hero_c.webp" as="image" />
         <Head />
         <Hero />
         <Cta />
@@ -16,7 +16,6 @@
 <script setup>
 import { defineAsyncComponent, shallowRef } from 'vue';
 import { Head } from "@inertiajs/vue3";
-import { defineProps } from "vue";
 
 // Lazy load components
 const MainLayout = defineAsyncComponent(() => import('@/Layouts/MainLayout.vue'));

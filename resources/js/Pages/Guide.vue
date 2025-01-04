@@ -13,7 +13,6 @@
 import FooterBar from "@/Components/FooterBar.vue";
 import MainLayout from "@/Layouts/MainLayout.vue";
 
-import { defineProps } from 'vue';
 
 defineProps({
     links: {

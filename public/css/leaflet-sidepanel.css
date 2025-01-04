@@ -62,7 +62,9 @@
   color: #191a1d;
   overflow-y: auto;
   overflow-x: hidden;
+  font-size: large;
 }
+
 .sidepanel.sidepanel-dark .sidepanel-content-wrapper {
   color: #d4d4d4;
 }

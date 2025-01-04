@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, defineProps, computed, reactive } from "vue";
+import { ref, onMounted, onUnmounted, computed, reactive } from "vue";
 import { Head } from "@inertiajs/vue3";
 import MainLayout from "@/Layouts/MainLayout.vue";
 import FooterBar from "@/Components/FooterBar.vue";
