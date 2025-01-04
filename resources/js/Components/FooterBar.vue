@@ -114,8 +114,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
-
 defineProps({
     links: {
         type: Array,

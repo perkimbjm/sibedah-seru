@@ -267,13 +267,13 @@ class RtlhController extends Controller
 
                 
                 $query->selectRaw("
-                    id, name, address, people, area, pondasi, kolom_blk, rngk_atap, atap, dinding, lantai, air, jarak_tinja, wc, jenis_wc, tpa_tinja, status, is_renov, note, district_id, village_id, ST_X(geom::geometry) AS lng, ST_Y(geom::geometry) AS lat,
+                    id, name, address, people, area, pondasi, kolom_blk, rngk_atap, atap, dinding, lantai, air, jarak_tinja, wc, jenis_wc, tpa_tinja, status_safety, status, is_renov, note, district_id, village_id, ST_X(geom::geometry) AS lng, ST_Y(geom::geometry) AS lat,
                     ST_DistanceSphere(ST_MakePoint(?, ?), ST_MakePoint(lng, lat)) AS distance
                 ", [$lng, $lat])
                 ->orderBy('distance');
             } else {
                 // Jika tidak ada lat dan lng, ambil semua data
-                $query->select('id', 'name', 'address', 'people', 'area', 'pondasi', 'kolom_blk', 'rngk_atap', 'atap', 'dinding', 'lantai', 'air', 'jarak_tinja', 'wc', 'jenis_wc', 'tpa_tinja', 'status', 'is_renov', 'note', 'district_id', 'village_id', 'lat', 'lng');
+                $query->select('id', 'name', 'address', 'people', 'area', 'pondasi', 'kolom_blk', 'rngk_atap', 'atap', 'dinding', 'lantai', 'air', 'jarak_tinja', 'wc', 'jenis_wc', 'tpa_tinja', 'status_safety', 'status', 'is_renov', 'note', 'district_id', 'village_id', 'lat', 'lng');
             }
 
             // Terapkan semua filter menggunakan data tervalidasi

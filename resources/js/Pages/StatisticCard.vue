@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted } from "vue";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 // Mengimpor icon secara individual
 import { 

@@ -79,6 +79,7 @@ import DesaSearch from "./DesaSearch.vue";
 import RtlhFilter from "./RtlhFilter.vue";
 import ListFeatures from "./ListFeatures.vue";
 import DetailPanel from "./DetailPanel.vue";
+import DetailLeftPanel from "./DetailLeftPanel.vue";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 
@@ -86,7 +87,8 @@ const Components = {
   DesaSearch: markRaw(DesaSearch),
   RtlhFilter: markRaw(RtlhFilter),
   ListFeatures: markRaw(ListFeatures),
-  DetailPanel: markRaw(DetailPanel)
+  DetailPanel: markRaw(DetailPanel),
+  DetailLeftPanel: markRaw(DetailLeftPanel),
 };
 
 
@@ -276,8 +278,9 @@ const rightTabs = ref([
 const leftContents = ([
     {
         id: "tab-1",
-        title: "Content 1",
-        body: "Nam nec lacinia purus, in accumsan arcu...",
+        title: "Lihat Data RTLH",
+        component: Components.DetailLeftPanel,
+        body: "Aktifkan Layer RTLH terlebih dahulu",
     },
     {
         id: "tab-2",
@@ -344,6 +347,7 @@ loadIcons();
   color: #1f2937;
   font-weight: 500;
 }
+
 
 .sidepanel-content-wrapper-2 {
   position: absolute;
