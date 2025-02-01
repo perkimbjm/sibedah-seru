@@ -10,14 +10,11 @@
         <meta property="og:title" content="SIBEDAH SERU" />
         <meta property="og:description" content="Sistem Informasi Bedah Rumah Kabupaten Balangan" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://sibedahseru.info" />
-        <link rel="manifest" href="https://sibedahseru.info/js/site.webmanifest">
+        <link rel="canonical" href="https://sibedahseru.web.id" />
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-
-        <link href="https://dikayuh-baimbai.com/img/favicon/favicon.ico" rel="shortcut icon" type="image/x-icon">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <title>SIBEDAH SERU</title>
 

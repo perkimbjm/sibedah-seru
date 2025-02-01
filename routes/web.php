@@ -14,6 +14,7 @@ use App\Http\Controllers\HouseController;
 use App\Http\Controllers\ProxyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RtlhMapController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DownloadController;
@@ -23,6 +24,8 @@ use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\HousePhotoController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\FileManagerController;
+use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\RenovatedHousePhotoController;
 
 
@@ -31,11 +34,11 @@ Route::get('/', function() {
     $statisticController = app(StatisticController::class);
     $faqController = app(FaqController::class);
     $linkController = app(LinkController::class);
-    
+
     $statistics = $statisticController->getData();
     $faqs = $faqController->getData();
     $links = $linkController->getData();
-     
+
     return Inertia::render('LandingPage', [
         'statistics' => $statistics,
         'faqs' => $faqs,
@@ -101,14 +104,22 @@ Route::post('/logout', function () {
 Route::get('/proxy/wfs', [ProxyController::class, 'proxyGeoserverWFS'])->name('proxyWFS');
 Route::get('/proxy/wms', [ProxyController::class, 'proxyGeoserverWMS'])->name('proxyWMS');
 
+Route::get('file-manager/thumbnail/{path}', [FileManagerController::class, 'showThumbnail'])->where('path', '.*')->name('file-manager.thumbnail');
+
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    // Dashboard route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('profile/password', [ChangePasswordController::class, 'edit'])->name('profile.password.edit');
+    Route::post('profile/password', [ChangePasswordController::class, 'update'])->name('profile.password.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.photo.update');
+    Route::delete('/profile/photo', [ProfileController::class, 'deleteProfilePhoto'])->name('profile.photo.delete');
 
     // Admin routes dengan prefix 'app'
     Route::prefix('app')->name('app.')->group(function () {
@@ -132,6 +143,18 @@ Route::middleware([
             Route::get('houses/check-nik', [HouseController::class, 'checkNIK'])->name('houses.checkNIK');
             Route::get('rtlh/getKecamatan', [RtlhController::class, 'getKecamatan'])->name('rtlh.getKecamatan');
             Route::delete('houses/destroy', [HouseController::class, 'massDestroy'])->name('houses.massDestroy');
+            Route::get('houses/getDesa', [HouseController::class, 'getDesa'])->name('houses.getDesa');
+            Route::get('rtlh/getDesa', [RtlhController::class, 'getDesa'])->name('rtlh.getDesa');
+            Route::get('houses/download-template', [HouseController::class, 'downloadTemplate'])->name('houses.download-template');
+            Route::get('rtlh/download-template', [RtlhController::class, 'downloadTemplate'])->name('rtlh.download-template');
+            Route::post('houses/import', [HouseController::class, 'import'])->name('houses.import');
+            Route::get('houses/import', function () {
+                return view('house.import');
+            })->name('houses.import.form');
+            Route::post('rtlh/import', [RtlhController::class, 'import'])->name('rtlh.import');
+            Route::get('rtlh/import', function () {
+                return view('rtlh.import');
+            })->name('rtlh.import.form');
             Route::delete('rtlh/destroy', [RtlhController::class, 'massDestroy'])->name('rtlh.massDestroy');
             Route::resources([
                 'houses' => HouseController::class,
@@ -155,9 +178,21 @@ Route::middleware([
                 Route::put('/{photo}', [HousePhotoController::class, 'update'])->name('rutilahu.update');
                 Route::delete('/{photo}', [HousePhotoController::class, 'destroy'])->name('rutilahu.destroy');
             });
-            
+
             Route::get('bedah/peta', [HouseMapController::class, 'index'])->name('bedah.peta');
+            Route::post('bedah/store-map', [HouseMapController::class, 'store'])->name('bedah.store');
+            Route::get('/bedah/edit', [HouseMapController::class, 'edit'])->name('bedah.edit');
+            Route::put('/bedah/update', [HouseMapController::class, 'update'])->name('bedah.update');
+            Route::get('/bedah/get-data', [HouseMapController::class, 'getHouseData'])->name('bedah.getData');
+
             Route::get('rutilahu/peta', [RtlhMapController::class, 'index'])->name('rutilahu.peta');
+            Route::post('rumah/store-map', [RtlhMapController::class, 'store'])->name('rumah.store');
+            Route::get('/rumah/edit', [RtlhMapController::class, 'edit'])->name('rumah.edit');
+            Route::put('/rumah/update', [RtlhMapController::class, 'update'])->name('rumah.update');
+            Route::get('/rumah/get-data', [RtlhMapController::class, 'getRtlhData'])->name('rumah.getData');
+
+
+
         });
 
         // Content Management
@@ -172,5 +207,21 @@ Route::middleware([
                 'contacts' => ContactController::class,
             ]);
         });
+
+        Route::middleware(['can:file-manager_access'])->group(function () {
+            Route::prefix('file-manager')->group(function () {
+                Route::get('/', [FileManagerController::class, 'index'])->name('file-manager.index');
+                Route::post('/upload', [FileManagerController::class, 'upload'])->name('file-manager.upload');
+                Route::post('/create-folder', [FileManagerController::class, 'createFolder'])->name('file-manager.create-folder');
+                Route::delete('/delete', [FileManagerController::class, 'delete'])->name('file-manager.delete');
+                Route::post('/rename', [FileManagerController::class, 'rename'])->name('file-manager.rename');
+                Route::post('/copy', [FileManagerController::class, 'copy'])->name('file-manager.copy');
+                Route::post('/move', [FileManagerController::class, 'move'])->name('file-manager.move');
+                Route::post('/extract', [FileManagerController::class, 'extract'])->name('file-manager.extract');
+                Route::post('/download-file', [FileManagerController::class, 'downloadFile'])->name('file-manager.download-file');
+                Route::post('/download-items', [FileManagerController::class, 'downloadItems'])->name('file-manager.download-items');
+            });
+         });
+
     });
 });

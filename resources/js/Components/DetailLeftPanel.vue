@@ -98,14 +98,14 @@ const handleRtlhDataChange = (newData) => {
 
 
 onMounted(() => {
-    window.addEventListener('rtlhDataChanged', (event) => {
+    window.addEventListener('data:rtlhChanged', (event) => {
         console.log('Data yang diterima:', event.detail);
         handleRtlhDataChange(event.detail);
     });
 });
 
 onUnmounted(() => {
-    window.removeEventListener('rtlhDataChanged', handleRtlhDataChange);
+    window.removeEventListener('data:rtlhChanged', handleRtlhDataChange);
 });
 
 // Computed property untuk menampilkan data tanpa foto

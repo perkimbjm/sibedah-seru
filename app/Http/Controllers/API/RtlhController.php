@@ -377,4 +377,23 @@ class RtlhController extends Controller
         return response()->json($villages);
     }
 
+    public function searchRTLH($identifier)  
+    {  
+        // Cari data berdasarkan NIK atau KK  
+        $rtlhData = DB::table('rtlh')
+            ->select('nik', 'kk', 'name', 'address', 'is_renov')  
+            ->where('nik', $identifier)  
+            ->orWhere('kk', $identifier)  
+            ->first();  
+  
+        if ($rtlhData) {  
+            // Ubah nilai is_renov menjadi string "sudah dibedah rumah" jika true  
+            $rtlhData->is_renov = $rtlhData->is_renov ? "sudah dibedah rumah" : "belum dibedah rumah";  
+  
+            return response()->json($rtlhData);  
+        } else {  
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);  
+        }  
+    }  
+
 }
