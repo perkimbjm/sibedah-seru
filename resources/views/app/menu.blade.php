@@ -26,6 +26,16 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route("webgis") }}">
+                        <i class="fas fa-globe-asia nav-icon">
+                        </i>
+                        <p>
+                            WebGIS Balangan
+                        </p>
+                    </a>
+                </li>
+
                 @can('data_access')
                     <li class="nav-item has-treeview {{ request()->is("app/houses*") ? "menu-open" : "" }} {{ request()->is("app/nsups*") ? "menu-open" : "" }} {{ request()->is("app/ipals*") ? "menu-open" : "" }} {{ request()->is("app/build-galleries*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
