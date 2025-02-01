@@ -8,7 +8,10 @@
 @section('content')
 <div class="container">
     <h3>Foto Rumah: {{ $house->name }}</h3>
-    <a href="{{ route('app.gallery.create', $house) }}" class="btn btn-primary mb-3">Tambah Foto</a>
+    <div class="m-3">
+        <a href="{{ route('app.gallery.create', $house) }}" class="mb-3 btn btn-primary">Tambah Foto</a>
+        <a href="{{ route('app.houses.index') }}" class="mb-3 btn btn-secondary">Kembali</a>
+    </div>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -22,7 +25,7 @@
         <tbody>
             @if($photos->isEmpty())
                 <tr>
-                    <td class="text-center text-3xl font-bold" colspan="5">Ooops belum ada data foto</td>
+                    <td class="text-3xl font-bold text-center" colspan="5">Ooops belum ada data foto</td>
                 </tr>
             @else
                 @foreach ($photos as $photo)

@@ -8,6 +8,7 @@ use App\Models\House;
 use App\Models\Village;
 use App\Models\District;
 use Illuminate\View\View;
+use App\Imports\RtlhImport;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,15 +16,18 @@ use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreRtlhRequest;
 use App\Http\Requests\UpdateRtlhRequest;
 use Yajra\DataTables\Facades\DataTables;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Http\Requests\MassDestroyRtlhRequest;
 use Symfony\Component\HttpFoundation\Response;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RtlhController extends Controller
 {
     public function index(Request $request)
     {
         abort_if(Gate::denies('rtlh_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        
+
         if ($request->ajax() || $request->wantsJson()) {
             $query = Rtlh::query()
                 ->select([
@@ -68,7 +72,7 @@ class RtlhController extends Controller
                 })
                 ->addColumn('gallery', function ($row) {
                     return '
-                    <a href="' . route('app.rutilahu.index', $row->id) . '" class="btn btn-md btn-warning rounded-lg px-2 py-1 d-inline-block text-gray-500">
+                    <a href="' . route('app.rutilahu.index', $row->id) . '" class="px-2 py-1 text-gray-500 rounded-lg btn btn-md btn-warning d-inline-block">
                         Foto
                     </a>';
                 })
@@ -122,7 +126,7 @@ class RtlhController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            $validatedData['is_renov'] = false;          
+            $validatedData['is_renov'] = false;
 
             $rtlh = Rtlh::create($validatedData);
             $rtlh['name'] = strtoupper($rtlh['name']);
@@ -132,13 +136,13 @@ class RtlhController extends Controller
             $rtlh->slug = strtolower($rtlh->id . '-' . Str::slug($rtlh->name));
             $rtlh->save();
 
-            $request->session()->flash('rtlh.id', $rtlh->id);
+            session(['rtlh.id' => $rtlh->id]);
             return redirect()->route('app.rtlh.index')->with('success', 'Data berhasil ditambahkan.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Gagal menyimpan data RTLH: ' . $e->getMessage()]);
         }
     }
-    
+
 
     // // Menampilkan detail satu data RTLH
     public function show(Rtlh $rtlh)
@@ -148,8 +152,8 @@ class RtlhController extends Controller
             'district:id,name',
             'village:id,name',
         ])->findOrFail($rtlh->id);
-        
-        
+
+
         $spaceScore = $rtlh->calculateSpaceScore();
         $cleanWaterScore = $rtlh->calculateCleanWaterScore();
         $sanitationScore = $rtlh->calculateSanitationScore();
@@ -157,7 +161,7 @@ class RtlhController extends Controller
         $finalScore = $rtlh->calculateFinalScore();
 
         return view('rtlh.show', compact('rtlh', 'safetyScore', 'sanitationScore', 'cleanWaterScore', 'spaceScore', 'finalScore'));
-        
+
     }
 
     public function edit(Rtlh $rtlh)
@@ -194,7 +198,7 @@ class RtlhController extends Controller
         return view('rtlh.edit', compact('districts', 'villages', 'rtlh', 'kelayakanOptions', 'bigOptions','jenisWcOptions', 'airOptions', 'jarakTinjaOptions', 'wcOptions', 'tpaTinjaOptions'));
     }
 
-    
+
 
     // Mengupdate data RTLH
     public function update(UpdateRtlhRequest $request, $id)
@@ -260,8 +264,141 @@ class RtlhController extends Controller
 
         // Kembalikan data district sebagai JSON
         return response()->json([
-            'district_name' => $district->name, 
+            'district_name' => $district->name,
             'district_id' => $district->id
         ]);
+    }
+
+    public function getDesa(Request $request)
+    {
+        $villages = Village::select('id', 'name')->get();
+
+        return response()->json($villages);
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header kolom
+        $headers = [
+            'NAMA',
+            'NIK',
+            'KK',
+            'ALAMAT',
+            'PEOPLE',
+            'LATITUDE',
+            'LONGITUDE',
+            'AREA',
+            'PONDASI',
+            'KOLOM_BLK',
+            'RNGK_ATAP',
+            'ATAP',
+            'DINDING',
+            'LANTAI',
+            'AIR',
+            'JARAK_TINJA',
+            'WC',
+            'JENIS_WC',
+            'TPA_TINJA',
+            'STATUS_SAFETY',
+            'STATUS',
+            'IS_RENOV',
+            'KECAMATAN',
+            'DESA',
+            'CATATAN'
+        ];
+
+        // Atur lebar kolom
+        foreach (range('A', 'Y') as $column) {
+            $sheet->getColumnDimension($column)->setWidth(20);
+        }
+
+        // Tulis header
+        foreach ($headers as $index => $header) {
+            $column = chr(65 + $index); // Konversi ke huruf kolom (A, B, C, etc.)
+            $sheet->setCellValue($column . '1', $header);
+
+            // Style header
+            $sheet->getStyle($column . '1')->getFont()->setBold(true);
+            $sheet->getStyle($column . '1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('CCCCCC');
+        }
+
+        // Tambah contoh data
+        $exampleData = [
+            [
+                'Ahmad Muhammad',
+                "'6311567890123456",
+                '1234567890123456',
+                'Dayak Pitap RT. 03',
+                4,
+                '-2.123456',
+                '115.123456',
+                100,
+                'Layak',
+                'Layak',
+                'Layak',
+                'Layak',
+                'Layak',
+                'Layak',
+                'Layak',
+                '≥ 10 Meter',
+                'Milik Sendiri',
+                'Leher Angsa',
+                'Tangki Septik',
+                'Layak',
+                'Aktif',
+                true,
+                'Tebing Tinggi',
+                'Dayak Pitap',
+                'Perlu Perbaikan Koordinat'
+            ]
+        ];
+
+        // Tulis contoh data
+        $row = 2;
+        foreach ($exampleData as $data) {
+            foreach ($data as $index => $value) {
+                $column = chr(65 + $index);
+                $sheet->setCellValue($column . $row, $value);
+            }
+            $row++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Set header untuk download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="template_import_rtlh.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // Output file
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function import(Request $request)
+    {
+        abort_if(Gate::denies('rtlh_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        try {
+            Excel::import(new RtlhImport, $request->file('file'));
+            return redirect()->route('app.rtlh.index')->with('success', 'Data berhasil diimpor.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal mengimpor data: ' . $e->getMessage()]);
+        }
+    }
+
+    public function importForm()
+    {
+        abort_if(Gate::denies('rtlh_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return view('rtlh.import');
     }
 }

@@ -58,7 +58,7 @@ class House extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($house) {
             if ($house->lat && $house->lng) {
                 $house->geom = DB::raw("ST_SetSRID(ST_MakePoint($house->lng, $house->lat), 4326)");

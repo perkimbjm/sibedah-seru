@@ -15,6 +15,9 @@
             <a class="btn btn-info" href="{{ route('app.bedah.peta') }}">
                 <i class="far fa-map"></i> Peta
             </a>
+            <a class="btn btn-danger" href="{{ route('app.houses.import') }}">
+                <i class="fas fa-file-excel"></i> Import Excel
+            </a>
         </div>
     </div>
 @endcan
@@ -25,7 +28,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table class=" table table-bordered table-striped table-hover datatable datatable-House">
+            <table class="table table-bordered table-striped table-hover datatable datatable-House">
                 <thead>
                     <tr>
                         <th width="10">
@@ -63,7 +66,7 @@
                             &nbsp;
                         </th>
                     </tr>
-            
+
                 </thead>
                 <tbody>
                     @foreach($houses as $key => $house)
@@ -86,7 +89,7 @@
                             <td>
                                 {{ $house->district ?? '' }}
                             </td>
-                           
+
                             <td>
                                 {{ $house->year?? '' }}
                             </td>
@@ -94,12 +97,12 @@
                             <td>
                                 {{ $house->type ?? '' }}
                             </td>
-                           
+
                             <td>
                                 {{ $house->source ?? '' }}
                             </td>
                             <td>
-                                <a class="btn btn-sm btn-warning font-bold text-dark" href="{{ route('app.gallery.index', $house) }}">Lihat Foto</a>
+                                <a class="font-bold btn btn-sm btn-warning text-dark" href="{{ route('app.gallery.index', $house) }}">Lihat Foto</a>
                             </td>
 
                             <td>
@@ -182,7 +185,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 })
 
 </script>

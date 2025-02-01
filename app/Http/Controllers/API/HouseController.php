@@ -98,7 +98,13 @@ class HouseController extends Controller
             });
         }
 
-        $houses = $query->get();
+        // Eksekusi query
+        $houses = $query->with([
+            'renovatedHousePhotos' => function ($query) {
+                $query->select('renovated_house_id', 'photo_url')->limit(1);
+            },
+        ])
+        ->get();
 
         return response()->json([
             'success' => true,

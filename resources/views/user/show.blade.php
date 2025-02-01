@@ -9,12 +9,12 @@
     <div class="card-header">
         Profil Pengguna
     </div>
-    <div class="card-body text-center">
+    <div class="text-center card-body">
         <div class="profile-header">
             @if($user->profile_photo_path)
-                <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Foto Profil" class="img-thumbnail rounded-circle" width="150" height="150">
+                <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Foto Profil" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
             @else
-                <img src="https://via.placeholder.com/150" alt="Foto Profil" class="img-thumbnail rounded-circle" width="150" height="150">
+                <img src="{{ asset('img/profile.webp') }}" alt="Foto Profil" class="img-thumbnail rounded-circle" width="150" height="150">
             @endif
             <h3 class="mt-3">{{ $user->name }}</h3>
             <p class="text-muted">
@@ -25,7 +25,7 @@
             </p>
         </div>
 
-        <div class="profile-details mt-4">
+        <div class="mt-4 profile-details">
             <h5 class="mb-3">Detail Pengguna</h5>
             <p><strong>Role:</strong> {{ $user->role->name ?? '-' }}</p>
             <p><strong>Email Terverifikasi:</strong> {{ $user->email_verified_at ? 'Ya' : 'Tidak' }}</p>

@@ -8,7 +8,7 @@ const mapZoom = 18;
 
 const dataCache = {
     house: { data: null, timestamp: null },
-    rtlh: { data: null, timestamp: null }
+    rtlh: { data: null, timestamp: null },
 };
 
 const debouncedInvalidateSize = _.debounce(() => {
@@ -17,16 +17,14 @@ const debouncedInvalidateSize = _.debounce(() => {
     }
 }, 250);
 
-
-const debouncedZoomHandler = _.debounce(function() {
+const debouncedZoomHandler = _.debounce(function () {
     // Handle zoom event
 }, 200);
-map.on('zoomend', debouncedZoomHandler);
+map.on("zoomend", debouncedZoomHandler);
 
-const worker = new Worker('/js/marker-worker.js');
+const worker = new Worker("/js/marker-worker.js");
 let markerQueue = [];
 let isProcessingQueue = false;
-
 
 /*Zoom Extends*/
 if (L && L.easyButton) {
@@ -108,7 +106,11 @@ const iconLayers = [
     { title: "Voyager", layer: cartoVoyager, icon: baseMapIcons.cartoVoyager },
     { title: "RBI", layer: rbi, icon: baseMapIcons.rbi },
     { title: "Google Maps", layer: googleMaps, icon: baseMapIcons.googleMaps },
-    { title: "Google Imagery", layer: googleSatellite, icon: baseMapIcons.googleSatellite },
+    {
+        title: "Google Imagery",
+        layer: googleSatellite,
+        icon: baseMapIcons.googleSatellite,
+    },
     { title: "OSM", layer: osm, icon: baseMapIcons.streetMap },
     { title: "Topo Map", layer: otopomap, icon: baseMapIcons.topoMap },
 ];
@@ -124,7 +126,6 @@ iconLayersControl.addTo(map);
 let options = {
     position: "topleft",
     drawMarker: true,
-    drawPolyline: true,
     drawRectangle: true,
     drawPolygon: true,
     drawCircle: true,
@@ -147,7 +148,13 @@ const showModal = (title, content) => {
 const zoomToFeature = (e) => {
     map.fitBounds(e.target.getBounds());
 };
-function loadGeoJsonData(url, layer, tooltipLayer, tooltipProperty, filters = {}) {
+function loadGeoJsonData(
+    url,
+    layer,
+    tooltipLayer,
+    tooltipProperty,
+    filters = {}
+) {
     const params = new URLSearchParams(filters).toString();
     const fetchUrl = params ? `${url}?${params}` : url;
 
@@ -180,8 +187,6 @@ function loadGeoJsonData(url, layer, tooltipLayer, tooltipProperty, filters = {}
                     tooltipLayer.addLayer(tooltip);
 
                     map.on("zoomend", updateTooltipPosition);
-                    
-                   
                 });
             }
         })
@@ -392,6 +397,7 @@ let polaruang = L.tileLayer.wms("/proxy/wms?", {
     time: new Date().getTime(),
     cacheControl: "max-age=3600",
     noCache: false,
+    crs: L.CRS.EPSG4326,
 });
 
 // Tambahkan event listener untuk tile loading
@@ -440,20 +446,29 @@ const createClusterGroup = () => {
         removeOutsideVisibleBounds: true,
         spiderfyDistanceMultiplier: 1.5,
         zoomAnimation: true,
-        animateAddingMarkers: false
+        animateAddingMarkers: false,
     });
 };
 const isValidLatLng = (lat, lng) => {
-    return lat !== null && lng !== null &&
-           !isNaN(lat) && !isNaN(lng) &&
-           lat >= -90 && lat <= 90 &&
-           lng >= -180 && lng <= 180;
+    return (
+        lat !== null &&
+        lng !== null &&
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat >= -90 &&
+        lat <= 90 &&
+        lng >= -180 &&
+        lng <= 180
+    );
 };
 
 function isCacheValid(type) {
     const cache = dataCache[type];
-    return cache.data && cache.timestamp && 
-           (Date.now() - cache.timestamp) < CACHE_DURATION;
+    return (
+        cache.data &&
+        cache.timestamp &&
+        Date.now() - cache.timestamp < CACHE_DURATION
+    );
 }
 
 const processChunk = () => {
@@ -462,17 +477,25 @@ const processChunk = () => {
     const chunk = markerQueue.splice(0, CHUNK_SIZE);
     const geoJsonChunk = {
         type: "FeatureCollection",
-        features: chunk
+        features: chunk,
     };
 
     targetLayer.addData(geoJsonChunk);
     targetCluster.addLayer(targetLayer);
 
-    if ('requestIdleCallback' in window) {
+    if ("requestIdleCallback" in window) {
         requestIdleCallback(processChunk);
     } else {
         setTimeout(processChunk, 50); // Fallback
     }
+};
+
+window.houseData = null;
+
+window.updateHouseData = (data) => {
+    window.houseData = data;
+    const event = new CustomEvent("data:houseChanged", { detail: data });
+    window.dispatchEvent(event);
 };
 
 window.house = L.geoJson(null, {
@@ -485,7 +508,7 @@ window.house = L.geoJson(null, {
         const marker = L.marker(latlng, {
             icon: L.icon({
                 iconUrl: "/img/home-blue.png",
-                iconSize: [18, 21], 
+                iconSize: [18, 21],
                 iconAnchor: [9, 21],
                 popupAnchor: [0, -19],
             }),
@@ -500,6 +523,22 @@ window.house = L.geoJson(null, {
     onEachFeature: function (feature, layer) {
         if (feature.properties) {
             const properties = feature.properties;
+
+            const filteredProperties = Object.fromEntries(
+                Object.entries(properties).filter(
+                    ([key]) =>
+                        ![
+                            "slug",
+                            "district_id",
+                            "village_id",
+                            "lng",
+                            "lat",
+                            "map_popup_content",
+                            "district",
+                            "village",
+                        ].includes(key)
+                )
+            );
             const content = `<div class='p-2 shadow rounded-md'>
                 <table class='table-auto w-full border-collapse border border-gray-400'>
                     ${Object.entries({
@@ -511,7 +550,14 @@ window.house = L.geoJson(null, {
                         Tipe: properties.type,
                         Sumber: properties.source,
                         Catatan: properties.note,
-                    }).map(([key, value]) => `<tr><th class='text-left text-gray-700 bg-gray-200 px-1'>${key}</th><td class='text-gray-600'>${value || "-"}</td></tr>`).join('')}
+                    })
+                        .map(
+                            ([key, value]) =>
+                                `<tr><th class='text-left text-gray-700 bg-gray-200 px-1'>${key}</th><td class='text-gray-600'>${
+                                    value || "-"
+                                }</td></tr>`
+                        )
+                        .join("")}
                 </table>
             </div>`;
             const popup = L.popup({
@@ -519,10 +565,24 @@ window.house = L.geoJson(null, {
                 autoPan: false,
                 maxWidth: 300,
                 closeOnClick: true,
-                autoClose: true
+                autoClose: true,
             }).setContent(content);
 
             layer.bindPopup(popup);
+            layer.on("click", () => {
+                const firstPhoto =
+                    feature.properties.renovated_house_photos &&
+                    feature.properties.renovated_house_photos.length > 0
+                        ? `${feature.properties.renovated_house_photos[0].photo_url}`
+                        : null;
+                const kecamatanName = feature.properties.district?.name;
+                const updatedData = {
+                    ...filteredProperties,
+                    kecamatan: kecamatanName,
+                    photo: firstPhoto,
+                };
+                window.updateHouseData(updatedData);
+            });
         }
     },
     filter: function (feature) {
@@ -532,11 +592,11 @@ window.house = L.geoJson(null, {
 });
 
 window.house = house;
-window.initHouseLayer = function(map, handleHouseClick) {
+window.initHouseLayer = function (map, handleHouseClick) {
     return window.house;
 };
 
-window.fetchData = async function(url) {
+window.fetchData = async function (url) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -553,10 +613,9 @@ window.rtlhData = null;
 
 window.updateRtlhData = (data) => {
     window.rtlhData = data;
-    const event = new CustomEvent('rtlhDataChanged', { detail: data });
+    const event = new CustomEvent("data:rtlhChanged", { detail: data });
     window.dispatchEvent(event);
 };
-
 
 window.rtlh = L.geoJson(null, {
     pointToLayer: function (feature, latlng) {
@@ -568,7 +627,7 @@ window.rtlh = L.geoJson(null, {
         const marker = L.marker(latlng, {
             icon: L.icon({
                 iconUrl: "/img/home-red.png",
-                iconSize: [18, 21], 
+                iconSize: [18, 21],
                 iconAnchor: [9, 21],
                 popupAnchor: [0, -19],
             }),
@@ -599,7 +658,14 @@ window.rtlh = L.geoJson(null, {
                     "Kelayakan Bangunan": properties.status_safety,
                     "Kelayakan (Keseluruhan)": properties.status,
                     Catatan: properties.note,
-                }).map(([key, value]) => `<tr><th class='text-left text-gray-700 bg-gray-200 px-1'>${key}</th><td class='text-gray-700'>${value || "-"}</td></tr>`).join('')}
+                })
+                    .map(
+                        ([key, value]) =>
+                            `<tr><th class='text-left text-gray-700 bg-gray-200 px-1'>${key}</th><td class='text-gray-700'>${
+                                value || "-"
+                            }</td></tr>`
+                    )
+                    .join("")}
             </table>
         </div>`;
             const popup = L.popup({
@@ -607,19 +673,21 @@ window.rtlh = L.geoJson(null, {
                 autoPan: false,
                 maxWidth: 400,
                 closeOnClick: true,
-                autoClose: true
+                autoClose: true,
             }).setContent(content);
-    
+
             layer.bindPopup(popup);
-            layer.on('click', () => {
-                const firstPhoto = feature.properties.house_photos && feature.properties.house_photos.length > 0
-                ? `storage/${feature.properties.house_photos[0].photo_url}`
-                : null;
+            layer.on("click", () => {
+                const firstPhoto =
+                    feature.properties.house_photos &&
+                    feature.properties.house_photos.length > 0
+                        ? `storage/${feature.properties.house_photos[0].photo_url}`
+                        : null;
                 const updatedData = {
                     ...properties,
                     house_photos: firstPhoto,
                 };
-                console.log('Data yang dikirim:', updatedData); // Debugging
+                console.log("Data yang dikirim:", updatedData); // Debugging
                 window.updateRtlhData(updatedData);
             });
         }
@@ -638,29 +706,28 @@ let isHouseLoaded = false;
 let isRtlhLoaded = false;
 let activePopup = null;
 
-
 async function loadHouseData() {
     if (!isHouseLoaded) {
         try {
             let data;
 
-            if (isCacheValid('house')) {
+            if (isCacheValid("house")) {
                 data = dataCache.house.data;
-                console.log('Using cached house data');
+                console.log("Using cached house data");
             } else {
                 const response = await fetch("/api/bedah/general");
                 data = await response.json();
 
                 dataCache.house = {
                     data: data,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 };
             }
 
             // Hindari redundant event listener
             if (!worker._isListenerAdded) {
-                worker.addEventListener('message', (e) => {
-                    if (e.data.action === 'markersProcessed') {
+                worker.addEventListener("message", (e) => {
+                    if (e.data.action === "markersProcessed") {
                         markerQueue = e.data.data;
 
                         house.clearLayers();
@@ -673,14 +740,14 @@ async function loadHouseData() {
                             const chunk = markerQueue.splice(0, CHUNK_SIZE);
                             const geoJsonChunk = {
                                 type: "FeatureCollection",
-                                features: chunk
+                                features: chunk,
                             };
 
                             house.addData(geoJsonChunk);
                             houseCluster.addLayer(house);
 
                             // Panggil processChunk lagi saat browser idle
-                            if ('requestIdleCallback' in window) {
+                            if ("requestIdleCallback" in window) {
                                 requestIdleCallback(processChunk);
                             } else {
                                 setTimeout(processChunk, 50); // Fallback untuk browser yang tidak mendukung
@@ -698,8 +765,8 @@ async function loadHouseData() {
             }
 
             worker.postMessage({
-                action: 'processMarkers',
-                data: data.data
+                action: "processMarkers",
+                data: data.data,
             });
 
             isHouseLoaded = true;
@@ -714,16 +781,17 @@ async function loadRtlhData() {
         try {
             const response = await fetch("/api/rtlh/houses");
             const data = await response.json();
-            if (!Array.isArray(data.data)) throw new Error("Data yang diterima bukan array");
+            if (!Array.isArray(data.data))
+                throw new Error("Data yang diterima bukan array");
 
             const CHUNK_SIZE = 1000;
             const validFeatures = data.data
-                .filter(item => isValidLatLng(item.lat, item.lng))
-                .map(item => ({
+                .filter((item) => isValidLatLng(item.lat, item.lng))
+                .map((item) => ({
                     type: "Feature",
                     geometry: {
                         type: "Point",
-                        coordinates: [item.lng, item.lat]
+                        coordinates: [item.lng, item.lat],
                     },
                     properties: {
                         id: item.id,
@@ -744,11 +812,11 @@ async function loadRtlhData() {
                         status: item.status,
                         note: item.note,
                         house_photos: item.house_photos,
-                    }
+                    },
                 }));
 
             for (let i = 0; i < validFeatures.length; i += CHUNK_SIZE) {
-                await new Promise(resolve => setTimeout(resolve, 0));
+                await new Promise((resolve) => setTimeout(resolve, 0));
             }
 
             if (validFeatures.length > 0) {
@@ -775,7 +843,6 @@ async function loadRtlhData() {
     }
 }
 
-
 // Event listeners
 map.on("zoomstart", () => {
     if (activePopup) {
@@ -784,21 +851,20 @@ map.on("zoomstart", () => {
     }
 });
 
-map.on('zoomend', () => {
-    [houseCluster, rtlhCluster].forEach(cluster => {
+map.on("zoomend", () => {
+    [houseCluster, rtlhCluster].forEach((cluster) => {
         if (cluster && cluster.enableClustering) {
             cluster.enableClustering();
         }
     });
 });
 
-
-map.on('error', function(e) {
-    console.error('Map error:', e);
-    if (e.error && e.error.message === '_latLngToNewLayerPoint') {
+map.on("error", function (e) {
+    console.error("Map error:", e);
+    if (e.error && e.error.message === "_latLngToNewLayerPoint") {
         map.flyTo(map.getCenter(), map.getZoom(), {
             animate: true,
-            duration: 1.5 // durasi transisi dalam detik
+            duration: 1.5, // durasi transisi dalam detik
         });
     }
 });
@@ -946,6 +1012,7 @@ function toggleDrawToolbar() {
                 element.style.display = "block";
             } else {
                 element.style.display = "none";
+                ctlMeasure._finishMeasure();
             }
         });
 }
@@ -1048,10 +1115,14 @@ function addLayerToControl(layer, name) {
 
             layerControl.addTo(map);
         } else {
-            console.error(`Layer "${name}" tidak memiliki _leaflet_id yang valid.`);
+            console.error(
+                `Layer "${name}" tidak memiliki _leaflet_id yang valid.`
+            );
         }
     } else {
-        console.error(`Gagal menambahkan layer "${name}" ke layer control: Parameter tidak valid.`);
+        console.error(
+            `Gagal menambahkan layer "${name}" ke layer control: Parameter tidak valid.`
+        );
     }
 }
 

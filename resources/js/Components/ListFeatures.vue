@@ -86,7 +86,7 @@ const filteredFeatures = computed(() => {
         features = features.filter(feature =>
             feature.id.toString().toLowerCase().includes(searchTerm) ||
             feature.name.toLowerCase().includes(searchTerm) ||
-            feature.district.toLowerCase().toString().includes(searchTerm)
+            feature.district.name.toLowerCase().toString().includes(searchTerm)
         );
     }
 

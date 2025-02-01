@@ -52,9 +52,14 @@ const submit = () => {
         remember: form.remember ? "on" : "",
     })).post(route("login"), {
         onSuccess: (response) => {
-            // Update auth store setelah login berhasil
-            // authStore.handleLoginSuccess(response?.props?.auth?.user);
-            window.location.assign(route("dashboard"));
+            console.log(response); // Periksa respons
+            if (response.data && response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                window.location.assign(route("dashboard"));
+            } else {
+                alert('Login failed: Token not found.');
+            }
+
         },
         onError: () => {
             form.reset("password");

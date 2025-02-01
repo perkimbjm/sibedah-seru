@@ -75,7 +75,7 @@ class Rtlh extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($rtlh) {
             if ($rtlh->lat && $rtlh->lng) {
                 $rtlh->geom = DB::raw("ST_SetSRID(ST_MakePoint($rtlh->lng, $rtlh->lat), 4326)");
@@ -94,7 +94,7 @@ class Rtlh extends Model
     {
         return DB::select("SELECT ST_AsGeoJSON(geom) as geojson FROM rtlh WHERE id = ?", [$this->id])[0]->geojson;
     }
-    
+
 
     // Hitung nilai aspek keselamatan (Safety Score)
     public function calculateSafetyScore()
@@ -112,7 +112,7 @@ class Rtlh extends Model
             'Kurang Layak' => 10,
             'Tidak Layak' => 0,
         ]);
-        
+
         $nonStructural = $this->getScore($this->atap, [
             'Layak' => 15,
             'Kurang Layak' => 7.5,
@@ -229,5 +229,5 @@ class Rtlh extends Model
     {
         return $map[$value] ?? $default;
     }
-    
+
 }

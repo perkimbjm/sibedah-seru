@@ -191,7 +191,7 @@
                         '#FF6384',
                         '#FFCE56',
                         '#4BC0C0',
-                        
+
                     ],
                     hoverOffset: 4
                 }]
@@ -222,8 +222,6 @@
         .then(kecamatanData => {
             // Data jumlah RTLH berdasarkan district_id
             const rtlhCounts = @json($rtlhCounts->toArray()); // Ambil data dari controller
-            console.log('Jumlah RTLH per district_id:', rtlhCounts); // Tambahkan log untuk memeriksa data
-
             // Tambahkan jumlah RTLH ke data GeoJSON kecamatan
             kecamatanData.features.forEach(feature => {
                 const districtId = feature.properties.id;

@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-green-info elevation-4 overflow-y-hidden" style="min-height: 917px;">
+<aside class="overflow-y-hidden main-sidebar sidebar-green-info elevation-4" style="min-height: 917px;">
     <!-- Brand Logo -->
     <a href="/" class="brand-link ">
         <img src="{{ asset('img/logo-sibedah.png') }}" alt="logo Sibedah-seru" class="brand-image" style="background: white; border-radius: 50%; padding:5px;">
@@ -10,7 +10,7 @@
         <div class="user-panel d-flex">
             <!-- Sidebar user (optional) -->
             <div class="info">
-                <a href="#" class="d-block ml-3 text-white">{{ Auth::user()->name }}</a>
+                <a href="#" class="ml-3 text-white d-block">{{ Auth::user()->name }}</a>
             </div>
         </div>
         <!-- Sidebar Menu -->
@@ -38,7 +38,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            
+
                                 <li class="nav-item">
                                     <a href="{{ route("app.houses.index") }}" class="nav-link {{ request()->is("app/houses") || request()->is("app/houses/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-home">
@@ -60,13 +60,13 @@
                                         </p>
                                     </a>
                                 </li>
-                    
-                                                      
+
+
 
                         </ul>
                     </li>
                 @endcan
-                
+
                 @can('user_management_access')
                     <li class="nav-item has-treeview {{ request()->is("app/permissions*") ? "menu-open" : "" }} {{ request()->is("app/roles*") ? "menu-open" : "" }} {{ request()->is("app/users*") ? "menu-open" : "" }} {{ request()->is("app/audit-logs*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
@@ -79,7 +79,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                      
+
                                 <li class="nav-item">
                                     <a href="{{ route("app.permissions.index") }}" class="nav-link {{ request()->is("app/permissions") || request()->is("app/permissions/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-key">
@@ -90,7 +90,7 @@
                                         </p>
                                     </a>
                                 </li>
-                          
+
                                 <li class="nav-item">
                                     <a href="{{ route("app.roles.index") }}" class="nav-link {{ request()->is("app/roles") || request()->is("app/roles/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-user-tag">
@@ -122,13 +122,13 @@
                                         </p>
                                     </a>
                                 </li> --}}
-                      
+
                         </ul>
                     </li>
                     @endcan
- 
 
-   
+
+
                     <li class="nav-item has-treeview {{ request()->is("app/faqs*") ? "menu-open" : "" }} {{ request()->is("app/links*") ? "menu-open" : "" }} {{ request()->is("app/downloads*") ? "menu-open" : "" }} ">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-laptop">
@@ -140,7 +140,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-   
+
                                 <li class="nav-item">
                                     <a href="{{ route("app.faqs.index") }}" class="nav-link {{ request()->is("app/faqs") || request()->is("app/faqs/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-question-circle">
@@ -174,25 +174,34 @@
                                     </a>
                                 </li>
 
-                                
-                           
+
+
                         </ul>
                     </li>
                 {{-- @endcan --}}
 
                 @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
-                    @can('profile_password_edit')
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('profile/password') || request()->is('profile/password/*') ? 'active' : '' }}" href="{{ route('profile.password.edit') }}">
+                            <a class="nav-link {{ request()->is('profile') || request()->is('profile/*') ? 'active' : '' }}" href="{{ route('profile.show') }}">
                                 <i class="fa-fw fas fa-user nav-icon">
                                 </i>
                                 <p>
-                                    Ubah Kata Sandi
+                                    Edit Profil
                                 </p>
                             </a>
                         </li>
-                    @endcan
                 @endif
+                @can('file-manager_access')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('file-manager') || request()->is('file-manager/*') ? 'active' : '' }}" href="{{ route('app.file-manager.index') }}">
+                        <i class="fa-fw fas fa-folder nav-icon">
+                        </i>
+                        <p>
+                            File Manager
+                        </p>
+                    </a>
+                </li>
+                @endcan
                 <li class="nav-item">
                     <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logoutform').submit();">
                         <p>

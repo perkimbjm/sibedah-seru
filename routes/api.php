@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\RtlhController;
 use App\Http\Controllers\Api\HouseController;
 use App\Http\Controllers\Api\VillageController;
 use App\Http\Controllers\Api\DistrictController;
+use App\Http\Controllers\TwoFactorAuthenticationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,12 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::delete('/{slug}', [HouseController::class, 'destroy']);
     });
 
+    Route::post('/two-factor-authentication', [TwoFactorAuthenticationController::class, 'enable']);
+    Route::post('/two-factor-authentication/confirm', [TwoFactorAuthenticationController::class, 'confirm']);
+    Route::delete('/two-factor-authentication', [TwoFactorAuthenticationController::class, 'disable']);
+    Route::post('/two-factor-authentication/recovery-codes', [TwoFactorAuthenticationController::class, 'regenerateRecoveryCodes']);
+    Route::get('/two-factor-authentication/recovery-codes', [TwoFactorAuthenticationController::class, 'getRecoveryCodes']);
+
 });
 
 
@@ -53,7 +60,7 @@ Route::prefix('kecamatan')->group(function() {
     Route::get('/find-by-location', [DistrictController::class, 'findByLocation']);
 });
 
-// Public Village routes 
+// Public Village routes
 Route::prefix('desa')->group(function() {
     Route::get('/', [VillageController::class, 'index']);
     Route::get('/geojson', [VillageController::class, 'geojson']);
@@ -68,6 +75,7 @@ Route::prefix('rtlh')->group(function() {
     Route::get('/districts', [RtlhController::class, 'getDistricts']);
     Route::get('/villages/{district_id}', [RtlhController::class, 'getVillagesByDistrict']);
     Route::get('/villages', [RtlhController::class, 'getVillages']);
+    Route::get('/{identifier}', [RtlhController::class, 'searchRtlh'])->name('api.searchRtlh');
     Route::post('/', [RtlhController::class, 'store']);
     Route::put('/{slug}', [RtlhController::class, 'update']);
     Route::delete('/{slug}', [RtlhController::class, 'destroy']);

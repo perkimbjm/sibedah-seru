@@ -28,7 +28,7 @@
                     <span class="text-danger">{{ $errors->first('email') }}</span>
                 @endif
             </div>
-            
+
             <div class="form-group">
                 <label for="phone">Nomor telepon</label>
                 <input class="form-control {{ $errors->has('phone') ? 'is-invalid' : '' }}" type="text" name="phone" id="phone" value="{{ old('phone', '') }}">
@@ -67,7 +67,7 @@
 
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
-                    SImpan
+                    Simpan
                 </button>
             </div>
         </form>

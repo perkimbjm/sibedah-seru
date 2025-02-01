@@ -11,8 +11,8 @@
     <meta name="msapplication-TileColor" content="#000000" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <title>{{ $title ?? 'Sibedah Seru Dashboard' }}</title>
-    
+  <title>{{ $title ?? 'Sibedah Seru' }}</title>
+
   <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/favicon/apple-touch-icon.png')}}">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon/favicon-32x32.png')}}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon/favicon-16x16.png')}}">
@@ -29,7 +29,7 @@
 
 <body class="sidebar-mini layout-fixed hold-transition" style="height: auto;">
     <div class="wrapper">
-                
+
         <div class="preloader">
             <div class="loading">
                 <img src="{{ asset('img/dualball.svg') }}">
@@ -45,10 +45,10 @@
             </ul>
 
             <!-- Right navbar links -->
-                <ul class="navbar-nav ml-auto">
+                <ul class="ml-auto navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                        <i class="fas fa-expand-arrows-alt text-gray-500"></i>
+                        <i class="text-gray-500 fas fa-expand-arrows-alt"></i>
                         </a>
                     </li>
                 </ul>
@@ -56,11 +56,11 @@
         </nav>
 
         @include('app.menu')
-        <div class="content-wrapper" style="min-height: 917px;">
+        <div class="content-wrapper">
             <!-- Main content -->
             <section class="content" style="padding-top: 20px">
                 @if(session('message'))
-                    <div class="row mb-2">
+                    <div class="mb-2 row">
                         <div class="col-lg-12">
                             <div class="alert alert-success" role="alert">{{ session('message') }}</div>
                         </div>
@@ -76,7 +76,7 @@
                     </div>
                 @endif
 
-                <x-page-header :title="$menuName" :currentRoute="$currentRoute" />                                     
+                <x-page-header :title="$menuName" :currentRoute="$currentRoute" />
 
                     @yield('content')
             </section>
@@ -99,9 +99,9 @@
     @stack('before-script')
 
     @include('app.script')
-    
+
     @stack('after-script')
-    
+
     @yield('scripts')
 </body>
 

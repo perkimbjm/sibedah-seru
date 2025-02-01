@@ -15,6 +15,9 @@
             <a class="btn btn-info" href="{{ route('app.rutilahu.peta') }}">
                 <i class="far fa-map"></i> Peta
             </a>
+            <a class="btn btn-danger" href="{{ route('app.rtlh.import') }}">
+                <i class="fas fa-file-excel"></i> Import Excel
+            </a>
         </div>
     </div>
 @endcan
@@ -25,7 +28,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-User">
+            <table class="table table-bordered table-striped table-hover ajaxTable datatable datatable-User">
                 <thead>
                     <tr>
                         <th rowspan="2" width="10" class="text-center align-middle"></th>
@@ -148,7 +151,7 @@ $(function () {
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 let visibleColumnsIndexes = null;
 $('.datatable thead').on('input', '.search', function () {
       let strict = $(this).attr('strict') || false

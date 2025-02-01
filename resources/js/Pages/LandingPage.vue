@@ -6,6 +6,7 @@
         <Cta />
         <StatisticCard :statistics="statistics" />
         <FeaturesList />
+        <SearchFamily />
         <GalleryCard />
         <Faq :faqs="faqs" />
         <FooterBar :links="links" />
@@ -23,6 +24,7 @@ const Hero = defineAsyncComponent(() => import('@/Components/Hero.vue'));
 const ScrollTop = defineAsyncComponent(() => import('@/Components/ScrollTop.vue'));
 const Cta = defineAsyncComponent(() => import('@/Components/Cta.vue'));
 const FeaturesList = defineAsyncComponent(() => import('@/Components/FeaturesList.vue'));
+const SearchFamily = defineAsyncComponent(() => import('@/Components/SearchFamily.vue'));
 const GalleryCard = defineAsyncComponent(() => import('@/Components/GalleryCard.vue'));
 const Faq = defineAsyncComponent(() => import('@/Pages/Faq.vue'));
 const StatisticCard = defineAsyncComponent(() => import('@/Pages/StatisticCard.vue'));
