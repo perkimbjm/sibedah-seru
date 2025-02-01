@@ -113,6 +113,9 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/webgis', function () {
+        return view('app.webgis');
+    })->name('webgis');
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('profile/password', [ChangePasswordController::class, 'edit'])->name('profile.password.edit');
