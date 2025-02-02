@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Observers\UserObserver;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
                 'role' => RoleMiddleware::class,
             ]);
         });
+
+        User::observe(UserObserver::class);
 
         Paginator::useBootstrap();
     }
