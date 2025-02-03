@@ -52,14 +52,13 @@ const submit = () => {
         remember: form.remember ? "on" : "",
     })).post(route("login"), {
         onSuccess: (response) => {
-            console.log(response); // Periksa respons
-            if (response.data && response.data.token) {
-                localStorage.setItem('token', response.data.token);
+            // Periksa apakah user sudah terautentikasi melalui store
+            if (authStore.isAuthenticated) {
+                // Redirect ke dashboard langsung karena session sudah valid
                 window.location.assign(route("dashboard"));
             } else {
-                alert('Login failed: Token not found.');
+                alert('Login failed: Please check your credentials.');
             }
-
         },
         onError: () => {
             form.reset("password");
@@ -116,23 +115,23 @@ onMounted(() => {
 <template>
 
     <Head title="Log in" />
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-100 to-emerald-100">
-        <div class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-2xl shadow-xl flex overflow-hidden">
+    <div class="flex items-center justify-center min-h-screen bg-gradient-to-r from-green-100 to-emerald-100">
+        <div class="flex w-full max-w-6xl overflow-hidden bg-white shadow-xl dark:bg-gray-900 rounded-2xl">
             <!-- Left Side - Login Form -->
-            <div class="w-full lg:w-1/2 px-8 py-12 sm:px-12">
+            <div class="w-full px-8 py-12 lg:w-1/2 sm:px-12">
                 <div class="flex items-center gap-2 mb-3">
-                    <button class="w-10 h-10 flex items-center justify-center" @click="handleBack">
+                    <button class="flex items-center justify-center w-10 h-10" @click="handleBack">
                         <ChevronLeftIcon class="w-8 h-8" />
                     </button>
-                    <div class="w-60 flex items-center justify-center">
+                    <div class="flex items-center justify-center w-60">
                         <AuthenticationCardLogo />
                     </div>
                 </div>
 
-                <h1 class="text-3xl font-bold mb-2">Welcome Back !</h1>
-                <p class="text-gray-600 mb-8">Silahkan Login Kembali</p>
+                <h1 class="mb-2 text-3xl font-bold">Welcome Back !</h1>
+                <p class="mb-8 text-gray-600">Silahkan Login Kembali</p>
 
-                <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
+                <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
                     {{ status }}
                 </div>
 
@@ -151,7 +150,7 @@ onMounted(() => {
                             <TextInput id="password" v-model="form.password" :type="showPassword ? 'text' : 'password'"
                                 required autocomplete="current-password" placeholder="Masukkan kata sandi" />
                             <button type="button" @click="showPassword = !showPassword"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                class="absolute text-gray-500 -translate-y-1/2 right-3 top-1/2 hover:text-gray-700">
                                 <EyeIcon v-if="!showPassword" class="w-5 h-5" />
                                 <EyeOffIcon v-else class="w-5 h-5" />
                             </button>
@@ -162,12 +161,12 @@ onMounted(() => {
                     <!-- Captcha Section -->
                     <div>
                         <div class="p-4 mb-2">
-                            <p class="text-blue-800 text-3xl font-semibold text-center">
+                            <p class="text-3xl font-semibold text-center text-blue-800">
                                 {{ captcha.num1 }} + {{ captcha.num2 }} =
                             </p>
                         </div>
                         <input type="number" v-model="captchaInput" required
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                            class="w-full px-4 py-3 transition-all border border-gray-200 rounded-lg outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
                             placeholder="Masukkan Captcha Hasil Penjumlahan" />
                         <p v-if="captchaError" class="mt-1 text-sm text-red-500">
                             {{ captchaError }}
@@ -178,17 +177,17 @@ onMounted(() => {
                     <div class="flex items-center justify-between mt-4">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <Checkbox v-model:checked="form.remember" name="remember" />
-                            <span class="ms-2 text-sm text-gray-600">Remember me</span>
+                            <span class="text-sm text-gray-600 ms-2">Remember me</span>
                         </label>
 
                         <Link v-if="canResetPassword" :href="route('password.request')"
-                            class="text-sm text-emerald-600 hover:text-emerald-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                            class="text-sm transition duration-150 ease-in-out text-emerald-600 hover:text-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                         Lupa Password ?
                         </Link>
                     </div>
 
                     <button :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
-                        class="w-full px-4 py-3 text-white bg-emerald-500 hover:bg-emerald-600 font-semibold rounded-lg transition-colors duration-300">
+                        class="w-full px-4 py-3 font-semibold text-white transition-colors duration-300 rounded-lg bg-emerald-500 hover:bg-emerald-600">
                         {{ form.processing ? "Logging in..." : "Log in" }}
                     </button>
 
@@ -197,12 +196,12 @@ onMounted(() => {
                             <div class="w-full border-t border-gray-200"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500">or continue</span>
+                            <span class="px-2 text-gray-500 bg-white">or continue</span>
                         </div>
                     </div>
 
                     <button type="button" @click="handleGoogleLogin"
-                        class="w-full flex items-center justify-center gap-3 border border-gray-200 hover:bg-gray-50 py-3 rounded-lg transition-colors"
+                        class="flex items-center justify-center w-full gap-3 py-3 transition-colors border border-gray-200 rounded-lg hover:bg-gray-50"
                         :disabled="form.processing">
                         <img src="/img/google.png" alt="Google" class="w-5 h-5" />
                         {{
@@ -213,19 +212,19 @@ onMounted(() => {
                     </button>
                 </form>
 
-                <p class="mt-8 text-center text-sm text-gray-600">
+                <p class="mt-8 text-sm text-center text-gray-600">
                     Belum memiliki Akun?
-                    <Link :href="route('register')" class="text-emerald-600 hover:text-emerald-700 font-medium">Daftar
+                    <Link :href="route('register')" class="font-medium text-emerald-600 hover:text-emerald-700">Daftar
                     Sekarang</Link>
                 </p>
             </div>
             <!-- End Left Side -->
 
             <!-- Right Side - Illustration -->
-            <div class="hidden sm:block w-1/2 bg-gray-300 dark:bg-gray-600 p-12 relative">
-                <div class="h-full flex flex-col items-center justify-center text-center">
+            <div class="relative hidden w-1/2 p-12 bg-gray-300 sm:block dark:bg-gray-600">
+                <div class="flex flex-col items-center justify-center h-full text-center">
                     <img src="/img/tugu.svg" alt="Login Illustration" class="mb-3" />
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    <h2 class="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
                         SIBEDAH SERU
                     </h2>
                     <p class="text-gray-600">
