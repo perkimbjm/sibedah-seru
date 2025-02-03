@@ -138,7 +138,7 @@
                     @endcan
 
 
-
+                    @can('content_management_access')
                     <li class="nav-item has-treeview {{ request()->is("app/faqs*") ? "menu-open" : "" }} {{ request()->is("app/links*") ? "menu-open" : "" }} {{ request()->is("app/downloads*") ? "menu-open" : "" }} ">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-laptop">
@@ -188,7 +188,7 @@
 
                         </ul>
                     </li>
-                {{-- @endcan --}}
+                @endcan
 
                 @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
                         <li class="nav-item">
