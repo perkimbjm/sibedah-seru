@@ -1,12 +1,16 @@
 <template>
     <MainLayout>
         <link rel="preload" href="/img/hero_c.webp" as="image" />
+
         <Head />
         <Hero />
         <Cta />
         <StatisticCard :statistics="statistics" />
+        <UsulanInfo />
+        <UsulanBenefits />
         <FeaturesList />
         <SearchFamily />
+        <ComplaintSection />
         <GalleryCard />
         <Faq :faqs="faqs" />
         <FooterBar :links="links" />
@@ -25,6 +29,9 @@ const ScrollTop = defineAsyncComponent(() => import('@/Components/ScrollTop.vue'
 const Cta = defineAsyncComponent(() => import('@/Components/Cta.vue'));
 const FeaturesList = defineAsyncComponent(() => import('@/Components/FeaturesList.vue'));
 const SearchFamily = defineAsyncComponent(() => import('@/Components/SearchFamily.vue'));
+const ComplaintSection = defineAsyncComponent(() => import('@/Components/ComplaintSection.vue'));
+const UsulanInfo = defineAsyncComponent(() => import('@/Components/UsulanInfo.vue'));
+const UsulanBenefits = defineAsyncComponent(() => import('@/Components/UsulanBenefits.vue'));
 const GalleryCard = defineAsyncComponent(() => import('@/Components/GalleryCard.vue'));
 const Faq = defineAsyncComponent(() => import('@/Pages/Faq.vue'));
 const StatisticCard = defineAsyncComponent(() => import('@/Pages/StatisticCard.vue'));
@@ -49,10 +56,12 @@ defineProps({
 
 <style>
 #text-hero {
-    min-height: 300px; /* Sesuaikan dengan tinggi teks */
+    min-height: 300px;
+    /* Sesuaikan dengan tinggi teks */
 }
 
 .hero-img {
-    aspect-ratio: 629 / 512; /* Sesuaikan dengan rasio gambar */
+    aspect-ratio: 629 / 512;
+    /* Sesuaikan dengan rasio gambar */
 }
 </style>

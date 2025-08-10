@@ -34,15 +34,39 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
+        // Rate limiting configuration
+        $this->configureRateLimiting();
+    }
+
+    /**
+     * Configure rate limiting for the application.
+     */
+    protected function configureRateLimiting(): void
+    {
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
+            // More permissive in development
+            if (app()->environment('local', 'development')) {
+                return Limit::perMinute(10)->by($throttleKey);
+            }
+
             return Limit::perMinute(5)->by($throttleKey);
+        });
+
+        RateLimiter::for('register', function (Request $request) {
+            $throttleKey = $request->ip();
+
+            // More permissive in development
+            if (app()->environment('local', 'development')) {
+                return Limit::perMinute(10)->by($throttleKey);
+            }
+
+            return Limit::perMinute(3)->by($throttleKey);
         });
 
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
-
     }
 }

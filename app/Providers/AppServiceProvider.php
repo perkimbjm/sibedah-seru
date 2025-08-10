@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\Verifikasi;
 use App\Observers\UserObserver;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Pagination\Paginator;
@@ -39,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         User::observe(UserObserver::class);
+
+        // Route model binding untuk Verifikasi
+        Route::model('verifikasi', Verifikasi::class);
 
         Paginator::useBootstrap();
     }

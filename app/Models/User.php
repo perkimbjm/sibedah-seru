@@ -12,11 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable implements Authorizable
 {
-    use HasFactory, HasRoles, TwoFactorAuthenticatable;
+    use HasFactory, HasRoles, TwoFactorAuthenticatable, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -96,6 +97,16 @@ class User extends Authenticatable implements Authorizable
         return asset('img/profile.webp');
     }
 
+    // Method untuk menangani error DataTables
+    public function __get($key)
+    {
+        if ($key === 'id') {
+            return $this->getKey();
+        }
+
+        return parent::__get($key);
+    }
+
     // Enable two-factor authentication
     public function enableTwoFactorAuthentication()
     {
@@ -135,5 +146,16 @@ class User extends Authenticatable implements Authorizable
     protected function createTwoFactorSecret()
     {
         return app('auth.password.broker')->createToken($this);
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
 }

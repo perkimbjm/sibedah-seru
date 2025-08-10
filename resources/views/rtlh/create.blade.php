@@ -13,19 +13,24 @@
 <div class="card">
     <div class="card-header">
         Tambah Data RTLH
+        @if(isset($verifikasiData))
+            <div class="mt-2 alert alert-info">
+                <i class="fas fa-info-circle"></i> Data ini berasal dari verifikasi usulan yang telah diterima.
+            </div>
+        @endif
     </div>
 
     <div class="card-body">
         <form method="POST" action="{{ route("app.rtlh.store") }}" enctype="multipart/form-data">
             @csrf
-            
+
             <!-- Identitas Diri dan Lokasi Rumah -->
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white">Identitas Diri dan Lokasi Rumah</div>
+            <div class="mb-3 card">
+                <div class="text-white card-header bg-info">Identitas Diri dan Lokasi Rumah</div>
                 <div class="card-body">
                     <div class="form-group">
                         <label class="required" for="nik">NIK</label>
-                        <input class="form-control {{ $errors->has('nik') ? 'is-invalid' : '' }}" type="number" name="nik" id="nik" value="{{ old('nik', '') }}" required pattern="[0-9]{16}" placeholder="Isi Nomor Identitas yang Valid (16 digit)">           
+                        <input class="form-control {{ $errors->has('nik') ? 'is-invalid' : '' }}" type="number" name="nik" id="nik" value="{{ old('nik', $verifikasiData['nik'] ?? request('nik')) }}" required pattern="[0-9]{16}" placeholder="Isi Nomor Identitas yang Valid (16 digit)">
                         @if($errors->has('nik'))
                             <span class="text-danger">{{ $errors->first('nik') }}</span>
                         @endif
@@ -33,7 +38,7 @@
 
                     <div class="form-group">
                         <label class="required" for="kk">KK</label>
-                        <input class="form-control {{ $errors->has('kk') ? 'is-invalid' : '' }}" type="number" name="kk" id="kk" value="{{ old('kk', '') }}" required pattern="[0-9]" placeholder="Isi Nomor Kartu Keluarga yang Valid">           
+                        <input class="form-control {{ $errors->has('kk') ? 'is-invalid' : '' }}" type="number" name="kk" id="kk" value="{{ old('kk', $verifikasiData['kk'] ?? request('kk')) }}" required pattern="[0-9]" placeholder="Isi Nomor Kartu Keluarga yang Valid">
                         @if($errors->has('kk'))
                             <span class="text-danger">{{ $errors->first('kk') }}</span>
                         @endif
@@ -41,7 +46,7 @@
 
                     <div class="form-group">
                         <label class="required" for="name">Nama</label>
-                        <input class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}" type="text" name="name" id="name" value="{{ old('name', '') }}" required placeholder="Masukkan Nama">
+                        <input class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}" type="text" name="name" id="name" value="{{ old('name', $verifikasiData['name'] ?? request('name')) }}" required placeholder="Masukkan Nama">
                         @if($errors->has('name'))
                             <span class="text-danger">{{ $errors->first('name') }}</span>
                         @endif
@@ -49,7 +54,7 @@
 
                     <div class="form-group">
                         <label class="required" for="address">Alamat</label>
-                        <input class="form-control {{ $errors->has('address') ? 'is-invalid' : '' }}" type="text" name="address" id="address" value="{{ old('address', '') }}" required placeholder="Masukkan Alamat (dengan nama desa)">
+                        <input class="form-control {{ $errors->has('address') ? 'is-invalid' : '' }}" type="text" name="address" id="address" value="{{ old('address', $verifikasiData['address'] ?? request('address')) }}" required placeholder="Masukkan Alamat (dengan nama desa)">
                         @if($errors->has('address'))
                             <span class="text-danger">{{ $errors->first('address') }}</span>
                         @endif
@@ -59,7 +64,7 @@
                         <label class="required" for="village_id">Kel / Desa</label>
                         <select class="form-control select2 {{ $errors->has('village_id') ? 'is-invalid' : '' }}" name="village_id" id="village_id" required>
                             @foreach($villages as $id => $village)
-                                <option value="{{ $id }}" {{ old('village_id') == $id? 'selected' : '' }}>{{ $village }}</option>
+                                <option value="{{ $id }}" {{ old('village_id', $verifikasiData['village_id'] ?? request('village_id')) == $id? 'selected' : '' }}>{{ $village }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('village_id'))
@@ -69,32 +74,32 @@
 
                     <div class="form-group">
                         <label class="required" for="district_id">Kecamatan</label>
-                        <input type="text" class="form-control" id="district_name" readonly>
-                        <input type="hidden" name="district_id" id="district_id" required>
+                        <input type="text" class="form-control" id="district_name" readonly value="{{ old('district_name', $verifikasiData['district_name'] ?? request('district_name')) }}">
+                        <input type="hidden" name="district_id" id="district_id" required value="{{ old('district_id', $verifikasiData['district_id'] ?? request('district_id')) }}">
                     </div>
 
                     <label>Geser Marker pada Peta</label>
-                    <div id="mapid" class="mb-3 mx-auto" style="min-height: 350px"></div>
+                    <div id="mapid" class="mx-auto mb-3" style="min-height: 350px"></div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="lat" class="control-label">Latitude</label>
-                                <input class="form-control {{ $errors->has('lat') ? 'is-invalid' : '' }}" type="text" name="lat" id="lat" value="{{ old('lat', request('lat')) }}" onfocus="this.value='-2.';">
+                                <input class="form-control {{ $errors->has('lat') ? 'is-invalid' : '' }}" type="text" name="lat" id="lat" value="{{ old('lat', $verifikasiData['lat'] ?? request('lat')) }}" onfocus="this.value='-2.';">
                                 @if($errors->has('lat'))
                                     <span class="text-danger">{{ $errors->first('lat') }}</span>
                                 @endif
-                                <span class="help-block text-sm">Masukkan garis Latitude / Lintang yang benar (format -2.xxx)</span>
+                                <span class="text-sm help-block">Masukkan garis Latitude / Lintang yang benar (format -2.xxx)</span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="lng" class="control-label">Longitude</label>
-                                <input class="form-control {{ $errors->has('lng') ? 'is-invalid' : '' }}" type="text" name="lng" id="lng" value="{{ old('lng', request('lng')) }}" onfocus="this.value='115.';">
+                                <input class="form-control {{ $errors->has('lng') ? 'is-invalid' : '' }}" type="text" name="lng" id="lng" value="{{ old('lng', $verifikasiData['lng'] ?? request('lng')) }}" onfocus="this.value='115.';">
                                 @if($errors->has('lng'))
                                     <span class="text-danger">{{ $errors->first('lng') }}</span>
                                 @endif
-                                <span class="help-block text-sm">Masukkan garis Longitude / Bujur yang benar (format 115.xxx)</span>
+                                <span class="text-sm help-block">Masukkan garis Longitude / Bujur yang benar (format 115.xxx)</span>
                             </div>
                         </div>
                     </div>
@@ -118,8 +123,8 @@
             </div>
 
             <!-- Struktural -->
-            <div class="card mb-3">
-                <div class="card-header bg-success text-white">Struktural</div>
+            <div class="mb-3 card">
+                <div class="text-white card-header bg-success">Struktural</div>
                 <div class="card-body">
                     <x-condition-select name="pondasi" label="Pondasi" :options="$kelayakanOptions" :errors="$errors" />
                     <x-condition-select name="kolom_blk" label="Kolom / Balok" :options="$kelayakanOptions" :errors="$errors" />
@@ -128,8 +133,8 @@
             </div>
 
             <!-- Non Struktural -->
-            <div class="card mb-3">
-                <div class="card-header bg-warning text-white">Non Struktural</div>
+            <div class="mb-3 card">
+                <div class="text-white card-header bg-warning">Non Struktural</div>
                 <div class="card-body">
                     <x-condition-select name="atap" label="Atap" :options="$kelayakanOptions" :errors="$errors" />
                     <x-condition-select name="dinding" label="Dinding" :options="$kelayakanOptions" :errors="$errors" />
@@ -138,8 +143,8 @@
             </div>
 
             <!-- Air Bersih -->
-            <div class="card mb-3">
-                <div class="card-header bg-primary text-white">Air Bersih</div>
+            <div class="mb-3 card">
+                <div class="text-white card-header bg-primary">Air Bersih</div>
                 <div class="card-body">
                     <x-condition-select name="air" label="Sumber Air Minum" :options="$airOptions" :errors="$errors" />
                     <x-condition-select name="jarak_tinja" label="Jarak Sumber Air Minum ke TPA Tinja" :options="$jarakTinjaOptions" :errors="$errors" />
@@ -147,8 +152,8 @@
             </div>
 
             <!-- Sanitasi -->
-            <div class="card mb-3">
-                <div class="card-header bg-danger text-white">Sanitasi</div>
+            <div class="mb-3 card">
+                <div class="text-white card-header bg-danger">Sanitasi</div>
                 <div class="card-body">
                     <x-condition-select name="wc" label="Kepemilikan WC" :options="$wcOptions" :errors="$errors" />
                     <x-condition-select name="jenis_wc" label="Jenis Kloset / WC" :options="$jenisWcOptions" :errors="$errors" />
@@ -157,8 +162,8 @@
             </div>
 
             <!-- Hasil Penilaian -->
-            <div class="card mb-3">
-                <div class="card-header bg-dark text-white">Hasil Penilaian</div>
+            <div class="mb-3 card">
+                <div class="text-white card-header bg-dark">Hasil Penilaian</div>
                 <div class="card-body">
                     <div class="form-group">
                         <label for="status_safety">Hasil Penilaian Keselamatan Bangunan</label>
@@ -195,108 +200,120 @@
 
 @section('scripts')
 <script>
-    $("#village_id").change(function(){
-        let selectedValue = $(this).val();
-        $.ajax({
-            url: "{{ route('app.rtlh.getKecamatan') }}?village_id=" + selectedValue,
-            type: 'GET',
-            success: function (data) {
-                if (data.district_name) {
-                    $('#district_name').val(data.district_name);
-                    $('#district_id').val(data.district_id);
-                } else {
-                    $('#district_name').val('');
-                    $('#district_id').val('');
-                    alert('Kecamatan tidak ditemukan.');
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log('Terjadi kesalahan: ' + error);
+    $(document).ready(function() {
+        // Function to fetch district based on village
+        function fetchDistrict(villageId) {
+            if (!villageId) {
+                $('#district_name').val('');
+                $('#district_id').val('');
+                return;
             }
+
+            $.ajax({
+                url: "{{ route('app.rtlh.getKecamatan') }}?village_id=" + villageId,
+                type: 'GET',
+                success: function (data) {
+                    if (data.district_name) {
+                        $('#district_name').val(data.district_name);
+                        $('#district_id').val(data.district_id);
+                    } else {
+                        $('#district_name').val('');
+                        $('#district_id').val('');
+                        console.warn('Kecamatan tidak ditemukan untuk desa ID:', villageId);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Terjadi kesalahan AJAX: ' + error);
+                }
+            });
+        }
+
+        // Event listener for village dropdown change
+        $("#village_id").change(function(){
+            fetchDistrict($(this).val());
         });
-    });
 
-    const kelayakanScores = {
-        'Layak': 20,
-        'Kurang Layak': 10,
-        'Tidak Layak': 0,
-    };
+        // Trigger change event on page load if a village is already selected
+        const initialVillageId = $("#village_id").val();
+        if (initialVillageId) {
+            // If district name is not pre-filled, fetch it.
+            if ($('#district_name').val() === '') {
+                 fetchDistrict(initialVillageId);
+            }
+        }
 
-    const airScores = {
-        'PDAM': 50,
-        'Isi Ulang': 50,
-        'Air Kemasan': 50,
-        'Sumur': 40,
-        'Pamsimas': 40,
-        'Mata Air': 30,
-        'Air Hujan': 20,
-    };
+        const kelayakanScores = {
+            'Layak': 20,
+            'Kurang Layak': 10,
+            'Tidak Layak': 0,
+        };
 
-    const jarakTinjaScores = {
-        '≥ 10 Meter': 50,
-        '≤ 10 Meter': 0,
-    };
+        const airScores = {
+            'PDAM': 50,
+            'Isi Ulang': 50,
+            'Air Kemasan': 50,
+            'Sumur': 40,
+            'Pamsimas': 40,
+            'Mata Air': 30,
+            'Air Hujan': 20,
+        };
 
-    const statusCategories = (score) => {
-        if (score > 80) return 'LAYAK';
-        if (score >= 60) return 'MENUJU LAYAK';
-        if (score >= 35) return 'KURANG LAYAK';
-        return 'TIDAK LAYAK';
-    };
+        const jarakTinjaScores = {
+            '≥ 10 Meter': 50,
+            '≤ 10 Meter': 0,
+        };
 
-    function calculateSafetyScore() {
-        let pondasi = kelayakanScores[$("select[name='pondasi']").val()] || 0;
-        let kolomBlk = kelayakanScores[$("select[name='kolom_blk']").val()] || 0;
-        let rngkAtap = kelayakanScores[$("select[name='rngk_atap']").val()] || 0;
+        const statusCategories = (score) => {
+            if (score > 80) return 'LAYAK';
+            if (score >= 60) return 'MENUJU LAYAK';
+            if (score >= 35) return 'KURANG LAYAK';
+            return 'TIDAK LAYAK';
+        };
 
-        let structuralScore = pondasi + kolomBlk + rngkAtap;
+        function calculateSafetyScore() {
+            let pondasi = kelayakanScores[$("select[name='pondasi']").val()] || 0;
+            let kolomBlk = kelayakanScores[$("select[name='kolom_blk']").val()] || 0;
+            let rngkAtap = kelayakanScores[$("select[name='rngk_atap']").val()] || 0;
+            let structuralScore = pondasi + kolomBlk + rngkAtap;
+            let atap = kelayakanScores[$("select[name='atap']").val()] || 0;
+            let dinding = kelayakanScores[$("select[name='dinding']").val()] || 0;
+            let lantai = kelayakanScores[$("select[name='lantai']").val()] || 0;
+            let nonStructuralScore = atap + dinding + lantai;
+            return structuralScore + nonStructuralScore;
+        }
 
-        let atap = kelayakanScores[$("select[name='atap']").val()] || 0;
-        let dinding = kelayakanScores[$("select[name='dinding']").val()] || 0;
-        let lantai = kelayakanScores[$("select[name='lantai']").val()] || 0;
+        function calculateCleanWaterScore() {
+            let air = airScores[$("select[name='air']").val()] || 0;
+            let jarakTinja = jarakTinjaScores[$("select[name='jarak_tinja']").val()] || 0;
+            return air + jarakTinja;
+        }
 
-        let nonStructuralScore = atap + dinding + lantai;
+        function calculateOverallScore(safetyScore, cleanWaterScore) {
+            let people = parseInt($("#people").val()) || 1; // Default to 1 to avoid division by zero
+            let area = parseInt($("#area").val()) || 0;
+            let roomAdequacyScore = (area / people) > 7 ? 100 : 0;
+            let sanitationScore = 0;
+            sanitationScore += $("select[name='wc']").val() === 'Milik Sendiri' ? 50 : 25;
+            sanitationScore += $("select[name='jenis_wc']").val() === 'Leher Angsa' ? 25 : 12.5;
+            sanitationScore += $("select[name='tpa_tinja']").val() === 'Tangki Septik' ? 25 : 0;
+            let totalScore = (safetyScore + cleanWaterScore + roomAdequacyScore + sanitationScore) / 4;
+            return totalScore;
+        }
 
-        return structuralScore + nonStructuralScore;
-    }
+        function updateScores() {
+            let safetyScore = calculateSafetyScore();
+            $("#status_safety").val(statusCategories(safetyScore));
+            let cleanWaterScore = calculateCleanWaterScore();
+            let overallScore = calculateOverallScore(safetyScore, cleanWaterScore);
+            $("#status").val(statusCategories(overallScore));
+        }
 
-    function calculateCleanWaterScore() {
-        let air = airScores[$("select[name='air']").val()] || 0;
-        let jarakTinja = jarakTinjaScores[$("select[name='jarak_tinja']").val()] || 0;
-        return air + jarakTinja;
-    }
+        // Event listener for all relevant inputs
+        $("select, input[type='number']").on("change keyup", updateScores);
 
-    function calculateOverallScore(safetyScore, cleanWaterScore) {
-        let people = parseInt($("#people").val()) || 0;
-        let area = parseInt($("#area").val()) || 0;
-
-        let roomAdequacyScore = area / people > 7 ? 100 : 0;
-
-        let sanitationScore = 0;
-        sanitationScore += $("select[name='wc']").val() === 'Milik Sendiri' ? 50 : 25;
-        sanitationScore += $("select[name='jenis_wc']").val() === 'Leher Angsa' ? 25 : 12.5;
-        sanitationScore += $("select[name='tpa_tinja']").val() === 'Tangki Septik' ? 25 : 0;
-
-        let totalScore = (safetyScore + cleanWaterScore + roomAdequacyScore + sanitationScore) / 4;
-        return totalScore;
-    }
-
-    function updateScores() {
-        let safetyScore = calculateSafetyScore();
-        $("#status_safety").val(statusCategories(safetyScore));
-
-        let cleanWaterScore = calculateCleanWaterScore();
-        let overallScore = calculateOverallScore(safetyScore, cleanWaterScore);
-        $("#status").val(statusCategories(overallScore));
-    }
-
-    // Event listener untuk semua input terkait
-    $("select, input").on("change keyup", function () {
+        // Initial calculation on page load
         updateScores();
     });
-
-    // Perhitungan awal (default)
-    updateScores();
 </script>
     <x-coordinate></x-coordinate>
 @endsection

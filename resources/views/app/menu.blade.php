@@ -1,6 +1,6 @@
 <aside class="overflow-y-hidden main-sidebar sidebar-green-info elevation-4" style="min-height: 917px;">
     <!-- Brand Logo -->
-    <a href="/" class="brand-link ">
+    <a href="/" class="brand-link">
         <img src="{{ asset('img/logo-sibedah.png') }}" alt="logo Sibedah-seru" class="brand-image" style="background: white; border-radius: 50%; padding:5px;">
         <span class="brand-text">SIBEDAH SERU</span>
     </a>
@@ -78,7 +78,7 @@
                 @endcan
 
                 @can('user_management_access')
-                    <li class="nav-item has-treeview {{ request()->is("app/permissions*") ? "menu-open" : "" }} {{ request()->is("app/roles*") ? "menu-open" : "" }} {{ request()->is("app/users*") ? "menu-open" : "" }} {{ request()->is("app/audit-logs*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("app/permissions*") ? "menu-open" : "" }} {{ request()->is("app/roles*") ? "menu-open" : "" }} {{ request()->is("app/users*") ? "menu-open" : "" }} {{ request()->is("app/audit-logs*") ? "menu-open" : "" }} {{ request()->is('app/security-logs*') ? 'menu-open' : '' }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-users">
 
@@ -101,6 +101,15 @@
                                     </a>
                                 </li>
 
+                                @can('security_log_access')
+                                <li class="nav-item">
+                                    <a href="{{ route('app.security-logs.index') }}" class="nav-link {{ request()->is('app/security-logs') || request()->is('app/security-logs/*') ? 'active' : '' }}">
+                                        <i class="fa-fw nav-icon fas fa-shield-alt"></i>
+                                        <p>Security Logs</p>
+                                    </a>
+                                </li>
+                                @endcan
+
                                 <li class="nav-item">
                                     <a href="{{ route("app.roles.index") }}" class="nav-link {{ request()->is("app/roles") || request()->is("app/roles/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-user-tag">
@@ -122,16 +131,7 @@
                                     </a>
                                 </li>
 
-                                {{-- <li class="nav-item">
-                                    <a href="{{ route("app.audit-logs.index") }}" class="nav-link {{ request()->is("app/audit-logs") || request()->is("app/audit-logs/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-clipboard-list">
 
-                                        </i>
-                                        <p>
-                                            Audit Log
-                                        </p>
-                                    </a>
-                                </li> --}}
 
                         </ul>
                     </li>
@@ -189,6 +189,63 @@
                         </ul>
                     </li>
                 @endcan
+
+
+                @can('usulan_access')
+                <li class="nav-item has-treeview {{ request()->is('usulan*') ? 'menu-open' : '' }}">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="fa-fw nav-icon fas fa-file-alt">
+                        </i>
+                        <p>
+                            Usulan Masyarakat
+                            <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('usulan.proposals.index') }}" class="nav-link {{ request()->is('usulan/proposals') || request()->is('usulan/proposals/*') ? 'active' : '' }}">
+                                <i class="fa-fw nav-icon fas fa-list">
+                                </i>
+                                <p>
+                                    Daftar Usulan
+                                </p>
+                            </a>
+                        </li>
+                        @if(auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 10 || auth()->user()->hasRole(['Super Admin', 'Admin', 'tfl']))
+                            @can('usulan_create')
+                            <li class="nav-item">
+                                <a href="{{ route('usulan.proposals.create') }}" class="nav-link {{ request()->is('usulan/proposals/create') ? 'active' : '' }}">
+                                    <i class="fa-fw nav-icon fas fa-plus">
+                                    </i>
+                                    <p>
+                                        Tambah Usulan
+                                    </p>
+                                </a>
+                            </li>
+                            @endcan
+                        @endif
+                        @can('verifikasi_access')
+                        <li class="nav-item">
+                            <a href="{{ route('usulan.verifikasi-management.verifikasi.index') }}" class="nav-link {{ request()->is('usulan/verifikasi-management') || request()->is('usulan/verifikasi-management/*') ? 'active' : '' }}">
+                                <i class="mr-2 fas fa-check-circle"></i>
+                                <span>Verifikasi Usulan</span>
+                            </a>
+                        </li>
+                        @endcan
+                    </ul>
+                </li>
+                @endcan
+
+                <!-- Menu Pengaduan -->
+                <li class="nav-item">
+                    <a href="{{ route('aduan.index') }}" class="nav-link {{ request()->is('aduan') || request()->is('aduan/*') ? 'active' : '' }}">
+                        <i class="fa-fw nav-icon fas fa-comment-alt">
+                        </i>
+                        <p>
+                            Manajemen Pengaduan
+                        </p>
+                    </a>
+                </li>
 
                 @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
                         <li class="nav-item">

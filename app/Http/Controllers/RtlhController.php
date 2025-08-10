@@ -118,8 +118,28 @@ class RtlhController extends Controller
 
         $tpaTinjaOptions = ['Tangki Septik', 'Lubang Tanah', 'IPAL', 'Kolam/Sawah/Sungai/Danau/Laut', 'Pantai/Tanah Lapang/Kebun'];
 
+        // Data dari verifikasi (jika ada)
+        $fromVerifikasi = request('from_verifikasi');
+        $verifikasiData = null;
 
-        return view('rtlh.create', compact('districts', 'villages', 'kelayakanOptions', 'jenisWcOptions', 'airOptions', 'jarakTinjaOptions', 'wcOptions', 'tpaTinjaOptions'));
+        if ($fromVerifikasi) {
+            $verifikasi = \App\Models\Verifikasi::with(['usulan.user', 'usulan.district', 'usulan.village'])->find($fromVerifikasi);
+            if ($verifikasi && $verifikasi->isAccepted()) {
+                $verifikasiData = [
+                    'nik' => $verifikasi->usulan->nik,
+                    'kk' => $verifikasi->usulan->nomor_kk,
+                    'name' => $verifikasi->usulan->nama,
+                    'address' => $verifikasi->usulan->alamat_lengkap,
+                    'district_id' => $verifikasi->usulan->district_id,
+                    'village_id' => $verifikasi->usulan->village_id,
+                    'district_name' => $verifikasi->usulan->district->name ?? '',
+                    'lat' => $verifikasi->usulan->latitude,
+                    'lng' => $verifikasi->usulan->longitude,
+                ];
+            }
+        }
+
+        return view('rtlh.create', compact('districts', 'villages', 'kelayakanOptions', 'jenisWcOptions', 'airOptions', 'jarakTinjaOptions', 'wcOptions', 'tpaTinjaOptions', 'verifikasiData'));
     }
 
     public function store(StoreRtlhRequest $request)

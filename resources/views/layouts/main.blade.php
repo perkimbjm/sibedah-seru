@@ -46,6 +46,11 @@
 
             <!-- Right navbar links -->
                 <ul class="ml-auto navbar-nav">
+                    @can('notification_access')
+                    <li class="nav-item">
+                        @include('components.notification-bell')
+                    </li>
+                    @endcan
                     <li class="nav-item">
                         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
                         <i class="text-gray-500 fas fa-expand-arrows-alt"></i>
@@ -103,6 +108,7 @@
     @stack('after-script')
 
     @yield('scripts')
+    @stack('scripts')
 </body>
 
 </html>

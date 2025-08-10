@@ -7,8 +7,20 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import { createPinia } from "pinia";
 import { loadAOS } from "./utils/aos";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {
+    faBullhorn,
+    faClipboardList,
+    faClock,
+    faBolt,
+    faChartLine,
+} from "@fortawesome/free-solid-svg-icons";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+
+// Register only the icons we actually use to keep bundle light
+library.add(faBullhorn, faClipboardList, faClock, faBolt, faChartLine);
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -24,12 +36,15 @@ createInertiaApp({
 
         // Inisialisasi Pinia untuk state management
         const pinia = createPinia();
-       
+
         // Tambahkan event listener untuk memuat AOS setelah halaman selesai dimuat
         window.addEventListener("load", loadAOS);
 
         // Daftarkan semua plugin
         app.use(plugin).use(ZiggyVue, Ziggy).use(pinia);
+
+        // Register Font Awesome component globally
+        app.component("font-awesome-icon", FontAwesomeIcon);
 
         // Mount aplikasi utama ke elemen root
         return app.mount(el);
