@@ -2,28 +2,26 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Role;
 use Closure;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AuthGates
 {
     public function handle($request, Closure $next)
     {
-        // $user = \Auth::user();
         $user = Auth::user();
+
         if ($user) {
-            $roles            = Role::with('permissions')->get();
-            $permissionsArray = [];
-            foreach ($roles as $role) {
-                foreach ($role->permissions as $permissions) {
-                    $permissionsArray[$permissions->name][] = $role->id;
-                }
-            }
-            foreach ($permissionsArray as $name => $roles) {
-                Gate::define($name, function ($user) use ($roles) {
-                    return count(array_intersect($user->roles->pluck('id')->toArray(), $roles)) > 0;
+            // Dapatkan semua permissions
+            $permissions = Permission::all();
+
+            // Define gates untuk setiap permission
+            foreach ($permissions as $permission) {
+                Gate::define($permission->name, function ($user) use ($permission) {
+                    return $user->hasPermissionTo($permission->name);
                 });
             }
         }

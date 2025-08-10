@@ -1,9 +1,9 @@
-
 <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1,user-scalable=yes,maximum-scale=1,width=device-width">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Sistem Informasi Bedah Seribu Rumah Kabupaten Balangan">
     <meta name="author" content="dinas pupr-perkim Kabupaten Balangan Kalimantan Selatan">
     <meta name='keywords' content='WebGIS, WebGIS bedah rumah, WebGIS pupr perkim, Sistem informasi bedah rumah'/>

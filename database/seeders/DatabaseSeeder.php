@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UsersTableSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\TflRoleAndUsersSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,7 +21,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UsersTableSeeder::class,
             PermissionsTableSeeder::class,
-            RoleAndPermissionsSeeder::class
+            RolesAndPermissionsSeeder::class,
+            AduanPermissionsSeeder::class,
+            TflRoleAndUsersSeeder::class
         ]);
     }
 }

@@ -15,7 +15,20 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\SanitizeInput::class,
+            \App\Http\Middleware\ValidateCaptcha::class,
+            \App\Http\Middleware\IpBlocking::class,
+            \App\Http\Middleware\AuthGates::class,
             // 'verify.api.token' => \App\Http\Middleware\VerifyApiToken::class,
+        ]);
+
+        // Register middleware aliases
+        $middleware->alias([
+            'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
+            'sanitize.input' => \App\Http\Middleware\SanitizeInput::class,
+            'validate.captcha' => \App\Http\Middleware\ValidateCaptcha::class,
+            'ip.blocking' => \App\Http\Middleware\IpBlocking::class,
         ]);
 
         //

@@ -3,6 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Sistem Informasi Bedah Seribu Rumah Kabupaten Balangan">
     <meta name="author" content="dinas pupr-perkim Kabupaten Balangan Kalimantan Selatan">
     <meta name='keywords' content='WebGIS, WebGIS bedah rumah, WebGIS pupr perkim, Sistem informasi bedah rumah'/>
@@ -28,7 +29,7 @@
     <meta name="msapplication-TileImage" content="{{ asset('img/icons/favicon/favicon-144x144.png')}}">
     <meta name="theme-color" content="#ffffff">
     <meta name="robots" content="index, follow">
- 
+
     <meta property="og:title" content="SIBEDAH SERU Kabupaten Balangan" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ url('/map') }}" />
