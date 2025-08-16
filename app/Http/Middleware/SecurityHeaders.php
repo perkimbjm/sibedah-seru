@@ -40,12 +40,12 @@ class SecurityHeaders
         } else {
             // Production CSP - More restrictive but still allows necessary resources
             $csp = "default-src 'self'; " .
-                   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com https://cdnjs.cloudflare.com; " .
-                   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; " .
-                   "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
+                   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com https://api.mapbox.com https://api.tiles.mapbox.com https://cdn.datatables.net https://stackpath.bootstrapcdn.com https://cdn.rawgit.com; " .
+                   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://api.mapbox.com https://api.tiles.mapbox.com https://cdn.datatables.net https://stackpath.bootstrapcdn.com; " .
+                   "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.bunny.net; " .
                    "img-src 'self' data: https:; " .
                    "connect-src 'self' https:; " .
-                   "frame-src 'self' https:; " .
+                   "frame-src 'self' https: https://app.atlas.co; " .
                    "object-src 'none'; " .
                    "base-uri 'self'; " .
                    "form-action 'self';";
