@@ -152,7 +152,7 @@
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" name="belum_pernah_bantuan" id="belum_pernah_bantuan" value="1">
                                                 <label class="custom-control-label" for="belum_pernah_bantuan">
-                                                    <i class="mr-2 fas fa-hand-holding-heart"></i>Belum Pernah Menerima Bantuan Perumahan dari Pemerintah dalam 5 Tahun terakhir
+                                                    <i class="mr-2 fas fa-hand-holding-heart"></i>Belum Pernah Menerima Bantuan Perumahan dari Pemerintah dalam 10 Tahun terakhir
                                                 </label>
                                             </div>
                                         </div>
