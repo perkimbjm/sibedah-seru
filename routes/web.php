@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LinkController;
@@ -296,10 +297,30 @@ Route::middleware('guest')->group(function () {
 
     // Register routes with rate limiting
     Route::get('register', function () {
+        // Log register page access for debugging
+        Log::info('Register page GET request', [
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'environment' => app()->environment(),
+            'timestamp' => now()->toISOString(),
+            'session_id' => session()->getId()
+        ]);
+
         return Inertia::render('Auth/Register');
     })->name('register');
 
     Route::post('register', function (Request $request) {
+        // Log register POST request for debugging
+        Log::info('Register page POST request', [
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'environment' => app()->environment(),
+            'timestamp' => now()->toISOString(),
+            'session_id' => session()->getId(),
+            'has_email' => $request->has('email'),
+            'has_captcha' => $request->has('captcha')
+        ]);
+
         // Use Fortify's built-in registration handling
         return app(\Laravel\Fortify\Http\Controllers\RegisteredUserController::class)->store(
             $request,

@@ -12,6 +12,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Log;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -56,13 +57,22 @@ class FortifyServiceProvider extends ServiceProvider
 
         RateLimiter::for('register', function (Request $request) {
             $throttleKey = $request->ip();
+            $environment = app()->environment();
 
-            // More permissive in development
+            // Log rate limiting attempts for debugging
+            Log::info('Register rate limiting check', [
+                'ip' => $request->ip(),
+                'environment' => $environment,
+                'timestamp' => now()->toISOString()
+            ]);
+
+            // More permissive in development, but reasonable for production
             if (app()->environment('local', 'development')) {
                 return Limit::perMinute(10)->by($throttleKey);
             }
 
-            return Limit::perMinute(3)->by($throttleKey);
+            // Increase production limit to 5 per minute (was 3)
+            return Limit::perMinute(5)->by($throttleKey);
         });
 
         RateLimiter::for('two-factor', function (Request $request) {
