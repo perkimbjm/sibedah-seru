@@ -25,6 +25,12 @@ class ValidateCaptcha
             return $next($request);
         }
 
+        // Hanya validasi captcha untuk POST request, bukan GET request
+        // GET request untuk menampilkan form register tidak perlu validasi captcha
+        if ($request->isMethod('GET')) {
+            return $next($request);
+        }
+
         $captcha = $request->input('captcha');
 
         if (!$captcha) {
