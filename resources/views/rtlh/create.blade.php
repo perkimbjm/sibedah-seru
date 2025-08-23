@@ -85,7 +85,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="lat" class="control-label">Latitude</label>
-                                <input class="form-control {{ $errors->has('lat') ? 'is-invalid' : '' }}" type="text" name="lat" id="lat" value="{{ old('lat', $verifikasiData['lat'] ?? request('lat')) }}" onfocus="this.value='-2.';">
+                                <div class="input-group">
+                                    <input class="form-control {{ $errors->has('lat') ? 'is-invalid' : '' }}" type="text" name="lat" id="lat" value="{{ old('lat', $verifikasiData['lat'] ?? request('lat')) }}" onfocus="this.value='-2.';">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#dmsModal">
+                                            <i class="fas fa-calculator"></i> DMS
+                                        </button>
+                                    </div>
+                                </div>
                                 @if($errors->has('lat'))
                                     <span class="text-danger">{{ $errors->first('lat') }}</span>
                                 @endif
@@ -95,7 +102,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="lng" class="control-label">Longitude</label>
-                                <input class="form-control {{ $errors->has('lng') ? 'is-invalid' : '' }}" type="text" name="lng" id="lng" value="{{ old('lng', $verifikasiData['lng'] ?? request('lng')) }}" onfocus="this.value='115.';">
+                                <div class="input-group">
+                                    <input class="form-control {{ $errors->has('lng') ? 'is-invalid' : '' }}" type="text" name="lng" id="lng" value="{{ old('lng', $verifikasiData['lng'] ?? request('lng')) }}" onfocus="this.value='115.';">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#dmsModal">
+                                            <i class="fas fa-calculator"></i> DMS
+                                        </button>
+                                    </div>
+                                </div>
                                 @if($errors->has('lng'))
                                     <span class="text-danger">{{ $errors->first('lng') }}</span>
                                 @endif
@@ -196,6 +210,96 @@
     </div>
 </div>
 
+<!-- Modal Konversi DMS -->
+<div class="modal fade" id="dmsModal" tabindex="-1" role="dialog" aria-labelledby="dmsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dmsModalLabel">
+                    <i class="fas fa-calculator"></i> Konversi Koordinat DMS ke Desimal
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Latitude DMS -->
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Latitude (Lintang)</h6>
+                        <div class="form-group">
+                            <label for="lat_degree">Derajat</label>
+                            <input type="number" class="form-control" id="lat_degree" min="0" max="90" placeholder="0-90">
+                        </div>
+                        <div class="form-group">
+                            <label for="lat_minute">Menit</label>
+                            <input type="number" class="form-control" id="lat_minute" min="0" max="59" placeholder="0-59">
+                        </div>
+                        <div class="form-group">
+                            <label for="lat_second">Detik</label>
+                            <input type="number" class="form-control" id="lat_second" min="0" max="59" step="0.001" placeholder="0-59.999">
+                        </div>
+                        <div class="form-group">
+                            <label for="lat_direction">Arah</label>
+                            <select class="form-control" id="lat_direction">
+                                <option value="N">Utara (N)</option>
+                                <option value="S">Selatan (S)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Hasil Konversi Latitude:</label>
+                            <input type="text" class="form-control" id="lat_result" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Longitude DMS -->
+                    <div class="col-md-6">
+                        <h6 class="text-success">Longitude (Bujur)</h6>
+                        <div class="form-group">
+                            <label for="lng_degree">Derajat</label>
+                            <input type="number" class="form-control" id="lng_degree" min="0" max="180" placeholder="0-180">
+                        </div>
+                        <div class="form-group">
+                            <label for="lng_minute">Menit</label>
+                            <input type="number" class="form-control" id="lng_minute" min="0" max="59" placeholder="0-59">
+                        </div>
+                        <div class="form-group">
+                            <label for="lng_second">Detik</label>
+                            <input type="number" class="form-control" id="lng_second" min="0" max="59" step="0.001" placeholder="0-59.999">
+                        </div>
+                        <div class="form-group">
+                            <label for="lng_direction">Arah</label>
+                            <select class="form-control" id="lng_direction">
+                                <option value="E">Timur (E)</option>
+                                <option value="W">Barat (W)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Hasil Konversi Longitude:</label>
+                            <input type="text" class="form-control" id="lng_result" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Petunjuk:</strong> Masukkan koordinat dalam format DMS (Derajat, Menit, Detik) dan pilih arah yang sesuai.
+                    Sistem akan mengkonversi ke format desimal yang dapat digunakan dalam form.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="convertDmsBtn">
+                    <i class="fas fa-calculator"></i> Konversi
+                </button>
+                <button type="button" class="btn btn-success" id="applyDmsBtn" disabled>
+                    <i class="fas fa-check"></i> Terapkan ke Form
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -241,6 +345,150 @@
                  fetchDistrict(initialVillageId);
             }
         }
+
+        // DMS Conversion Functions
+        function convertDMSToDecimal(degree, minute, second, direction) {
+            let decimal = degree + (minute / 60) + (second / 3600);
+
+            if (direction === 'S' || direction === 'W') {
+                decimal = -decimal;
+            }
+
+            return decimal.toFixed(6);
+        }
+
+        function validateDMSInputs() {
+            const latDegree = parseInt($('#lat_degree').val()) || 0;
+            const latMinute = parseInt($('#lat_minute').val()) || 0;
+            const latSecond = parseFloat($('#lat_second').val()) || 0;
+            const lngDegree = parseInt($('#lng_degree').val()) || 0;
+            const lngMinute = parseInt($('#lng_minute').val()) || 0;
+            const lngSecond = parseFloat($('#lng_second').val()) || 0;
+
+            // Validate latitude
+            if (latDegree < 0 || latDegree > 90) {
+                alert('Latitude derajat harus antara 0-90');
+                return false;
+            }
+            if (latMinute < 0 || latMinute > 59) {
+                alert('Latitude menit harus antara 0-59');
+                return false;
+            }
+            if (latSecond < 0 || latSecond >= 60) {
+                alert('Latitude detik harus antara 0-59.999');
+                return false;
+            }
+
+            // Validate longitude
+            if (lngDegree < 0 || lngDegree > 180) {
+                alert('Longitude derajat harus antara 0-180');
+                return false;
+            }
+            if (lngMinute < 0 || lngMinute > 59) {
+                alert('Longitude menit harus antara 0-59');
+                return false;
+            }
+            if (lngSecond < 0 || lngSecond >= 60) {
+                alert('Longitude detik harus antara 0-59.999');
+                return false;
+            }
+
+            return true;
+        }
+
+        function performDMSConversion() {
+            if (!validateDMSInputs()) {
+                return;
+            }
+
+            const latDegree = parseInt($('#lat_degree').val()) || 0;
+            const latMinute = parseInt($('#lat_minute').val()) || 0;
+            const latSecond = parseFloat($('#lat_second').val()) || 0;
+            const latDirection = $('#lat_direction').val();
+
+            const lngDegree = parseInt($('#lng_degree').val()) || 0;
+            const lngMinute = parseInt($('#lng_minute').val()) || 0;
+            const lngSecond = parseFloat($('#lng_second').val()) || 0;
+            const lngDirection = $('#lng_direction').val();
+
+            // Convert to decimal
+            const latDecimal = convertDMSToDecimal(latDegree, latMinute, latSecond, latDirection);
+            const lngDecimal = convertDMSToDecimal(lngDegree, lngMinute, lngSecond, lngDirection);
+
+            // Display results
+            $('#lat_result').val(latDecimal);
+            $('#lng_result').val(lngDecimal);
+
+            // Enable apply button
+            $('#applyDmsBtn').prop('disabled', false);
+
+            // Show success message
+            $('<div class="alert alert-success alert-dismissible fade show" role="alert">')
+                .html('<i class="fas fa-check-circle"></i> Konversi berhasil! Klik "Terapkan ke Form" untuk menggunakan hasil konversi.')
+                .insertAfter('.alert-info');
+        }
+
+        function applyDMSToForm() {
+            const latDecimal = $('#lat_result').val();
+            const lngDecimal = $('#lng_result').val();
+
+            if (latDecimal && lngDecimal) {
+                // Update form inputs
+                $('#lat').val(latDecimal);
+                $('#lng').val(lngDecimal);
+
+                // Update map marker if map exists
+                if (typeof updateMapMarker === 'function') {
+                    updateMapMarker(parseFloat(latDecimal), parseFloat(lngDecimal));
+                }
+
+                // Close modal
+                $('#dmsModal').modal('hide');
+
+                // Show success message
+                $('<div class="alert alert-success alert-dismissible fade show" role="alert">')
+                    .html('<i class="fas fa-check-circle"></i> Koordinat berhasil diterapkan ke form!')
+                    .insertAfter('.card-header')
+                    .delay(3000)
+                    .fadeOut();
+            }
+        }
+
+        // Event listeners for DMS conversion
+        $('#convertDmsBtn').click(performDMSConversion);
+        $('#applyDmsBtn').click(applyDMSToForm);
+
+        // Reset modal when opened
+        $('#dmsModal').on('show.bs.modal', function() {
+            $('#lat_degree, #lat_minute, #lat_second').val('');
+            $('#lng_degree, #lng_minute, #lng_second').val('');
+            $('#lat_result, #lng_result').val('');
+            $('#applyDmsBtn').prop('disabled', true);
+            $('.alert-success').remove();
+        });
+
+        // Auto-format inputs
+        $('#lat_degree, #lng_degree').on('input', function() {
+            const value = parseInt($(this).val());
+            const max = $(this).attr('id').includes('lat') ? 90 : 180;
+            if (value > max) {
+                $(this).val(max);
+            }
+        });
+
+        $('#lat_minute, #lng_minute').on('input', function() {
+            const value = parseInt($(this).val());
+            if (value > 59) {
+                $(this).val(59);
+            }
+        });
+
+        $('#lat_second, #lng_second').on('input', function() {
+            const value = parseFloat($(this).val());
+            if (value >= 60) {
+                $(this).val(59.999);
+            }
+        });
 
         const kelayakanScores = {
             'Layak': 20,
