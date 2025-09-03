@@ -23,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
             // 'verify.api.token' => \App\Http\Middleware\VerifyApiToken::class,
         ]);
 
+        $middleware->api(prepend: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+
         // Register middleware aliases
         $middleware->alias([
             'security.headers' => \App\Http\Middleware\SecurityHeaders::class,

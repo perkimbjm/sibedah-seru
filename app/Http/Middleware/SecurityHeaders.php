@@ -24,6 +24,12 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
+        // CORS Headers for cross-origin requests
+        $response->headers->set('Access-Control-Allow-Origin', 'http://sibedahseru.balangankab.go.id');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+
         // Content Security Policy - Different for development and production
         if (app()->environment('local', 'development')) {
             // Development CSP - Completely permissive for development
