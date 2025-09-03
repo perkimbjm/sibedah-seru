@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'build/*'],
     'allowed_methods' => ['*'],
     'allowed_origins' => ['*'],  // In production, set this to your frontend URL
     'allowed_origins_patterns' => [],
