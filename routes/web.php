@@ -117,6 +117,65 @@ Route::get('/proxy/wms', [ProxyController::class, 'proxyGeoserverWMS'])->name('p
 
 Route::get('file-manager/thumbnail/{path}', [FileManagerController::class, 'showThumbnail'])->where('path', '.*')->name('file-manager.thumbnail');
 
+// CORS route untuk static assets
+Route::get('build/assets/{file}', function ($file) {
+    $filePath = public_path("build/assets/{$file}");
+
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+
+    $response = response()->file($filePath);
+
+    // Add CORS headers
+    $response->headers->set('Access-Control-Allow-Origin', 'http://sibedahseru.balangankab.go.id');
+    $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    $response->headers->set('Access-Control-Allow-Credentials', 'true');
+
+    return $response;
+})->where('file', '.*')->name('cors.assets');
+
+// CORS route untuk manifest
+Route::get('js/manifest.webmanifest', function () {
+    $filePath = public_path('js/manifest.webmanifest');
+
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+
+    $response = response()->file($filePath);
+
+    // Add CORS headers
+    $response->headers->set('Access-Control-Allow-Origin', 'http://sibedahseru.balangankab.go.id');
+    $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    $response->headers->set('Access-Control-Allow-Credentials', 'true');
+
+    return $response;
+})->name('cors.manifest');
+
+// Handle OPTIONS preflight requests
+Route::options('build/assets/{file}', function () {
+    $response = response('', 204);
+    $response->headers->set('Access-Control-Allow-Origin', 'http://sibedahseru.balangankab.go.id');
+    $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    $response->headers->set('Access-Control-Allow-Credentials', 'true');
+    $response->headers->set('Access-Control-Max-Age', '1728000');
+    return $response;
+})->where('file', '.*');
+
+Route::options('js/manifest.webmanifest', function () {
+    $response = response('', 204);
+    $response->headers->set('Access-Control-Allow-Origin', 'http://sibedahseru.balangankab.go.id');
+    $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    $response->headers->set('Access-Control-Allow-Credentials', 'true');
+    $response->headers->set('Access-Control-Max-Age', '1728000');
+    return $response;
+});
+
 
 Route::middleware([
     'auth:sanctum',
