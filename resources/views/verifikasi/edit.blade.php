@@ -57,7 +57,7 @@
                                                 'memiliki_alas_hak' => 'Memiliki Alas Hak yang Sah',
                                                 'satu_satunya_rumah' => 'Merupakan Satu-satunya Rumah',
                                                 'belum_pernah_bantuan' => 'Belum Pernah Menerima Bantuan Sejenis',
-                                                'berpenghasilan_rendah' => 'Termasuk Masyarakat Berpenghasilan Rendah (MBR)',
+                                                'berpenghasilan_rendah' => 'Berpenghasilan maksimal senilai Upah Minimum Balangan',
                                             ];
                                         @endphp
                                         @foreach($criteria as $key => $label)

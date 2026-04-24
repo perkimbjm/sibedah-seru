@@ -10,7 +10,7 @@
         <meta property="og:title" content="SIBEDAH SERU" />
         <meta property="og:description" content="Sistem Informasi Bedah Rumah Kabupaten Balangan" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://sibedahseru.web.id" />
+        <link rel="canonical" href="http://sibedahseru.balangankab.go.id" />
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />

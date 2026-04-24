@@ -1,47 +1,25 @@
 <template>
-    <section id="statistic" class="pt-8 pb-12 bg-white bg-cover my-10">
+    <section id="statistic" class="pt-8 pb-12 my-10 bg-white bg-cover">
         <div class="w-full bg-white rounded-lg dark:bg-gray-800">
-            <h1
-                class="text-center text-gray-900 text-4xl dark:text-gray-400 mx-auto mt-3 mb-1 font-bold"
-            >
+            <h1 class="mx-auto mt-3 mb-1 text-4xl font-bold text-center text-gray-900 dark:text-gray-400">
                 BEDAH SERU DALAM ANGKA
             </h1>
             <div class="relative mt-3">
-                <div
-                    class="absolute inset-x-1/2 w-28 h-px bg-gray-300 transform -translate-x-1/2 bottom-0.5"
-                ></div>
-                <div
-                    class="absolute inset-x-1/2 w-9 h-1 bg-green-500 transform -translate-x-1/2 bottom-0"
-                ></div>
+                <div class="absolute bottom-0.5 inset-x-1/2 w-28 h-px bg-gray-300 transform -translate-x-1/2"></div>
+                <div class="absolute bottom-0 inset-x-1/2 w-9 h-1 bg-green-500 transform -translate-x-1/2"></div>
             </div>
 
             <dl
-                class="my-8 mx-auto text-gray-900 dark:text-white sm:p-8 flex flex-col items-center justify-around md:flex-row"
-            >
-                <div
-                    v-for="(statistic, index) in statistics"
-                    :key="index"
-                    class="flex flex-col items-center md:mr-8 my-8"
-                >
-                    <dt
-                        class="mb-2 text-6xl hover:text-7xl font-bold transition-all duration-500 ease-in-out"
-                    >
-                        <span
-                            ref="counterRefs"
-                            :data-target="statistic.value"
-                            :data-index="index"
-                        >
+                class="flex flex-col justify-around items-center mx-auto my-8 text-gray-900 dark:text-white sm:p-8 md:flex-row">
+                <div v-for="(statistic, index) in statistics" :key="index"
+                    class="flex flex-col items-center my-8 md:mr-8">
+                    <dt class="mb-2 text-6xl font-bold transition-all duration-500 ease-in-out hover:text-7xl">
+                        <span ref="counterRefs" :data-target="statistic.value" :data-index="index">
                             0
                         </span>
                     </dt>
-                    <dd
-                        class="flex items-center text-gray-500 dark:text-gray-400 gap-2 text-lg"
-                    >
-                        <component
-                            :is="statistic.icon"
-                            class="w-6 h-6"
-                            :stroke-width="2"
-                        />
+                    <dd class="flex gap-2 items-center text-lg text-gray-500 dark:text-gray-400">
+                        <component :is="statistic.icon" class="w-6 h-6" :stroke-width="2" />
                         {{ statistic.label }}
                     </dd>
                 </div>
@@ -61,7 +39,7 @@ const statistics = ref([
         icon: MapPinHouse,
     },
     {
-        value: "1134",
+        value: "1164",
         label: "Rumah yang Diperbaiki",
         icon: HousePlus,
     },

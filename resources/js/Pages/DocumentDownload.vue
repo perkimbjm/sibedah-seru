@@ -358,7 +358,3 @@ const downloadSelected = async () => {
     });
 };
 </script>
-
-<style>
-/* Additional styling if needed */
-</style>

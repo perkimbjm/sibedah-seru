@@ -45,17 +45,17 @@ class SecurityHeaders
                    "form-action *;";
         } else {
             // Production CSP - More restrictive but still allows necessary resources
-            $csp = "default-src 'self' https://sibedahseru.web.id; " .
-                   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sibedahseru.web.id https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com https://api.mapbox.com https://api.tiles.mapbox.com https://cdn.datatables.net https://stackpath.bootstrapcdn.com https://cdn.rawgit.com; " .
-                   "style-src 'self' 'unsafe-inline' https://sibedahseru.web.id https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://api.mapbox.com https://api.tiles.mapbox.com https://cdn.datatables.net https://stackpath.bootstrapcdn.com; " .
-                   "font-src 'self' https://sibedahseru.web.id https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.bunny.net; " .
-                   "img-src 'self' data: https: https://sibedahseru.web.id; " .
-                   "connect-src 'self' https: https://sibedahseru.web.id; " .
-                   "frame-src 'self' https: https://app.atlas.co https://sibedahseru.web.id; " .
-                   "manifest-src 'self' https://sibedahseru.web.id; " .
+            $csp = "default-src 'self' http://sibedahseru.balangankab.go.id; " .
+                   "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://sibedahseru.balangankab.go.id https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com https://api.mapbox.com https://api.tiles.mapbox.com https://cdn.datatables.net https://stackpath.bootstrapcdn.com https://cdn.rawgit.com; " .
+                   "style-src 'self' 'unsafe-inline' http://sibedahseru.balangankab.go.id https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://api.mapbox.com https://api.tiles.mapbox.com https://cdn.datatables.net https://stackpath.bootstrapcdn.com; " .
+                   "font-src 'self' http://sibedahseru.balangankab.go.id https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.bunny.net; " .
+                   "img-src 'self' data: https: http://sibedahseru.balangankab.go.id; " .
+                   "connect-src 'self' https: http://sibedahseru.balangankab.go.id; " .
+                   "frame-src 'self' https: https://app.atlas.co http://sibedahseru.balangankab.go.id; " .
+                   "manifest-src 'self' http://sibedahseru.balangankab.go.id; " .
                    "object-src 'none'; " .
-                   "base-uri 'self' https://sibedahseru.web.id; " .
-                   "form-action 'self' https://sibedahseru.web.id;";
+                   "base-uri 'self' http://sibedahseru.balangankab.go.id; " .
+                   "form-action 'self' http://sibedahseru.balangankab.go.id;";
         }
 
         $response->headers->set('Content-Security-Policy', $csp);

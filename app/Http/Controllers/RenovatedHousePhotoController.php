@@ -16,7 +16,7 @@ use App\Http\Requests\MassDestroyRenovatedHousePhotoRequest;
 class RenovatedHousePhotoController extends Controller
 {
     public function index(House $house)
-    {   
+    {
         abort_if(Gate::denies('renovated_house_photo_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $photos = $house->renovatedHousePhotos()->paginate(10);
         return view('gallery.index', compact('house', 'photos'));

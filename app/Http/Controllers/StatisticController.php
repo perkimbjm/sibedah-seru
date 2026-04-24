@@ -13,7 +13,7 @@ class StatisticController extends Controller
     {
         $uniqueVillages = House::distinct()->count('village_id');
         $totalRtlh = Rtlh::where('is_renov', false)->count();
-        $renovatedHouses = House::count() + 525;
+        $renovatedHouses = House::count() + 556;
 
         return [
             [
