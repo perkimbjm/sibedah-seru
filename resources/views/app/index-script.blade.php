@@ -20,6 +20,29 @@
     let selectAllButtonTrans = 'Select All'
     let selectNoneButtonTrans = 'Deselect All'
 
+    let exportFormatBody = function (data, row, column, node) {
+      if (typeof data === 'string') {
+        // 1. Strip HTML tags (replace tags with spaces to prevent words from sticking together)
+        let cleanData = data.replace(/<[^>]*>/g, ' ').trim();
+        
+        // 2. Decode HTML entities using textarea element
+        let txt = document.createElement("textarea");
+        txt.innerHTML = cleanData;
+        cleanData = txt.value;
+        
+        // 3. Normalize multiple whitespace characters
+        cleanData = cleanData.replace(/\s+/g, ' ').trim();
+        
+        // 4. If it's a NIK (exactly 16 digits), prepend Zero Width Non-Joiner to preserve string format
+        if (/^\d{16}$/.test(cleanData)) {
+          return '\u200C' + cleanData;
+        }
+        
+        return cleanData;
+      }
+      return data;
+    };
+
     let languages = {
       'id': 'https://cdn.datatables.net/plug-ins/1.10.19/i18n/Indonesian.json',
           'en': 'https://cdn.datatables.net/plug-ins/1.10.19/i18n/English.json'
@@ -74,7 +97,10 @@
           className: 'btn-default',
           text: copyButtonTrans,
           exportOptions: {
-            columns: ':visible'
+            columns: ':visible',
+            format: {
+              body: exportFormatBody
+            }
           }
         },
         {
@@ -82,7 +108,10 @@
           className: 'btn-default',
           text: csvButtonTrans,
           exportOptions: {
-            columns: ':visible'
+            columns: ':visible',
+            format: {
+              body: exportFormatBody
+            }
           }
         },
         {
@@ -90,7 +119,10 @@
           className: 'btn-default',
           text: excelButtonTrans,
           exportOptions: {
-            columns: ':visible:not(:first-child):not(:last-child)'
+            columns: ':visible:not(:first-child):not(:last-child)',
+            format: {
+              body: exportFormatBody
+            }
           }
         },
         {
