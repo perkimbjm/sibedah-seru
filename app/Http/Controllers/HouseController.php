@@ -27,7 +27,7 @@ class HouseController extends Controller
     {
         abort_if(Gate::denies('house_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $houses = House::select('id', 'name', 'nik', 'address', 'district', 'year', 'type', 'source')->get();
+        $houses = House::select('id', 'name', 'nik', 'address', 'lat', 'lng', 'district', 'year', 'type', 'source')->get();
 
         return view('house.index', compact('houses'));
     }

@@ -47,6 +47,12 @@
                             Alamat
                         </th>
                         <th>
+                            Latitude
+                        </th>
+                        <th>
+                            Longitude
+                        </th>
+                        <th>
                             Kecamatan
                         </th>
                         <th>
@@ -58,7 +64,7 @@
                         <th>
                             Sumber Dana
                         </th>
-                        <th>
+                        <th class="no-export">
                             Galeri
                         </th>
 
@@ -85,6 +91,12 @@
                             </td>
                             <td>
                                 {{ $house->address?? '' }}
+                            </td>
+                            <td>
+                                {{ $house->lat ?? '' }}
+                            </td>
+                            <td>
+                                {{ $house->lng ?? '' }}
                             </td>
                             <td>
                                 {{ $house->district ?? '' }}
@@ -174,6 +186,59 @@
   }
   dtButtons.push(deleteButton)
 @endcan
+
+  // Indeks kolom Latitude (5) & Longitude (6) sesuai urutan kolom tabel.
+  // Nilai koordinat dipaksa menjadi teks saat ekspor agar Excel tidak mengubahnya
+  // menjadi angka desimal (presisi terpotong / notasi ilmiah).
+  const coordColumnIndexes = [5, 6];
+  // Kolom NIK (indeks 3) selalu diperlakukan sebagai teks berapa pun jumlah digitnya.
+  const nikColumnIndexes = [3];
+  const exportFormatBodyHouse = function (data, row, column, node) {
+    let cleanData = data;
+    if (typeof cleanData === 'string') {
+      // Buang seluruh elemen tautan (beserta teksnya) — tautan adalah aksi, bukan data.
+      cleanData = cleanData.replace(/<a\b[^>]*>[\s\S]*?<\/a>/gi, ' ');
+      // Bersihkan tag HTML dan decode entity.
+      cleanData = cleanData.replace(/<[^>]*>/g, ' ').trim();
+      let txt = document.createElement('textarea');
+      txt.innerHTML = cleanData;
+      cleanData = txt.value.replace(/\s+/g, ' ').trim();
+    }
+    if (cleanData === null || cleanData === undefined || cleanData === '') {
+      return cleanData;
+    }
+    // Zero Width Non-Joiner memaksa Excel/Sheets memperlakukan nilai sebagai teks.
+    if (coordColumnIndexes.indexOf(column) !== -1) {
+      return '\u200C' + cleanData;
+    }
+    // Paksa kolom NIK, serta setiap rangkaian angka panjang (>= 15 digit), menjadi teks.
+    // Ini mencegah Excel me-right-align (tipe number) dan memangkas presisi angka besar
+    // (mis. NIK 17 digit yang berubah menjadi ...0000), termasuk NIK yang bukan 16 digit.
+    if (typeof cleanData === 'string' && /^\d+$/.test(cleanData) &&
+        (nikColumnIndexes.indexOf(column) !== -1 || cleanData.length >= 15)) {
+      return '\u200C' + cleanData;
+    }
+    return cleanData;
+  };
+  const exportButtonKinds = ['copy', 'csv', 'excel', 'pdf', 'print'];
+  dtButtons.forEach(function (btn) {
+    if (!btn || exportButtonKinds.indexOf(btn.extend) === -1) {
+      return;
+    }
+    btn.exportOptions = btn.exportOptions || {};
+    // Kecualikan kolom Galeri (ditandai class .no-export) dari hasil ekspor.
+    if (typeof btn.exportOptions.columns === 'string') {
+      if (btn.exportOptions.columns.indexOf('.no-export') === -1) {
+        btn.exportOptions.columns += ':not(.no-export)';
+      }
+    } else {
+      btn.exportOptions.columns = ':visible:not(.no-export)';
+    }
+    if (btn.extend === 'csv' || btn.extend === 'excel' || btn.extend === 'copy') {
+      btn.exportOptions.format = btn.exportOptions.format || {};
+      btn.exportOptions.format.body = exportFormatBodyHouse;
+    }
+  });
 
   $.extend(true, $.fn.dataTable.defaults, {
     orderCellsTop: true,

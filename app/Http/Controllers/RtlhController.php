@@ -35,6 +35,8 @@ class RtlhController extends Controller
                     'rtlh.name',
                     'rtlh.nik',
                     'rtlh.address',
+                    'rtlh.lat',
+                    'rtlh.lng',
                     'rtlh.district_id',
                     'districts.name as district_name',
                     'rtlh.people',

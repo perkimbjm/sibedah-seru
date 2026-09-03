@@ -89,46 +89,75 @@ class HousePhotoController extends Controller
     {
         abort_if(Gate::denies('house_photo_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        // Jika ada file foto baru
-        if ($request->hasFile('photo')) {
-            // Hapus foto lama
-            Storage::disk('public')->delete($photo->photo_url);
-
-            // Proses file baru
-            $file = $request->file('photo');
-
-            // Konversi nama file sesuai format
-            $name = strtoupper(Str::slug($rtlh->name, '-'));
-            $extension = $file->getClientOriginalExtension();
-            $filename = "{$rtlh->id}_{$name}.{$extension}";
-            $folder = "rtlh";
-
-            // Cek apakah file dengan nama yang sama sudah ada
-            if (Storage::disk('public')->exists("{$folder}/{$filename}")) {
-                // Tambahkan angka urut jika file sudah ada
-                $counter = 2;
-                while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
-                    $filename = "{$rtlh->id}_{$name}_{$counter}.{$extension}";
-                    $counter++;
-                }
-            }
-
-            $manager = new ImageManager(Driver::class);
-
-            $image = $manager->read($file)->scale(width: 600);
-
-
-            $image->toWebp(75)->save(storage_path("app/public/{$folder}/{$filename}"));
-            
-            // Update path foto di database
-            $photo->photo_url = "{$folder}/{$filename}";
-        }
-
-        // Update data lainnya
-        $photo->update([
-            'description' => $request->description,
+        $request->validate([
+            'photo' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:10240',
+            ],
+            'description' => ['nullable', 'string', 'max:255'],
         ]);
 
-        return redirect()->route('app.rutilahu.index', $rtlh)->with('success', 'Photo updated successfully.');
+        try {
+
+            if ($request->hasFile('photo')) {
+
+                $file = $request->file('photo');
+
+                if (!$file->isValid()) {
+                    return back()->withErrors([
+                        'photo' => 'File yang diupload tidak valid.'
+                    ]);
+                }
+
+                if ($photo->photo_url) {
+                    Storage::disk('public')->delete($photo->photo_url);
+                }
+
+                $folder = 'rtlh';
+
+                $name = strtoupper(Str::slug($rtlh->name, '-'));
+
+                $filename = "{$rtlh->id}_{$name}.webp";
+
+                $counter = 2;
+
+                while (Storage::disk('public')->exists("{$folder}/{$filename}")) {
+                    $filename = "{$rtlh->id}_{$name}_{$counter}.webp";
+                    $counter++;
+                }
+
+                $manager = new ImageManager(new Driver());
+
+                $image = $manager
+                    ->read($file)
+                    ->scale(width: 600);
+
+                Storage::disk('public')->put(
+                    "{$folder}/{$filename}",
+                    (string) $image->toWebp(75)
+                );
+
+                $photo->photo_url = "{$folder}/{$filename}";
+            }
+
+            $photo->description = $request->description;
+            $photo->save();
+
+            return redirect()
+                ->route('app.rutilahu.index', $rtlh)
+                ->with('success', 'Foto berhasil diperbarui.');
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'photo' => 'Gagal memproses gambar.'
+                ]);
+        }
     }
 }
