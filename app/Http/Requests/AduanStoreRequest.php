@@ -48,7 +48,7 @@ class AduanStoreRequest extends FormRequest
             'district_id' => 'required|exists:districts,id',
             'village_id' => 'required|exists:villages,id',
             'complain' => 'required|string|max:2000|min:10',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072|dimensions:max_width=4000,max_height=4000',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|extensions:jpeg,png,jpg,gif,webp|max:3072|dimensions:max_width=4000,max_height=4000',
             'captcha' => Auth::check() ? 'nullable|integer' : 'required|integer', // Untuk user login, captcha opsional
         ];
     }
@@ -75,6 +75,7 @@ class AduanStoreRequest extends FormRequest
             'complain.max' => 'Isi pengaduan maksimal 2000 karakter.',
             'foto.image' => 'File harus berupa gambar.',
             'foto.mimes' => 'Format foto harus jpeg, png, jpg, gif, atau webp.',
+            'foto.extensions' => 'Ekstensi foto harus jpeg, png, jpg, gif, atau webp.',
             'foto.max' => 'Ukuran foto maksimal 3MB.',
             'foto.dimensions' => 'Dimensi foto maksimal 4000x4000 pixel.',
             'captcha.required' => 'Captcha wajib diisi.',

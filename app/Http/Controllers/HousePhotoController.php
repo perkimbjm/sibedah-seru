@@ -31,12 +31,18 @@ class HousePhotoController extends Controller
     public function store(Request $request, Rtlh $rtlh)
     {
         abort_if(Gate::denies('house_photo_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
         // Ambil file dari request
         $file = $request->file('photo');
 
-        // Konversi nama file sesuai format
+        // Konversi nama file sesuai format; gambar selalu disimpan ulang sebagai WebP
         $name = strtoupper(Str::slug($rtlh->name, '-'));
-        $extension = $file->getClientOriginalExtension();
+        $extension = 'webp';
         $filename = "{$rtlh->id}_{$name}.{$extension}";
         $folder = "rtlh";
 

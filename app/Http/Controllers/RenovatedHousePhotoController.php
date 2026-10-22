@@ -45,7 +45,8 @@ class RenovatedHousePhotoController extends Controller
 
         // Konversi nama file sesuai format
         $name = strtoupper(Str::slug($house->name, '-'));
-        $extension = $file->getClientOriginalExtension();
+        // Gambar selalu disimpan ulang sebagai WebP, jangan pakai ekstensi kiriman klien
+        $extension = 'webp';
         $filename = "{$house->id}_{$name}.{$extension}";
 
         // Folder berdasarkan progres
@@ -102,6 +103,11 @@ class RenovatedHousePhotoController extends Controller
     public function update(Request $request, House $house, RenovatedHousePhoto $photo)
     {
         abort_if(Gate::denies('renovated_house_photo_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $request->validate([
+            'photo' => 'nullable|image|max:6144',
+        ]);
+
         // Jika ada file foto baru
         if ($request->hasFile('photo')) {
             // Hapus foto lama
@@ -113,7 +119,7 @@ class RenovatedHousePhotoController extends Controller
 
             // Konversi nama file sesuai format
             $name = strtoupper(Str::slug($house->name, '-'));
-            $extension = $file->getClientOriginalExtension();
+            $extension = 'webp';
             $filename = "{$house->id}_{$name}.{$extension}";
 
             // Folder berdasarkan progres

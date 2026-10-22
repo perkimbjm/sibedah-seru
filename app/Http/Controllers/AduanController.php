@@ -173,12 +173,6 @@ class AduanController extends Controller
                     return response()->json([
                         'success' => false,
                         'message' => 'Captcha salah. Silakan coba lagi.',
-                        'debug' => [
-                            'expected' => 'session_not_found',
-                            'received' => $request->captcha,
-                            'session_id' => session()->getId(),
-                            'fallback_used' => true
-                        ]
                     ], 422);
                 }
 
@@ -192,12 +186,6 @@ class AduanController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Captcha salah. Silakan coba lagi.',
-                    'debug' => [
-                        'expected' => $captchaAnswer,
-                        'received' => $request->captcha,
-                        'session_id' => session()->getId(),
-                        'fallback_used' => false
-                    ]
                 ], 422);
             }
         } else {
@@ -216,7 +204,8 @@ class AduanController extends Controller
         if ($request->hasFile('foto')) {
             try {
                 $foto = $request->file('foto');
-                $fotoName = 'aduan_' . time() . '_' . uniqid() . '.' . $foto->getClientOriginalExtension();
+                // Ekstensi diambil dari MIME hasil deteksi isi file, bukan dari nama file kiriman klien
+                $fotoName = 'aduan_' . time() . '_' . uniqid() . '.' . $foto->extension();
                 $fotoPath = $foto->storeAs('aduan', $fotoName, 'public');
                 $validated['foto'] = $fotoPath;
             } catch (\Exception $e) {

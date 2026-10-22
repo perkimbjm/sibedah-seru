@@ -176,10 +176,8 @@ class UsulanController extends Controller
 
             // Handle file upload
             if ($request->hasFile('foto_rumah')) {
-                $file = $request->file('foto_rumah');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('usulan/fotos', $filename, 'public');
-                $validatedData['foto_rumah'] = $path;
+                // store() memakai nama acak + ekstensi dari MIME, bukan nama file kiriman klien
+                $validatedData['foto_rumah'] = $request->file('foto_rumah')->store('usulan/fotos', 'public');
             }
 
             $usulan = Usulan::create($validatedData);
@@ -248,10 +246,7 @@ class UsulanController extends Controller
                     Storage::disk('public')->delete($usulan->foto_rumah);
                 }
 
-                $file = $request->file('foto_rumah');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('usulan/fotos', $filename, 'public');
-                $validatedData['foto_rumah'] = $path;
+                $validatedData['foto_rumah'] = $request->file('foto_rumah')->store('usulan/fotos', 'public');
             }
 
             $usulan->update($validatedData);

@@ -55,6 +55,7 @@ class UpdateUsulanRequest extends FormRequest
                 'file',
                 'image',
                 'mimes:jpeg,jpg,png,webp',
+                'extensions:jpeg,jpg,png,webp',
                 'max:2048', // 2MB max
             ],
             'latitude' => [

@@ -29,7 +29,7 @@ class UserStoreRequest extends FormRequest
             'role_id' => ['required', 'integer', 'exists:roles,id'],
             'email_verified_at' => ['nullable'],
             'phone' => ['nullable', 'string', 'min:11', 'max:14', 'unique:users,phone',],
-            'profile_photo_path' => ['nullable'],
+            'profile_photo_path' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'extensions:jpeg,jpg,png,webp'],
         ];
     }
 }
